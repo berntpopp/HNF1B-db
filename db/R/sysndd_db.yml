@@ -1,0 +1,7 @@
+db_setup:
+  dbtype: mysql
+  dbname: hnf1b_db
+  username: bernt
+  password: HNF1B-db
+  server: 127.0.0.1
+  port: 6612

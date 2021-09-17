@@ -1,0 +1,441 @@
+############################################
+## load libraries
+library(tidyverse)		##needed for general table operations
+library(googlesheets4)	##needed as interface to google sheets
+library(easyPubMed)		##needed for pubmed queries
+############################################
+
+
+############################################
+## set working directory (needs to be adapted to your specific working directory)
+setwd("C:/Users/bernt/OneDrive/!projekte/Nephrologie/HNF1B-db/db/R")
+## set global options
+options(scipen = 999)
+############################################
+
+
+############################################
+## define functions
+pubmed_info_from_pmid <- function(pmid_tibble, request_max = 200) {
+	input_tibble <- as_tibble(pmid_tibble) %>%
+		mutate(publication_id = as.character(value)) %>%
+		select(-value)
+	
+	row_number <- nrow(input_tibble)
+	groups_number <- ceiling(row_number/request_max)
+	
+	input_tibble_request <- input_tibble %>%
+		mutate(group = sample(1:groups_number, row_number, replace=T)) %>%
+		group_by(group) %>%
+		mutate(publication_id = paste0(publication_id, "[PMID]")) %>%
+		mutate(publication_id = str_flatten(publication_id, collapse = " or ")) %>%
+		unique() %>%
+		ungroup() %>%
+		rowwise() %>%
+		mutate(response = fetch_pubmed_data(get_pubmed_ids(publication_id), encoding = "ASCII")) %>%
+		ungroup() %>%
+		mutate(new_PM_df = map(response, ~table_articles_byAuth(pubmed_data = .x, 
+                                   included_authors = "first", 
+                                   max_chars = 1000, 
+                                   encoding = "ASCII"))) %>%
+		unnest(cols = new_PM_df) %>%
+		select(-publication_id, -group, -response) %>%
+		select(publication_id = pmid, DOI = doi, Title = title, Abstract = abstract, Year = year, Month = month, Day = day, Journal_abbreviation = jabbrv, Journal = journal, Keywords= keywords, Lastname = lastname, Firstname = firstname)
+
+	ouput_tibble <- input_tibble %>%
+		left_join(input_tibble_request, by = "publication_id")
+	
+	return(ouput_tibble)
+}
+############################################
+
+
+
+#to do: add report date (for sorting, take this from the publication)
+############################################
+## load all the sheets from the googlesheets curation table and reformat
+individuals_sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1jE4-HmyAh1FUK6Ph7AuHt2UDVW2mTINTWXBtAWqhVSw", sheet = "Individuals")
+reviewers_sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1jE4-HmyAh1FUK6Ph7AuHt2UDVW2mTINTWXBtAWqhVSw", sheet = "Reviewers")
+publications_sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1jE4-HmyAh1FUK6Ph7AuHt2UDVW2mTINTWXBtAWqhVSw", sheet = "Publications")
+
+phenotype_sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1jE4-HmyAh1FUK6Ph7AuHt2UDVW2mTINTWXBtAWqhVSw", sheet = "Phenotype")
+phenotype_modifier_sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1jE4-HmyAh1FUK6Ph7AuHt2UDVW2mTINTWXBtAWqhVSw", sheet = "Phenotype_modifier")
+phenotype_described_sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1jE4-HmyAh1FUK6Ph7AuHt2UDVW2mTINTWXBtAWqhVSw", sheet = "Phenotype_described")
+############################################
+
+
+
+############################################
+## create user table
+user <- reviewers_sheet %>%
+	select(user_id, user_name, password, email, user_role, first_name, family_name, orcid) %>%
+	arrange(user_id)
+View(user)
+############################################
+
+
+
+############################################
+## create publication table
+
+# to do: add publication type for literature without individuals from publication sheet
+publication_type <- individuals_sheet %>%
+	select(publication_alias = Publication, publication_type = PublicationType) %>%
+	unique() %>%
+	arrange(publication_alias)
+
+
+report_publication_connect <- individuals_sheet %>%
+	select(publication_alias = Publication, report_id, individual_id) %>%
+	left_join(publications_sheet, by = c("publication_alias")) %>%
+	select(report_id, publication_id, individual_id) %>%
+	arrange(individual_id, publication_id) %>% 
+	mutate(report_publication_id = row_number()) %>%
+	select(report_publication_id, report_id, publication_id, individual_id) 
+View(report_publication_connect)
+
+
+# to do: add info from sheet if no pmid entry or missing fields
+publication <- publications_sheet %>%
+	left_join(publication_type, by = c("publication_alias")) %>%
+	mutate(publication_user_id = 3) %>%
+	mutate(publication_entry_date = as.Date("2021-11-01")) %>%
+	select(publication_id, publication_alias, publication_type, publication_user_id, publication_entry_date, PMID, DOI, PDF) %>%
+	mutate(pubmed_info = pubmed_info_from_pmid(PMID)) %>%
+	mutate(title = pubmed_info$Title) %>%
+	mutate(abstract = pubmed_info$Abstract) %>%
+	mutate(year = pubmed_info$Year) %>%
+	mutate(month = pubmed_info$Month) %>%
+	mutate(day = pubmed_info$Day) %>%
+	mutate(publication_date = paste0(year,"-",month,"-",day)) %>%
+	mutate(publication_date = na_if(publication_date, "NA-NA-NA")) %>%	
+	mutate(journal_abbreviation = pubmed_info$Journal_abbreviation) %>%
+	mutate(journal = pubmed_info$Journal) %>%
+	mutate(keywords = pubmed_info$Keywords) %>%
+	mutate(firstauthor_lastname = pubmed_info$Lastname) %>%
+	mutate(firstauthor_firstname = pubmed_info$Firstname) %>%
+	select(-pubmed_info, -year, -month, -day) %>%
+	mutate(update_date = strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d"))
+View(publication)
+############################################
+
+
+
+############################################
+## create intermediate report tables
+report_table <- individuals_sheet %>%
+	left_join(reviewers_sheet, by = c("ReviewBy" = "email")) %>%
+	select(report_id, report_user_id = user_id, report_review_date = ReviewDate, individual_id, reported_multiple = DupCheck, 
+		publication = Publication,
+		cohort = Cohort, 
+		sex_reported = Sex,
+		onset_age = AgeOnset, 
+		report_age = AgeReported,
+		family_history = FamilyHistory,
+		RenalInsufficancy,
+		Hyperechogenicity,
+		RenalCysts,
+		MulticysticDysplasticKidney,
+		KidneyBiopsy,
+		RenalHypoplasia,
+		SolitaryKidney,
+		UrinaryTractMalformation,
+		GenitalTractAbnormality,
+		AntenatalRenalAbnormalities,
+		Hypomagnesemia,
+		Hypokalemia,
+		Hyperuricemia,
+		Gout,
+		MODY,
+		PancreaticHypoplasia,
+		ExocrinePancreaticInsufficiency,
+		Hyperparathyroidism,
+		NeurodevelopmentalDisorder,
+		MentalDisease,
+		Seizures,
+		BrainAbnormality,
+		PrematureBirth,
+		CongenitalCardiacAnomalies,
+		EyeAbnormality,
+		ShortStature,
+		MusculoskeletalFeatures,
+		DysmorphicFeatures,
+		ElevatedHepaticTransaminase,
+		AbnormalLiverPhysiology
+	) %>%
+	arrange(report_id)
+
+phenotype_sheet_select_join_phenotype_name <- phenotype_sheet %>%
+	select(phenotype_category, phenotype_id, phenotype_name)
+phenotype_sheet_select_join_phenotype_category <- phenotype_sheet %>%
+	select(phenotype_category, phenotype_id) %>%
+	filter( !(phenotype_category %in% c("RenalInsufficancy", "KidneyBiopsy")) )
+
+
+## create phenotype helper tables
+phenotype_modifier_select <- phenotype_modifier_sheet %>%
+	select(modifier_id, modifier_name)
+phenotype_described_select <- phenotype_described_sheet %>%
+	select(described_id, described_name)
+phenotype_select <- phenotype_sheet %>%
+	select(phenotype_id, phenotype_name, phenotype_description, phenotype_synonyms, phenotype_recommendation, phenotype_category)
+
+
+## create report_phenotype_connect table
+report_phenotype_connect <- report_table %>%
+	select(report_id,
+		sex_reported,
+		RenalInsufficancy,
+		Hyperechogenicity,
+		RenalCysts,
+		MulticysticDysplasticKidney,
+		KidneyBiopsy,
+		RenalHypoplasia,
+		SolitaryKidney,
+		UrinaryTractMalformation,
+		GenitalTractAbnormality,
+		AntenatalRenalAbnormalities,
+		Hypomagnesemia,
+		Hypokalemia,
+		Hyperuricemia,
+		Gout,
+		MODY,
+		PancreaticHypoplasia,
+		ExocrinePancreaticInsufficiency,
+		Hyperparathyroidism,
+		NeurodevelopmentalDisorder,
+		MentalDisease,
+		Seizures,
+		BrainAbnormality,
+		PrematureBirth,
+		CongenitalCardiacAnomalies,
+		EyeAbnormality,
+		ShortStature,
+		MusculoskeletalFeatures,
+		DysmorphicFeatures,
+		ElevatedHepaticTransaminase,
+		AbnormalLiverPhysiology) %>%
+		pivot_longer(!report_id, names_to = "phenotype_category", values_to = "value") %>%
+	separate_rows(value, sep = " and ") %>%
+	mutate(value = str_replace(value, "chronic kidney disease, not specified", "Chronic kidney disease")) %>%
+	left_join(phenotype_sheet_select_join_phenotype_name, by = c("value" = "phenotype_name")) %>%
+	mutate(phenotype_category = phenotype_category.x) %>%
+	select(-phenotype_category.x, -phenotype_category.y) %>%
+	left_join(phenotype_sheet_select_join_phenotype_category, by = c("phenotype_category")) %>%
+	mutate(phenotype_id = case_when(
+		is.na(phenotype_id.x) ~ phenotype_id.y,
+		!is.na(phenotype_id.x) ~ phenotype_id.x,
+		)
+	) %>%
+	select(-phenotype_id.x, -phenotype_id.y) %>%
+	mutate(phenotype_id = case_when(
+		is.na(phenotype_id) & (phenotype_category == "RenalInsufficancy") ~ "HP:0012622",
+		is.na(phenotype_id) & (phenotype_category == "KidneyBiopsy") ~ "HP:0100611;ORPHA:2260",
+		!is.na(phenotype_id) ~ phenotype_id
+		)
+	) %>%
+	separate_rows(phenotype_id, sep = ";") %>%
+	mutate(phenotype_described = case_when(
+		value == "no" ~ value,
+		value == "yes" ~ value,
+		value == "not reported" ~ value,
+		!(value %in% c("no", "yes", "not reported")) ~ "yes"
+		)
+	) %>%
+	mutate(modifier_name = case_when(
+		value == "unilateral left" ~ "Left",
+		value == "unilateral right" ~ "Right",
+		value == "unilateral unspecified" ~ "Unilateral",
+		value == "bilateral" ~ "Bilateral",
+		phenotype_category %in% c("CongenitalCardiacAnomalies", "AntenatalRenalAbnormalities") ~ "Congenital onset",
+		)
+	) %>% 
+	left_join(phenotype_modifier_select, by = c("modifier_name")) %>% 
+	left_join(phenotype_described_select, by = c("phenotype_described" = "described_name")) %>% 
+	arrange(report_id, phenotype_id, modifier_id, described_id) %>% 
+	mutate(report_phenotype_id = row_number()) %>% 
+	select(report_phenotype_id, report_id, phenotype_id, modifier_id, described_id)
+View(report_phenotype_connect)
+
+
+## create intermediate report table
+publication_dates <- publication %>%
+	select(publication_alias, publication_date)
+
+report_intermediate <- report_table %>%
+	select(report_id, publication, report_user_id, report_review_date, individual_id, reported_multiple, sex_reported, cohort, onset_age, report_age, family_history) %>%
+	mutate(reported_multiple = str_remove(reported_multiple, pattern = ",.*")) %>%
+	mutate(reported_multiple = case_when(
+		reported_multiple == "duplicate" ~ TRUE,
+		reported_multiple != "duplicate" ~ FALSE
+		)
+	) %>%
+	mutate(onset_age = na_if(onset_age, "not reported")) %>%
+	mutate(onset_prenatal = case_when(
+		cohort == "fetus" ~ TRUE,
+		cohort != "fetus" & str_detect(onset_age, pattern = "w") ~ TRUE,
+		cohort != "fetus" & str_detect(onset_age, pattern = "prenatal") ~ TRUE,
+		cohort != "fetus" ~ FALSE
+		)
+	) %>%
+	mutate(report_age = na_if(report_age, "not reported")) %>%
+	mutate(report_prenatal = case_when(
+		cohort == "fetus" ~ TRUE,
+		cohort != "fetus" & str_detect(report_age, pattern = "w") ~ TRUE,
+		cohort != "fetus" & str_detect(report_age, pattern = "prenatal") ~ TRUE,
+		cohort != "fetus" ~ FALSE
+		)
+	)%>%
+	mutate(onset_age = case_when(
+		str_detect(onset_age, pattern = "w") ~ "prenatal",
+		!str_detect(onset_age, pattern = "w") ~ onset_age,
+		)
+	) %>%
+	mutate(report_age = case_when(
+		str_detect(report_age, pattern = "w") ~ "prenatal",
+		!str_detect(report_age, pattern = "w") ~ report_age,
+		)
+	) %>%
+	mutate(onset_age = na_if(onset_age, "prenatal")) %>%
+	mutate(report_age = na_if(report_age, "prenatal")) %>%
+	mutate(onset_age = na_if(onset_age, "postnatal")) %>%
+	mutate(report_age = na_if(report_age, "postnatal")) %>%
+	separate(onset_age, c("onset_y", "onset_m"), "y") %>%
+	separate(report_age, c("report_y", "report_m"), "y") %>%
+	mutate(onset_m = str_remove(onset_m, pattern = "m")) %>%
+	mutate(report_m = str_remove(report_m, pattern = "m")) %>%
+	mutate(onset_m = case_when(
+		onset_m == "" ~ "0",
+		onset_m != "" ~ onset_m,
+		)
+	) %>%
+	mutate(report_m = case_when(
+		report_m == "" ~ "0",
+		report_m != "" ~ report_m,
+		)
+	) %>%
+	mutate(onset_age = str_c(onset_y, "y", onset_m, "m")) %>%
+	mutate(report_age = str_c(report_y, "y", report_m, "m")) %>%
+	left_join(publication_dates, by = c("publication" = "publication_alias")) %>%
+	select(report_id, report_date = publication_date, report_user_id, report_review_date, individual_id, sex_reported, reported_multiple, cohort, onset_prenatal, onset_age, report_prenatal, report_age, family_history) %>%
+	arrange(report_id)
+
+
+# generate helper tables
+sex_select <- report_intermediate %>%
+	select(sex_name = sex_reported) %>%
+	unique() %>% 
+	mutate(sex_id = row_number()) %>% 
+	select(sex_id, sex_name)
+
+cohort_select <- report_intermediate %>%
+	select(cohort_name = cohort) %>%
+	unique() %>% 
+	mutate(cohort_id = row_number()) %>% 
+	select(cohort_id, cohort_name)
+
+family_history_select <- report_intermediate %>%
+	select(family_history_name = family_history) %>%
+	unique() %>% 
+	mutate(family_history_id = row_number()) %>% 
+	select(family_history_id, family_history_name)
+
+
+# join helper tables back to intermediate report table to create final report table
+# to do: add variant reported to report table
+report <- report_intermediate %>%
+	left_join(sex_select, by = c("sex_reported" = "sex_name")) %>%
+	left_join(cohort_select, by = c("cohort" = "cohort_name")) %>%
+	left_join(family_history_select, by = c("family_history" = "family_history_name")) %>%
+	select(report_id, report_date, report_user_id, report_review_date, individual_id, sex_id, reported_multiple, cohort_id, onset_prenatal, onset_age, report_prenatal, report_age, family_history_id)
+View(report)
+
+############################################
+
+
+
+############################################
+## create individual table
+
+individual <- individuals_sheet %>%
+	select(individual_id, sex = Sex) %>%
+	arrange(individual_id, sex) %>%
+	group_by(individual_id) %>%
+	summarise(sex = paste(sex, collapse = ",")) %>%
+	mutate(sex = str_remove(sex, pattern = ",.*")) %>%
+	unique() %>%
+	ungroup() %>%
+	mutate(individual_DOI = "")
+View(individual)
+
+############################################
+
+
+
+############################################
+## create variant tables
+
+## to do: adapt variant_type for SNV/indel/MNV by splitting it, then create helper table
+## create helper tables for variant_report_status, variant_type
+## to do: how to handle CNVs with same startpoint?
+variant_annotation <- individuals_sheet %>%
+	select(variant_type = VariantType, variant_vcf_hg19 = hg19, ID, INFO, Varsome) %>%
+	mutate(Varsome = na_if(Varsome, "NA")) %>%
+	separate(Varsome, c("transcript","c_dot","p_dot"), sep = "[:|\n]") %>%
+	mutate(transcript = str_remove(transcript, "HNF1B\\(")) %>%
+	mutate(transcript = str_remove(transcript, "\\)")) %>%
+	mutate(c_dot = str_squish(c_dot)) %>%
+	mutate(p_dot = str_squish(p_dot)) %>%
+	mutate(p_dot = case_when(
+		!is.na(p_dot) ~ str_replace(p_dot, "\\(p\\.", "p\\.\\("),
+		is.na(p_dot) ~ p_dot,
+		)
+	) %>%
+	arrange(desc(variant_type), variant_vcf_hg19) %>%
+	unique() %>% 
+	mutate(variant_id = row_number()) %>%
+	mutate(variant_report_status = 1) %>%
+	mutate(variant_annotation_source = "varsome") %>%
+	mutate(variant_annotation_date = strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")) %>%
+	select(variant_id, variant_report_status, variant_annotation_source, variant_annotation_date, variant_type, variant_vcf_hg19, ID, INFO, transcript, c_dot, p_dot)
+View(variant_annotation)
+
+
+report_variant_connect <- individuals_sheet %>%
+	select(report_id, individual_id, variant_vcf_hg19 = hg19, detection_method = DetecionMethod, segregation = Segregation, INFO) %>%
+	left_join(variant_annotation, by = c("variant_vcf_hg19", "INFO")) %>%
+	arrange(report_id, individual_id, variant_id) %>% 
+	mutate(report_variant_id = row_number()) %>%
+	select(report_variant_id, report_id, individual_id, variant_id, detection_method, segregation)
+View(report_variant_connect)
+
+############################################
+
+
+
+
+############################################
+## export as csv with date of creation
+creation_date <- strftime(as.POSIXlt(Sys.time(), "UTC", "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d")
+
+write_csv(user, file = paste0("results/user.",creation_date,".csv"), na="NULL")
+
+write_csv(individual, file = paste0("results/individual.",creation_date,".csv"), na="NULL")
+
+write_csv(report, file = paste0("results/report.",creation_date,".csv"), na="NULL")
+write_csv(sex_select, file = paste0("results/sex_select.",creation_date,".csv"), na="NULL")
+write_csv(cohort_select, file = paste0("results/cohort_select.",creation_date,".csv"), na="NULL")
+write_csv(family_history_select, file = paste0("results/family_history_select.",creation_date,".csv"), na="NULL")
+
+write_csv(report_phenotype_connect, file = paste0("results/report_phenotype_connect.",creation_date,".csv"), na="NULL")
+write_csv(phenotype_described_select, file = paste0("results/phenotype_described_select.",creation_date,".csv"), na="NULL")
+write_csv(phenotype_modifier_select, file = paste0("results/phenotype_modifier_select.",creation_date,".csv"), na="NULL")
+write_csv(phenotype_select, file = paste0("results/phenotype_select.",creation_date,".csv"), na="NULL")
+
+write_csv(publication, file = paste0("results/publication.",creation_date,".csv"), na="NULL")
+write_csv(report_publication_connect, file = paste0("results/report_publication_connect.",creation_date,".csv"), na="NULL")
+
+write_csv(report_variant_connect, file = paste0("results/report_variant_connect.",creation_date,".csv"), na="NULL")
+write_csv(variant_annotation, file = paste0("results/variant_annotation.",creation_date,".csv"), na="NULL")
+
+############################################

@@ -1,0 +1,195 @@
+############################################
+## load libraries
+library(tidyverse)	##needed for general table operations
+library(DBI)		##needed for MySQL data export
+library(RMariaDB)	##needed for MySQL data export
+library(sqlr)		##needed for MySQL data export
+############################################
+
+
+
+############################################
+## set working directory (needs to be adapted to your specific working directory)
+setwd("C:/Users/bernt/OneDrive/!projekte/Nephrologie/HNF1B-db/db/R/")
+## set global options
+options(scipen = 999)
+############################################
+
+
+
+############################################
+## connect to the database
+hnf1b_db <- dbConnect(RMariaDB::MariaDB(), dbname = "hnf1b_db", user = "bernt", password = "HNF1B-db", server = "127.0.0.1", port = "6612")
+############################################
+
+
+############################################
+## make the primary keys auto increment
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.user MODIFY user_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.cohort_select MODIFY cohort_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.individual MODIFY individual_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.family_history_select MODIFY family_history_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.phenotype_described_select MODIFY described_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.publication MODIFY publication_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report MODIFY report_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect MODIFY report_phenotype_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_publication_connect MODIFY report_publication_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_variant_connect MODIFY report_variant_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.results_csv_table MODIFY results_file_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.sex_select MODIFY sex_id int auto_increment;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.variant_annotation MODIFY variant_id int auto_increment;")
+
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.phenotype_modifier_select MODIFY modifier_id char(10);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.phenotype_select MODIFY phenotype_id char(10);")
+
+############################################
+## make report_id in all tables compatible as int
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_variant_connect MODIFY report_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_publication_connect MODIFY report_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect MODIFY report_id int;")
+
+
+############################################
+## make individual_id in all tables compatible as int
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_variant_connect MODIFY individual_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_publication_connect MODIFY individual_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report MODIFY individual_id int;")
+
+
+############################################
+## make user_ids in all tables compatible as int and make the entry user required in all three tables
+#dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.variant_classification MODIFY classification_user_id int NOT NULL;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report MODIFY report_user_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.publication MODIFY publication_user_id int;")
+
+
+############################################
+## make username unique in user table
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.user ADD UNIQUE (user_name);")
+
+
+############################################
+## make role required and set default in user table
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.user CHANGE user_role user_role char(15) NOT NULL DEFAULT 'Viewer';")
+
+
+############################################
+## add foreign key constrains to report, make them compatible as int before
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report ADD FOREIGN KEY (individual_id) REFERENCES hnf1b_db.individual(individual_id);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report MODIFY sex_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report ADD FOREIGN KEY (sex_id) REFERENCES hnf1b_db.sex_select(sex_id);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report MODIFY cohort_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report ADD FOREIGN KEY (cohort_id) REFERENCES hnf1b_db.cohort_select(cohort_id);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report MODIFY family_history_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report ADD FOREIGN KEY (family_history_id) REFERENCES hnf1b_db.family_history_select(family_history_id);")
+
+
+############################################
+## add foreign key constrains to report_phenotype_connect, make them compatible as int before
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect ADD FOREIGN KEY (report_id) REFERENCES hnf1b_db.report(report_id);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect MODIFY described_id int;")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect ADD FOREIGN KEY (described_id) REFERENCES hnf1b_db.phenotype_described_select(described_id);")
+
+##to do make the chars compatible or replace with integer
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect MODIFY phenotype_id char(10);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect ADD FOREIGN KEY (phenotype_id) REFERENCES hnf1b_db.phenotype_select(phenotype_id);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect MODIFY modifier_id char(10);")
+dbSendQuery(hnf1b_db, "ALTER TABLE hnf1b_db.report_phenotype_connect ADD FOREIGN KEY (modifier_id) REFERENCES hnf1b_db.phenotype_modifier_select(modifier_id);")
+
+
+
+############################################
+## create views
+# report_view
+dbSendQuery(hnf1b_db, "CREATE OR REPLACE VIEW `hnf1b_db`.`report_view` AS
+    SELECT 
+        `hnf1b_db`.`report`.`report_id` AS `report_id`,
+        `hnf1b_db`.`report`.`report_date` AS `report_date`,
+        `hnf1b_db`.`report`.`report_user_id` AS `report_user_id`,
+        `hnf1b_db`.`report`.`report_review_date` AS `report_review_date`,
+        `hnf1b_db`.`report`.`individual_id` AS `individual_id`,
+        `hnf1b_db`.`sex_select`.`sex_name` AS `sex_reported`,
+        `hnf1b_db`.`report`.`reported_multiple` AS `reported_multiple`,
+        `hnf1b_db`.`cohort_select`.`cohort_name` AS `cohort`,
+        `hnf1b_db`.`report`.`onset_prenatal` AS `onset_prenatal`,
+        `hnf1b_db`.`report`.`onset_age` AS `onset_age`,
+        `hnf1b_db`.`report`.`report_prenatal` AS `report_prenatal`,
+        `hnf1b_db`.`report`.`report_age` AS `report_age`
+    FROM
+        (((`hnf1b_db`.`report`
+        JOIN `hnf1b_db`.`family_history_select` ON ((`hnf1b_db`.`report`.`family_history_id` = `hnf1b_db`.`family_history_select`.`family_history_id`)))
+        JOIN `hnf1b_db`.`cohort_select` ON ((`hnf1b_db`.`report`.`cohort_id` = `hnf1b_db`.`cohort_select`.`cohort_id`)))
+        JOIN `hnf1b_db`.`sex_select` ON ((`hnf1b_db`.`report`.`sex_id` = `hnf1b_db`.`sex_select`.`sex_id`)))")
+
+
+# report_phenotype_view
+dbSendQuery(hnf1b_db, "CREATE OR REPLACE VIEW `hnf1b_db`.`report_phenotype_view` AS
+    SELECT 
+        `hnf1b_db`.`report_phenotype_connect`.`report_id` AS `report_id`,
+        `hnf1b_db`.`report`.`individual_id` AS `individual_id`,
+        `hnf1b_db`.`report_phenotype_connect`.`phenotype_id` AS `phenotype_id`,
+        `hnf1b_db`.`phenotype_select`.`phenotype_name` AS `phenotype_name`,
+        `hnf1b_db`.`report_phenotype_connect`.`modifier_id` AS `modifier_id`,
+        `hnf1b_db`.`phenotype_modifier_select`.`modifier_name` AS `modifier_name`,
+        `hnf1b_db`.`phenotype_described_select`.`described_name` AS `described`
+    FROM
+        ((((`hnf1b_db`.`report_phenotype_connect`
+        JOIN `hnf1b_db`.`report` ON ((`hnf1b_db`.`report_phenotype_connect`.`report_id` = `hnf1b_db`.`report`.`report_id`)))
+        LEFT JOIN `hnf1b_db`.`phenotype_described_select` ON ((`hnf1b_db`.`report_phenotype_connect`.`described_id` = `hnf1b_db`.`phenotype_described_select`.`described_id`)))
+        LEFT JOIN `hnf1b_db`.`phenotype_select` ON ((`hnf1b_db`.`report_phenotype_connect`.`phenotype_id` = `hnf1b_db`.`phenotype_select`.`phenotype_id`)))
+        LEFT JOIN `hnf1b_db`.`phenotype_modifier_select` ON ((`hnf1b_db`.`report_phenotype_connect`.`modifier_id` = `hnf1b_db`.`phenotype_modifier_select`.`modifier_id`)))")
+
+
+# report_publication_view
+dbSendQuery(hnf1b_db, "CREATE OR REPLACE VIEW `hnf1b_db`.`report_publication_view` AS
+    SELECT 
+        `hnf1b_db`.`report_publication_connect`.`report_id` AS `report_id`,
+        `hnf1b_db`.`report_publication_connect`.`publication_id` AS `publication_id`,
+        `hnf1b_db`.`report_publication_connect`.`individual_id` AS `individual_id`,
+        `hnf1b_db`.`publication`.`publication_alias` AS `publication_alias`,
+        `hnf1b_db`.`publication`.`publication_user_id` AS `publication_user_id`,
+        `hnf1b_db`.`publication`.`publication_entry_date` AS `publication_entry_date`,
+        `hnf1b_db`.`publication`.`PMID` AS `PMID`,
+        `hnf1b_db`.`publication`.`DOI` AS `DOI`,
+        `hnf1b_db`.`publication`.`PDF` AS `PDF`,
+        `hnf1b_db`.`publication`.`publication_type` AS `publication_type`,
+        `hnf1b_db`.`publication`.`title` AS `title`,
+        `hnf1b_db`.`publication`.`abstract` AS `abstract`,
+        `hnf1b_db`.`publication`.`publication_date` AS `publication_date`,
+        `hnf1b_db`.`publication`.`journal_abbreviation` AS `journal_abbreviation`,
+        `hnf1b_db`.`publication`.`journal` AS `journal`,
+        `hnf1b_db`.`publication`.`keywords` AS `keywords`,
+        `hnf1b_db`.`publication`.`firstauthor_lastname` AS `firstauthor_lastname`,
+        `hnf1b_db`.`publication`.`firstauthor_firstname` AS `firstauthor_firstname`,
+        `hnf1b_db`.`publication`.`update_date` AS `update_date`
+    FROM
+        (`hnf1b_db`.`report_publication_connect`
+        LEFT JOIN `hnf1b_db`.`publication` ON ((`hnf1b_db`.`report_publication_connect`.`publication_id` = `hnf1b_db`.`publication`.`publication_id`)))")
+
+
+# report_variant_view
+dbSendQuery(hnf1b_db, "CREATE OR REPLACE VIEW `hnf1b_db`.`report_variant_view` AS
+    SELECT 
+        `hnf1b_db`.`report_variant_connect`.`report_id` AS `report_id`,
+        `hnf1b_db`.`report_variant_connect`.`individual_id` AS `individual_id`,
+        `hnf1b_db`.`report_variant_connect`.`variant_id` AS `variant_id`,
+        `hnf1b_db`.`report_variant_connect`.`detection_method` AS `detection_method`,
+        `hnf1b_db`.`report_variant_connect`.`segregation` AS `segregation`,
+        `hnf1b_db`.`variant_annotation`.`variant_report_status` AS `variant_report_status`,
+        `hnf1b_db`.`variant_annotation`.`variant_annotation_source` AS `variant_annotation_source`,
+        `hnf1b_db`.`variant_annotation`.`variant_annotation_date` AS `variant_annotation_date`,
+        `hnf1b_db`.`variant_annotation`.`variant_type` AS `variant_type`,
+        `hnf1b_db`.`variant_annotation`.`variant_vcf_hg19` AS `variant_vcf_hg19`,
+        `hnf1b_db`.`variant_annotation`.`ID` AS `ID`,
+        `hnf1b_db`.`variant_annotation`.`INFO` AS `INFO`,
+        `hnf1b_db`.`variant_annotation`.`transcript` AS `transcript`,
+        `hnf1b_db`.`variant_annotation`.`c_dot` AS `c_dot`,
+        `hnf1b_db`.`variant_annotation`.`p_dot` AS `p_dot`
+    FROM
+        (`hnf1b_db`.`report_variant_connect`
+        JOIN `hnf1b_db`.`variant_annotation` ON ((`hnf1b_db`.`report_variant_connect`.`variant_id` = `hnf1b_db`.`variant_annotation`.`variant_id`)))")
+
+############################################
+## close database connection
+rm_con()
+############################################
