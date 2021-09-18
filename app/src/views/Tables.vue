@@ -9,7 +9,13 @@
               rounded="lg"
               min-height="70vh"
             >
-              <!--  -->
+            <v-list-item
+              v-for="item in items_side"
+              :key="item.title"
+            >
+              {{ item.title }}
+            </v-list-item>
+
             </v-sheet>
           </v-col>
 
@@ -63,7 +69,13 @@ export default {
           ],
           search: '',
           totalRows: 1,
-          loading: true
+          loading: true,
+          items_side: [
+            {title: 'Reports'},
+            {title: 'Individuals'},
+            {title: 'Publications'},
+            {title: 'Variants'},
+          ]
         }
       },
       computed: {

@@ -47,7 +47,7 @@
         {title: 'Analyses', to: '/analyses'},
         {title: 'Search', to: '/search'},
         {title: 'About', to: '/about'},
-      ],
+      ]
     }),
   }
 </script>
