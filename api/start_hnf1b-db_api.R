@@ -1,6 +1,6 @@
 library(plumber)
 
-setwd("C:/Users/bernt/OneDrive/!projekte/Nephrologie/HNF1B-db/api")
+setwd("/hnf1b_api_volume")
 
 root <- pr("hnf1b-db_plumber.R") %>%
         pr_run(host = "0.0.0.0", port = 7779) %>%
