@@ -13,6 +13,7 @@
       >
 
         <v-tab
+        to="/"
         >
           <img
             src="../public/HNF1B-db_logo.png"
@@ -21,44 +22,18 @@
         </v-tab>
 
         <v-tab
-          v-for="link in links"
-          :key="link"
+          v-for="item in items"
+          :key="item.title"
+          :to="item.to"
         >
-          {{ link }}
+          {{ item.title }}
         </v-tab>
       </v-tabs>
 
     </v-app-bar>
 
     <v-main class="grey lighten-3">
-      <v-container>
-        <v-row>
-          <v-col
-            cols="12"
-            sm="2"
-          >
-            <v-sheet
-              rounded="lg"
-              min-height="70vh"
-            >
-              <!--  -->
-            </v-sheet>
-          </v-col>
-
-          <v-col
-            cols="12"
-            sm="10"
-          >
-            <v-sheet
-              min-height="70vh"
-              rounded="lg"
-            >
-              <!--  -->
-            </v-sheet>
-          </v-col>
-
-        </v-row>
-      </v-container>
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
@@ -67,18 +42,12 @@
 <script>
   export default {
     data: () => ({
-      links: [
-        'Tables',
-        'Analyses',
-        'Search',
-        'About',
+      items: [
+        {title: 'Tables', to: '/tables'},
+        {title: 'Analyses', to: '/analyses'},
+        {title: 'Search', to: '/search'},
+        {title: 'About', to: '/about'},
       ],
     }),
   }
 </script>
-
-<style>
-.v-app-bar-title__content{
-  width: 200px !important;
-}
-</style>
