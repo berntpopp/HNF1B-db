@@ -20,7 +20,7 @@ services:
   command: Rscript /hnf1b_api_volume/start_hnf1b-db_api.R
   restart: always
   volumes:
-  - /home/bernt/hnf1b_db/api/:/hnf1b_api_volume/
+  - /home/bernt/HNF1B-db/api/:/hnf1b_api_volume/
   ports:
      - "7779:7779"
   environment:
@@ -30,6 +30,6 @@ services:
   container_name: hnf1b_app
   restart: always
   ports:
-     - "8080:8080"
+     - "80:80"
 volumes:
  hnf1b_api_volume:
