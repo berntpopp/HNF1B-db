@@ -30,11 +30,6 @@ const routes = [
     component: Search
   },
   {
-    path: '/search',
-    name: 'Search',
-    component: Search
-  },
-  {
     path: '/about',
     name: 'About',
     component: About
