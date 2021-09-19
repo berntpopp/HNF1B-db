@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Tables from '../views/Tables.vue'
 import Analyses from '../views/Analyses.vue'
 import Search from '../views/Search.vue'
+import Scoring from '../views/Scoring.vue'
 import About from '../views/About.vue'
 
 Vue.use(VueRouter)
@@ -28,6 +29,11 @@ const routes = [
     path: '/search',
     name: 'Search',
     component: Search
+  },
+  {
+    path: '/scoring',
+    name: 'Scoring',
+    component: Scoring
   },
   {
     path: '/about',
