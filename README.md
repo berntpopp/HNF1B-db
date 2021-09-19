@@ -1,3 +1,4 @@
 # HNF1b-db
-* use google apps script as backend with sheets
-* use Vue.js as frontend
+* Vue.js with Vuetify.js as frontend
+* R plumber as API generator
+* MySQL database as backend
