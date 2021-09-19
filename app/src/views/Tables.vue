@@ -27,6 +27,7 @@
               min-height="70vh"
               rounded="lg"
             >
+            <div class="pa-2">
                 <v-text-field
                   v-model="search"
                   append-icon="mdi-magnify"
@@ -43,7 +44,7 @@
                   item-key="name"
                   class="elevation-1"
                 ></v-data-table>
-
+            </div>
             </v-sheet>
           </v-col>
 

@@ -46,6 +46,7 @@
         {title: 'Tables', to: '/tables'},
         {title: 'Analyses', to: '/analyses'},
         {title: 'Search', to: '/search'},
+        {title: 'Scoring', to: '/scoring'},
         {title: 'About', to: '/about'},
       ]
     }),
