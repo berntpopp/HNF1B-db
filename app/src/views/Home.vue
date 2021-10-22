@@ -35,10 +35,32 @@
                 from <span class="font-weight-bold"> {{ statistics.reports_count }} reports </span> in
                 <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications </span>.
               </div>
+
+
+  <v-card
+    class="mx-auto"
+    max-width="344"
+  >
+    <v-img
+      :src="image"
+      height="200px"
+    ></v-img>
+
+    <v-card-title>
+      Publications over time
+    </v-card-title>
+
+    <v-card-subtitle>
+      Plot showing the published publications by type since first description.
+    </v-card-subtitle>
+
+  </v-card>
+
             </v-sheet>
           </v-col>
 
         </v-row>
+        
       </v-container>
 </template>
 
@@ -52,6 +74,7 @@
           absolute: true,
           opacity: 1,
           color: "#FFFFFF",
+          image: '',
           loading: true
         }
       },
@@ -59,6 +82,7 @@
       },
       mounted() {
         this.loadStatisticsData();
+        this.loadImages();
       },
       methods: {
         async loadStatisticsData() {
@@ -77,6 +101,19 @@
           } catch (e) {
             console.error(e);
           }
+          this.loading = false;
+        },
+        async loadImages() {
+          this.loading = true;
+          let apiNewsPublicationsPlot = process.env.VUE_APP_API_URL + '/api/statistics/publications_plot';
+
+          try {
+            let response_publications_plot = await this.axios.get(apiNewsPublicationsPlot);
+
+            this.image = 'data:image/png;base64,'.concat(this.image.concat(response_publications_plot.data)) ;
+            } catch (e) {
+            console.error(e);
+            }
           this.loading = false;
         }
       }

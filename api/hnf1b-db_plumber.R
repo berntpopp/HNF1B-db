@@ -55,6 +55,24 @@ pool <- dbPool(
 ##-------------------------------------------------------------------##
 # Define global functions
 
+make_publications_plot <- function(data_tibble) {
+	plot <- ggplot(data = data_tibble , aes(x = publication_date, color = publication_type)) +
+		stat_bin(data=subset(data_tibble, publication_type=="research"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
+		stat_bin(data=subset(data_tibble, publication_type=="case_series"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
+		stat_bin(data=subset(data_tibble, publication_type=="case_report"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
+		stat_bin(data=subset(data_tibble, publication_type=="screening_multiple"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
+		stat_bin(data=subset(data_tibble, publication_type=="review_and_cases"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
+		theme_classic() +
+		theme(axis.text.x = element_text(angle = -45, hjust = 0), axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position="top", legend.title = element_blank())
+
+	file <- "results/publications_plot.png"
+	ggsave(file, plot, width = 4.5, height = 3.0, dpi = 150, units = "in")
+	return(base64Encode(readBin(file, "raw", n = file.info(file)$size), "txt"))
+}
+
+
+# Memoise functions
+make_publications_plot_mem <- memoise(make_publications_plot)
 
 ##-------------------------------------------------------------------##
 ##-------------------------------------------------------------------##
@@ -562,6 +580,26 @@ function() {
 		collect()
 		
 	statistics
+
+}
+
+
+#* @tag statistics
+## get statistics of the database entries
+#* @serializer text
+#' @get /api/statistics/publications_plot
+function() {
+
+	# get publication from the publication view
+	hnf1b_db_publications <- pool %>% 
+		tbl("publication") %>%
+		select(publication_id, publication_type, publication_date) %>%
+		collect() %>%
+		filter(publication_date != "NULL") %>%
+		mutate(publication_date = as.Date(publication_date))
+		
+	hnf1b_db_publications
+	make_publications_plot(hnf1b_db_publications)
 
 }
 
