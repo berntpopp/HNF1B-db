@@ -1,32 +1,26 @@
 <template>
        <v-container>
         <v-row>
-          <v-col
-            cols="12"
-            sm="2"
-          >
-            <v-sheet
-              rounded="lg"
-              min-height="70vh"
-            >
-            <v-list-item
-              v-for="item in items_side"
-              :key="item.title"
-            >
-              {{ item.title }}
-            </v-list-item>
-
-            </v-sheet>
-          </v-col>
 
           <v-col
             cols="12"
-            sm="10"
+            sm="12"
           >
             <v-sheet
               min-height="70vh"
               rounded="lg"
             >
+
+            <div 
+              class="text-lg-h6"
+            >
+            Individuals Table
+            </div>
+  
+            <p class="text-justify">
+              Search and filter the reviewed individuals in a tabular view.
+            </p>
+
             <div class="pa-2">
                 <v-text-field
                   v-model="search"
@@ -70,13 +64,7 @@ export default {
           ],
           search: '',
           totalRows: 1,
-          loading: true,
-          items_side: [
-            {title: 'Reports'},
-            {title: 'Individuals'},
-            {title: 'Publications'},
-            {title: 'Variants'},
-          ]
+          loading: true
         }
       },
       computed: {

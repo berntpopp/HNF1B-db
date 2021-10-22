@@ -1,36 +1,62 @@
 <template>
   <v-app id="HNF1B-db">
-    <v-app-bar
-      app
-      color="white"
-      flat
-      dense
+
+<v-app-bar
+  flat
+  app
+>
+  <v-toolbar-title>
+    <v-tab
+    to="/"
     >
+      <img
+        src="../public/HNF1B-db_logo.png"
 
-      <v-tabs
-        class="ml-n9"
-        color="grey darken-1"
-      >
+      />
+    </v-tab>
+  </v-toolbar-title>
 
-        <v-tab
-        to="/"
+  <v-toolbar-items class="hidden-sm-and-down">
+
+    <v-menu offset-y>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          text
+          v-on="on"
         >
-          <img
-            src="../public/HNF1B-db_logo.png"
-            height="40px"
-          />
-        </v-tab>
+        Tables
+        </v-btn>
+      </template>
+    
+      <v-card>
 
-        <v-tab
-          v-for="item in items"
-          :key="item.title"
-          :to="item.to"
-        >
-          {{ item.title }}
-        </v-tab>
-      </v-tabs>
+        <v-list dense>
+          <v-list-item
+            v-for="table in tables"
+            :key="`notification-key-${table.id}`"
+            :to="table.to"
+            link
+          >
+            <v-list-item-title>
+              {{ table.title }}
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
 
-    </v-app-bar>
+      </v-card>
+    </v-menu>
+
+    <v-btn text
+      v-for="item in items"
+      :key="item.title"
+      :to="item.to"
+    >
+      {{ item.title }}
+    </v-btn>
+
+  </v-toolbar-items>
+</v-app-bar>
+
 
     <v-main class="grey lighten-3">
       <router-view></router-view>
@@ -65,11 +91,16 @@
   export default {
     data: () => ({
       items: [
-        {title: 'Tables', to: '/tables'},
         {title: 'Analyses', to: '/analyses'},
         {title: 'Search', to: '/search'},
         {title: 'Scoring', to: '/scoring'},
         {title: 'About', to: '/about'},
+      ],
+      tables: [
+        { title: 'Reports', to: '/table_reports', id: 'tabe 1' },
+        { title: 'Individuals', to: '/table_individuals', id: 'tabe 2' },
+        { title: 'Publications', to: '/table_publications', id: 'tabe 3' },
+        { title: 'Variants', to: '/table_variants', id: 'tabe 4' },
       ],
       footer_items: [
         {icon: 'mdi-github', to: 'https://github.com/berntpopp/HNF1B-db', target: '_blank'},
