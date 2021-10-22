@@ -75,6 +75,7 @@ pool <- dbPool(
 #* @apiTag individual Individual related endpoints
 #* @apiTag publication Publication related endpoints
 #* @apiTag variant Variant related endpoints
+#* @apiTag statistics Database statistics
 ##-------------------------------------------------------------------##
 ##-------------------------------------------------------------------##
 
@@ -287,17 +288,17 @@ function(res, sort = "individual_id", `page[after]` = 0, `page[size]` = "all") {
 	if ( length(page_after_row) == 0 ){
 		page_after_row <- 0
 		page_after_row_next <- ( hnf1b_db_individual_plus_report_table %>%
-			filter(row_number() == page_after_row + page_size + 1) )$report_id
+			filter(row_number() == page_after_row + page_size + 1) )$individual_id
 	} else {
 		page_after_row_next <- ( hnf1b_db_individual_plus_report_table %>%
-			filter(row_number() == page_after_row + page_size) )$report_id
+			filter(row_number() == page_after_row + page_size) )$individual_id
 	}
 
 	# find next and prev item row
 	page_after_row_prev <- ( hnf1b_db_individual_plus_report_table %>%
-		filter(row_number() == page_after_row - page_size) )$report_id
+		filter(row_number() == page_after_row - page_size) )$individual_id
 	page_after_row_last <- ( hnf1b_db_individual_plus_report_table %>%
-		filter(row_number() ==  page_size * (page_count - 1) ) )$report_id
+		filter(row_number() ==  page_size * (page_count - 1) ) )$individual_id
 		
 	# filter by row
 	hnf1b_db_report_collected <- hnf1b_db_individual_plus_report_table %>%
@@ -542,4 +543,27 @@ function(res, sort = "publication_id", `page[after]` = 0, `page[size]` = "all") 
 }
 
 ## Publication endpoints
+##-------------------------------------------------------------------##
+
+
+
+##-------------------------------------------------------------------##
+## Statistics endpoints
+
+#* @tag statistics
+## get statistics of the database entries
+#* @serializer json list(na="string")
+#' @get /api/statistics
+function() {
+
+	# get statistics from the statistics view
+	statistics <- pool %>% 
+		tbl("statistics") %>%
+		collect()
+		
+	statistics
+
+}
+
+## Statistics endpoints
 ##-------------------------------------------------------------------##

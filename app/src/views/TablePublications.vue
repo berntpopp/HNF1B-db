@@ -72,7 +72,7 @@ export default {
             { text:"PMID", value:"PMID" },
             { text:"DOI", value:"DOI" },
             { text:"First Author", value:"firstauthor_lastname" },
-            { text:"journal", value:"journal" },
+            { text:"Journal", value:"journal" },
             { text:"Date", value:"publication_date" }
           ],
           search: '',
