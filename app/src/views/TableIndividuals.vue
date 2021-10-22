@@ -45,7 +45,7 @@
 
                 <v-data-table
                   dense
-                  :items="reports"
+                  :items="individuals"
                   :headers="headers"
                   :search="search"
                   item-key="name"
@@ -65,15 +65,11 @@ export default {
   name: 'Tables',
   data() {
         return {
-          reports: [],
+          individuals: [],
           headers:[
-            { text:'Report', value: 'report_id'  },
-            { text:"Individual", value:"individual_id" },
-            { text:"Reported multiple", value:"reported_multiple" },
-            { text:"Sex", value:"sex_reported" },
-            { text:"Cohort", value:"cohort" },
-            { text:"Age onset", value:"onset_age" },
-            { text:"Age report", value:"report_age" }
+            { text:'Individual', value: 'individual_id' },
+            { text:"Sex", value:"sex" },
+            { text:"DOI", value:"individual_DOI" },
           ],
           search: '',
           totalRows: 1,
@@ -86,17 +82,15 @@ export default {
       computed: {
       },
       mounted() {
-        this.loadReportsData();
+        this.loadIndividualsData();
       },
       methods: {
-        async loadReportsData() {
+        async loadIndividualsData() {
           this.loading = true;
-          let apiUrl = process.env.VUE_APP_API_URL + '/api/reports';
-          console.log(apiUrl);
+          let apiUrl = process.env.VUE_APP_API_URL + '/api/individuals';
           try {
             let response = await this.axios.get(apiUrl);
-            console.log(response);
-            this.reports = response.data.data;
+            this.individuals = response.data.data;
             this.totalRows = response.data.data.length;
           } catch (e) {
             console.error(e);

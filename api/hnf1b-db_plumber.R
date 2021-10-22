@@ -203,6 +203,7 @@ function(res, sort = "report_id", `page[after]` = 0, `page[size]` = "all") {
 	list(links = links, data = hnf1b_db_report_collected)
 }
 
+
 #* @tag report
 ## get infos for a single report by report_id
 #* @serializer json list(na="string")
@@ -227,6 +228,109 @@ function(report_id) {
 ##-------------------------------------------------------------------##
 ## Individual endpoints
 
+#* @tag individual
+## get all individuals
+#* @serializer json list(na="string")
+#' @get /api/individuals
+function(res, sort = "individual_id", `page[after]` = 0, `page[size]` = "all") {
+
+	# get number of rows in individual table
+	hnf1b_db_individual_rows <- (pool %>% 
+		tbl("individual") %>%
+		summarise(n = n()) %>%
+		collect()
+		)$n
+
+	# split the sort input by comma and check if individual_id in the resulting list, if not append to the list for unique sorting
+	sort_list <- str_split(str_squish(sort), ",")[[1]]
+	
+	if ( !("individual_id" %in% sort) ){
+		sort_list <- append(sort, "individual_id")
+	}
+
+	# check if `page[size]` is either "all" or a valid integer and convert or assign values accordingly
+	if ( `page[size]` == "all" ){
+		page_after <- 0
+		page_size <- hnf1b_db_individual_rows
+		page_count <- ceiling(hnf1b_db_individual_rows/page_size)
+	} else if ( is.numeric(as.integer(`page[size]`)) )
+	{
+		page_after <- as.integer(`page[after]`)
+		page_size <- as.integer(`page[size]`)
+		page_count <- ceiling(hnf1b_db_individual_rows/page_size)
+	} else
+	{
+		res$status <- 400 #Bad Request
+		return(list(error="Invalid Parameter Value Error."))
+	}
+
+	# get data from database
+	hnf1b_db_individual_table <- pool %>% 
+		tbl("individual")
+
+	hnf1b_db_report_table <- pool %>% 
+		tbl("report_view")
+
+	hnf1b_db_individual_plus_report_table <- hnf1b_db_individual_table %>% 
+		left_join(hnf1b_db_report_table, by = c("individual_id")) %>%
+		collect() %>%
+		arrange(desc(report_date)) %>%
+		arrange(!!!syms(sort_list)) %>%
+		nest(reports = -c(individual_id, sex, individual_DOI))
+
+	# find the current row of the requested page_after entry
+	page_after_row <- (hnf1b_db_individual_plus_report_table %>%
+		mutate(row = row_number()) %>%
+		filter(individual_id == page_after)
+		)$row
+
+	if ( length(page_after_row) == 0 ){
+		page_after_row <- 0
+		page_after_row_next <- ( hnf1b_db_individual_plus_report_table %>%
+			filter(row_number() == page_after_row + page_size + 1) )$report_id
+	} else {
+		page_after_row_next <- ( hnf1b_db_individual_plus_report_table %>%
+			filter(row_number() == page_after_row + page_size) )$report_id
+	}
+
+	# find next and prev item row
+	page_after_row_prev <- ( hnf1b_db_individual_plus_report_table %>%
+		filter(row_number() == page_after_row - page_size) )$report_id
+	page_after_row_last <- ( hnf1b_db_individual_plus_report_table %>%
+		filter(row_number() ==  page_size * (page_count - 1) ) )$report_id
+		
+	# filter by row
+	hnf1b_db_report_collected <- hnf1b_db_individual_plus_report_table %>%
+		filter(row_number() > page_after_row & row_number() <= page_after_row + page_size)
+
+	# generate links for self, next and prev pages
+	self <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals/?sort=", sort, "&page[after]=", `page[after]`, "&page[size]=", `page[size]`)
+	if ( length(page_after_row_prev) == 0 ){
+		prev <- "null"
+	} else
+	{
+		prev <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals?sort=", sort, "&page[after]=", page_after_row_prev, "&page[size]=", `page[size]`)
+	}
+	
+	if ( length(page_after_row_next) == 0 ){
+		`next` <- "null"
+	} else
+	{
+		`next` <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals?sort=", sort, "&page[after]=", page_after_row_next, "&page[size]=", `page[size]`)
+	}
+	
+	if ( length(page_after_row_last) == 0 ){
+		last <- "null"
+	} else
+	{
+		last <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals?sort=", sort, "&page[after]=", page_after_row_last, "&page[size]=", `page[size]`)
+	}
+
+	links <- as_tibble(list("prev" = prev, "self" = self, "next" = `next`, "last" = last))
+
+	# 
+	list(links = links, data = hnf1b_db_report_collected)
+}
 
 ## Individual endpoints
 ##-------------------------------------------------------------------##
