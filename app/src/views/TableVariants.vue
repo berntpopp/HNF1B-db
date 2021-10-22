@@ -6,10 +6,23 @@
             cols="12"
             sm="12"
           >
+
             <v-sheet
               min-height="70vh"
               rounded="lg"
             >
+  
+            <v-overlay
+              :absolute="absolute"
+              :opacity="opacity"
+              :value="loading"
+              :color="color"
+            >
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
+            </v-overlay>
 
             <div 
               class="text-lg-h6"
@@ -64,6 +77,9 @@ export default {
           ],
           search: '',
           totalRows: 1,
+          absolute: true,
+          opacity: 1,
+          color: "#FFFFFF",
           loading: true
         }
       },
