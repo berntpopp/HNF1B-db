@@ -712,5 +712,67 @@ function() {
 	make_cohort_plot(hnf1b_db_individual_plus_report_table)
 
 }
+
+
+#* @tag statistics
+## get statistics of the cohort
+#* @serializer text
+#' @get /api/statistics/phenotype_plot
+function() {
+
+	# get data from database
+	hnf1b_db_report_phenotype_view <- pool %>% 
+		tbl("report_phenotype_view") %>% 
+		collect() %>%
+		arrange(individual_id, phenotype_name) %>%
+		filter(phenotype_name != "NULL") %>%
+		select(individual_id, phenotype_name, described) %>%
+		mutate(described = 
+			case_when(
+				described == "yes" ~ 2,
+				described == "no" ~ 1,
+				described == "not reported" ~ 0,
+			)
+		) %>%
+		group_by(individual_id, phenotype_name) %>%
+		filter(described == max(described)) %>%
+		ungroup()
+
+
+
+	hnf1b_db_phenotypes <- hnf1b_db_report_phenotype_view %>%
+		filter(!str_detect(phenotype_name, "Stage")) %>% 
+		group_by(phenotype_name, described) %>%
+		mutate(described = 
+			case_when(
+				described == 2 ~ "yes",
+				described == 1 ~ "no",
+				described == 0 ~ "not reported",
+			)
+		) %>%
+		summarise(count = n()) %>%
+		ungroup() %>%
+		pivot_wider(names_from = described, values_from = count) %>%
+		filter(yes/(yes + no + `not reported`) >0.15) %>%
+		pivot_longer(cols = no:yes, names_to = c("described"), values_to = "count")
+		
+
+	## set factors
+	hnf1b_db_phenotypes$phenotype_name <- factor(hnf1b_db_phenotypes$phenotype_name, levels=(hnf1b_db_phenotypes %>% filter(described=="yes") %>% arrange(count))$phenotype_name)
+
+
+	phenotype_plot <- ggplot(hnf1b_db_phenotypes, aes(fill=described, x=count, y=phenotype_name)) + 
+		geom_bar(position="fill", stat="identity") +
+		scale_fill_manual(values=c("#5F9EA0", "#E1B378", "black")) +
+		geom_vline(xintercept=0.14, linetype="dashed", color = "red", size=0.7) +
+		theme_classic() +
+		theme(axis.text.x = element_text(angle = 0, hjust = 0), axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position="top")
+
+	file <- "results/phenotype_plot.png"
+	ggsave(file, phenotype_plot, width = 5.5, height = 3.0, dpi = 150, units = "in")
+	return(base64Encode(readBin(file, "raw", n = file.info(file)$size), "txt"))
+
+}
+
 ## Statistics endpoints
 ##-------------------------------------------------------------------##

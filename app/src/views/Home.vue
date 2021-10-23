@@ -34,6 +34,7 @@
                 with <span class="font-weight-bold"> {{ statistics.variants_count }} distinct variants </span>
                 from <span class="font-weight-bold"> {{ statistics.reports_count }} reports </span> in
                 <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications </span>.
+                <br><br>
               </div>
 
               <!--// cards with image summaries //-->
@@ -43,6 +44,7 @@
                   <v-card
                     class="mx-auto"
                     max-width="320"
+                    height="100%"
                   >
                     <v-img
                       :src="image_publications"
@@ -61,6 +63,7 @@
                   <v-card
                     class="mx-auto"
                     max-width="320"
+                    height="100%"
                   >
                     <v-img
                       :src="image_cohort"
@@ -80,15 +83,16 @@
                   <v-card
                     class="mx-auto"
                     max-width="320"
+                    height="100%"
                   >
                     <v-img
-                      :src="image_cohort"
+                      :src="image_phenotype"
                     ></v-img>
                     <v-card-title>
-                      Publications over time
+                      Phenotypes reported most
                     </v-card-title>
                     <v-card-subtitle>
-                      Plot showing the published publications by type since first description.
+                      Plot showing phenotypes described in over 15% of individuals.
                     </v-card-subtitle>
                   </v-card>
 
@@ -115,6 +119,7 @@
           color: "#FFFFFF",
           image_publications: '',
           image_cohort: '',
+          image_phenotype: '',
           loading: true
         }
       },
@@ -145,15 +150,18 @@
         },
         async loadImages() {
           this.loading = true;
-          let apiNewsPublicationsPlot = process.env.VUE_APP_API_URL + '/api/statistics/publications_plot';
-          let apiNewsCohortPlot = process.env.VUE_APP_API_URL + '/api/statistics/cohort_plot';
+          let apiPublicationsPlot = process.env.VUE_APP_API_URL + '/api/statistics/publications_plot';
+          let apiCohortPlot = process.env.VUE_APP_API_URL + '/api/statistics/cohort_plot';
+          let apiPhenotypePlot = process.env.VUE_APP_API_URL + '/api/statistics/phenotype_plot';
 
           try {
-            let response_publications_plot = await this.axios.get(apiNewsPublicationsPlot);
-            let response_cohort_plot = await this.axios.get(apiNewsCohortPlot);
+            let response_publications_plot = await this.axios.get(apiPublicationsPlot);
+            let response_cohort_plot = await this.axios.get(apiCohortPlot);
+            let response_phenotype_plot = await this.axios.get(apiPhenotypePlot);
 
-            this.image_publications = 'data:image/png;base64,'.concat(this.image_publications.concat(response_publications_plot.data)) ;
-            this.image_cohort = 'data:image/png;base64,'.concat(this.image_cohort.concat(response_cohort_plot.data)) ;
+            this.image_publications = 'data:image/png;base64,'.concat(this.image_publications.concat(response_publications_plot.data));
+            this.image_cohort = 'data:image/png;base64,'.concat(this.image_cohort.concat(response_cohort_plot.data));
+            this.image_phenotype = 'data:image/png;base64,'.concat(this.image_phenotype.concat(response_phenotype_plot.data));
             } catch (e) {
             console.error(e);
             }
