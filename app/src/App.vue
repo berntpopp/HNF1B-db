@@ -15,9 +15,12 @@
     </v-tab>
   </v-toolbar-title>
 
-  <v-toolbar-items class="hidden-sm-and-down">
+  <v-spacer></v-spacer>
 
-    <v-menu offset-y>
+  <v-toolbar-items class="hidden-sm-and-down">
+    <v-menu 
+      offset-y
+    >
       <template v-slot:activator="{ on }">
         <v-btn
           text
@@ -28,7 +31,6 @@
       </template>
     
       <v-card>
-
         <v-list dense>
           <v-list-item
             v-for="table in tables"
@@ -52,8 +54,45 @@
     >
       {{ item.title }}
     </v-btn>
-
   </v-toolbar-items>
+  
+  <!-- // collapsed toolbar for small screen devices //-->
+  <v-toolbar-items class="hidden-md-and-up">
+    <v-menu 
+    offset-y
+    >
+        <template v-slot:activator="{ on }">
+        <v-btn
+            text
+            v-on="on"
+        >
+        <v-icon
+        dark
+        right
+      >
+        mdi-dots-vertical
+      </v-icon>
+        </v-btn>
+        </template>
+    
+        <v-card>
+        <v-list dense>
+            <v-list-item
+            v-for="item in items_small"
+            :key="`notification-key-${item.id}`"
+            :to="item.to"
+            link
+            >
+            <v-list-item-title>
+                {{ item.title }}
+            </v-list-item-title>
+            </v-list-item>
+        </v-list>
+        </v-card>
+    </v-menu>
+  </v-toolbar-items>
+  <!-- // collapsed toolbar for small screen devices //-->
+
 </v-app-bar>
 
 
@@ -90,16 +129,26 @@
   export default {
     data: () => ({
       items: [
-        {title: 'Analyses', to: '/analyses'},
-        {title: 'Search', to: '/search'},
-        {title: 'Scoring', to: '/scoring'},
-        {title: 'About', to: '/about'},
+        {title: 'Analyses', to: '/analyses', id: 'analyses'},
+        {title: 'Search', to: '/search', id: 'search'},
+        {title: 'Scoring', to: '/scoring', id: 'scoring'},
+        {title: 'About', to: '/about', id: 'about'},
+      ],
+      items_small: [
+        {title: 'Reports', to: '/table_reports', id: 'tabe 1' },
+        {title: 'Individuals', to: '/table_individuals', id: 'tabe 2' },
+        {title: 'Publications', to: '/table_publications', id: 'tabe 3' },
+        {title: 'Variants', to: '/table_variants', id: 'tabe 4' },
+        {title: 'Analyses', to: '/analyses', id: 'analyses'},
+        {title: 'Search', to: '/search', id: 'search'},
+        {title: 'Scoring', to: '/scoring', id: 'scoring'},
+        {title: 'About', to: '/about', id: 'about'},
       ],
       tables: [
-        { title: 'Reports', to: '/table_reports', id: 'tabe 1' },
-        { title: 'Individuals', to: '/table_individuals', id: 'tabe 2' },
-        { title: 'Publications', to: '/table_publications', id: 'tabe 3' },
-        { title: 'Variants', to: '/table_variants', id: 'tabe 4' },
+        {title: 'Reports', to: '/table_reports', id: 'tabe 1'},
+        {title: 'Individuals', to: '/table_individuals', id: 'tabe 2'},
+        {title: 'Publications', to: '/table_publications', id: 'tabe 3'},
+        {title: 'Variants', to: '/table_variants', id: 'tabe 4'},
       ],
       footer_items: [
         {icon: 'mdi-github', to: 'https://github.com/berntpopp/HNF1B-db', target: '_blank'},

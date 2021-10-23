@@ -92,10 +92,8 @@ export default {
         async loadVariantsData() {
           this.loading = true;
           let apiUrl = process.env.VUE_APP_API_URL + '/api/variants';
-          console.log(apiUrl);
           try {
             let response = await this.axios.get(apiUrl);
-            console.log(response);
             this.variants = response.data.data;
             this.totalRows = response.data.data.length;
           } catch (e) {

@@ -135,14 +135,12 @@
           let apiUrl = process.env.VUE_APP_API_URL + '/api/statistics';
           try {
             let response = await this.axios.get(apiUrl);
-            console.log(response);
 
             this.statistics.reports_count = response.data.filter(obj => {return obj.value === "reports"})[0].count;
             this.statistics.publications_count = response.data.filter(obj => {return obj.value === "publications"})[0].count;
             this.statistics.individuals_count = response.data.filter(obj => {return obj.value === "individuals"})[0].count;
             this.statistics.variants_count = response.data.filter(obj => {return obj.value === "variants"})[0].count;
 
-            console.log(this.statistics.reports_count);
           } catch (e) {
             console.error(e);
           }
