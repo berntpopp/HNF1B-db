@@ -2,7 +2,6 @@
   <v-app id="HNF1B-db">
 
 <v-app-bar
-  flat
   app
 >
   <v-toolbar-title>

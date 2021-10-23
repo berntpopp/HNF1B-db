@@ -36,25 +36,64 @@
                 <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications </span>.
               </div>
 
+              <!--// cards with image summaries //-->
+              <v-row>
+                <v-col>
+                  
+                  <v-card
+                    class="mx-auto"
+                    max-width="320"
+                  >
+                    <v-img
+                      :src="image_publications"
+                    ></v-img>
+                    <v-card-title>
+                      Publications over time
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Plot showing the published publications by type since first description.
+                    </v-card-subtitle>
+                  </v-card>
 
-  <v-card
-    class="mx-auto"
-    max-width="344"
-  >
-    <v-img
-      :src="image"
-      height="200px"
-    ></v-img>
+                </v-col>
+                <v-col>
 
-    <v-card-title>
-      Publications over time
-    </v-card-title>
+                  <v-card
+                    class="mx-auto"
+                    max-width="320"
+                  >
+                    <v-img
+                      :src="image_cohort"
+                    ></v-img>
+                    <v-card-title>
+                      Cohort characteristic
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Plot showing the distribution of individual sex, fraction of prenatal cases and fraction of repeatedly reported individuals.
+                    </v-card-subtitle>
+                  </v-card>
 
-    <v-card-subtitle>
-      Plot showing the published publications by type since first description.
-    </v-card-subtitle>
+                </v-col>
 
-  </v-card>
+                <v-col>
+
+                  <v-card
+                    class="mx-auto"
+                    max-width="320"
+                  >
+                    <v-img
+                      :src="image_cohort"
+                    ></v-img>
+                    <v-card-title>
+                      Publications over time
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Plot showing the published publications by type since first description.
+                    </v-card-subtitle>
+                  </v-card>
+
+                </v-col>
+              </v-row>
 
             </v-sheet>
           </v-col>
@@ -74,7 +113,8 @@
           absolute: true,
           opacity: 1,
           color: "#FFFFFF",
-          image: '',
+          image_publications: '',
+          image_cohort: '',
           loading: true
         }
       },
@@ -106,11 +146,14 @@
         async loadImages() {
           this.loading = true;
           let apiNewsPublicationsPlot = process.env.VUE_APP_API_URL + '/api/statistics/publications_plot';
+          let apiNewsCohortPlot = process.env.VUE_APP_API_URL + '/api/statistics/cohort_plot';
 
           try {
             let response_publications_plot = await this.axios.get(apiNewsPublicationsPlot);
+            let response_cohort_plot = await this.axios.get(apiNewsCohortPlot);
 
-            this.image = 'data:image/png;base64,'.concat(this.image.concat(response_publications_plot.data)) ;
+            this.image_publications = 'data:image/png;base64,'.concat(this.image_publications.concat(response_publications_plot.data)) ;
+            this.image_cohort = 'data:image/png;base64,'.concat(this.image_cohort.concat(response_cohort_plot.data)) ;
             } catch (e) {
             console.error(e);
             }

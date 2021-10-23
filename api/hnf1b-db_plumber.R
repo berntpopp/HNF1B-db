@@ -5,6 +5,7 @@
 # load libraries
 library(plumber)
 library(tidyverse)
+library(cowplot)
 library(DBI)
 library(RMariaDB)
 library(jsonlite)
@@ -63,7 +64,12 @@ make_publications_plot <- function(data_tibble) {
 		stat_bin(data=subset(data_tibble, publication_type=="screening_multiple"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
 		stat_bin(data=subset(data_tibble, publication_type=="review_and_cases"), aes(y=cumsum(..count..)), geom="step", bins = 30) +
 		theme_classic() +
-		theme(axis.text.x = element_text(angle = -45, hjust = 0), axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position="top", legend.title = element_blank())
+		theme(axis.text.x = element_text(angle = -45, hjust = 0), axis.title.x = element_blank(), axis.title.y = element_blank(), 
+		legend.position = c(.40, 1.00),
+		legend.justification = c("right", "top"),
+		legend.box.just = "right",
+		legend.margin = margin(6, 6, 6, 6),
+		legend.title = element_blank())
 
 	file <- "results/publications_plot.png"
 	ggsave(file, plot, width = 4.5, height = 3.0, dpi = 150, units = "in")
@@ -71,8 +77,78 @@ make_publications_plot <- function(data_tibble) {
 }
 
 
+make_cohort_plot <- function(data_tibble) {
+	hnf1b_db_individual_sex <- data_tibble %>%
+		group_by(sex) %>%
+		summarise(count = n()) %>%
+		mutate(fraction = count / sum(count)) %>%
+		mutate(ymax = cumsum(fraction)) %>%
+		mutate(ymin = c(0, head(ymax, n=-1))) %>%
+		mutate(labelPosition = (ymax + ymin) / 2) %>%
+		ungroup()
+
+	hnf1b_db_individual_cohort <- data_tibble %>%
+		group_by(cohort) %>%
+		summarise(count = n()) %>%
+		mutate(fraction = count / sum(count)) %>%
+		mutate(ymax = cumsum(fraction)) %>%
+		mutate(ymin = c(0, head(ymax, n=-1))) %>%
+		mutate(labelPosition = (ymax + ymin) / 2) %>%
+		ungroup()
+
+	hnf1b_db_individual_multiple <- data_tibble %>%
+		group_by(reported_multiple) %>%
+		summarise(count = n()) %>%
+		mutate(fraction = count / sum(count)) %>%
+		mutate(ymax = cumsum(fraction)) %>%
+		mutate(ymin = c(0, head(ymax, n=-1))) %>%
+		mutate(labelPosition = (ymax + ymin) / 2) %>%
+		ungroup() %>%
+		mutate(reported_multiple = 
+			case_when(
+				reported_multiple == 1 ~ "yes",
+				reported_multiple == 0 ~ "no"
+			)
+		)
+
+	plot_hnf1b_db_individual_sex <- ggplot(hnf1b_db_individual_sex, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=sex)) +
+		geom_rect() +
+		geom_text(x=2, aes(y=labelPosition, label=sex), size=6) +
+		coord_polar(theta="y") +
+		xlim(c(-1, 4)) +
+		ggtitle("Individual\n sex") +
+		theme_void() +
+		theme(legend.position = "none", plot.title = element_text(color="blue", size=14, face="bold", hjust = 0.5))
+
+	plot_hnf1b_db_individual_cohort <- ggplot(hnf1b_db_individual_cohort, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=cohort)) +
+		geom_rect() +
+		geom_text(x=2, aes(y=labelPosition, label=cohort), size=6) +
+		coord_polar(theta="y") +
+		xlim(c(-1, 4)) +
+		ggtitle("Prenatal\n fraction") +
+		theme_void() +
+		theme(legend.position = "none", plot.title = element_text(color="blue", size=14, face="bold", hjust = 0.5))
+
+	plot_hnf1b_db_individual_multiple <- ggplot(hnf1b_db_individual_multiple, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=reported_multiple)) +
+		geom_rect() +
+		geom_text(x=2, aes(y=labelPosition, label=reported_multiple), size=6) +
+		coord_polar(theta="y") +
+		xlim(c(-1, 4)) +
+		ggtitle("Multiple\n reports") +
+		theme_void() +
+		theme(legend.position = "none", plot.title = element_text(color="blue", size=14, face="bold", hjust = 0.5))
+		
+	cohort_plot <- plot_grid(plot_hnf1b_db_individual_sex, plot_hnf1b_db_individual_cohort, plot_hnf1b_db_individual_multiple, 
+			  ncol = 3, nrow = 1)
+
+	file <- "results/cohort_plot.png"
+	ggsave(file, cohort_plot, width = 4.5, height = 3.0, dpi = 150, units = "in")
+	return(base64Encode(readBin(file, "raw", n = file.info(file)$size), "txt"))
+}
+
 # Memoise functions
 make_publications_plot_mem <- memoise(make_publications_plot)
+make_cohort_plot_mem <- memoise(make_cohort_plot)
 
 ##-------------------------------------------------------------------##
 ##-------------------------------------------------------------------##
@@ -597,11 +673,44 @@ function() {
 		collect() %>%
 		filter(publication_date != "NULL") %>%
 		mutate(publication_date = as.Date(publication_date))
-		
-	hnf1b_db_publications
+
 	make_publications_plot(hnf1b_db_publications)
 
 }
 
+
+#* @tag statistics
+## get statistics of the cohort
+#* @serializer text
+#' @get /api/statistics/cohort_plot
+function() {
+
+	# get data from individual table and report view and combine
+	hnf1b_db_individual_table <- pool %>% 
+		tbl("individual")
+
+	hnf1b_db_report_table <- pool %>% 
+		tbl("report_view")
+
+	hnf1b_db_individual_plus_report_table <- hnf1b_db_individual_table %>% 
+		left_join(hnf1b_db_report_table, by = c("individual_id")) %>%
+		collect() %>%
+		arrange(desc(report_date)) %>%
+		mutate(report_date = na_if(report_date, "NULL")) %>%
+		mutate(report_date = 
+			case_when(
+				is.na(report_date) ~ Sys.Date(),
+				!is.na(report_date)~ as.Date(report_date)
+			)
+		) %>%
+		group_by(individual_id) %>%
+		filter(report_date == max(report_date)) %>%
+		select(individual_id, sex, report_date, cohort, reported_multiple) %>%
+		arrange(individual_id) %>%
+		ungroup()
+
+	make_cohort_plot(hnf1b_db_individual_plus_report_table)
+
+}
 ## Statistics endpoints
 ##-------------------------------------------------------------------##
