@@ -120,113 +120,48 @@ function(req, res) {
 ## get all reports
 #* @serializer json list(na="string")
 #' @get /api/reports
-function(res, sort = "report_id", `page[after]` = 0, `page[size]` = "all") {
+function(res, sort = "report_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
-	# get number of rows in report_view
-	hnf1b_db_report_rows <- (pool %>% 
-		tbl("report_view") %>%
-		summarise(n = n()) %>%
-		collect()
-		)$n
+	start_time <- Sys.time()
 
-	# split the sort input by comma and check if report_ids in the resulting list, if not append to the list for unique sorting
-	sort_list <- str_split(str_squish(sort), ",")[[1]]
-	
-	if ( !("report_id" %in% sort) ){
-		sort_list <- append(sort, "report_id")
-	}
+	# generate sort expression based on sort input
+	sort_exprs <- generate_sort_expressions(sort, unique_id = "report_id")
 
-	# check if `page[size]` is either "all" or a valid integer and convert or assign values accordingly
-	if ( `page[size]` == "all" ){
-		page_after <- 0
-		page_size <- hnf1b_db_report_rows
-		page_count <- ceiling(hnf1b_db_report_rows/page_size)
-	} else if ( is.numeric(as.integer(`page[size]`)) )
-	{
-		page_after <- as.integer(`page[after]`)
-		page_size <- as.integer(`page[size]`)
-		page_count <- ceiling(hnf1b_db_report_rows/page_size)
-	} else
-	{
-		res$status <- 400 #Bad Request
-		return(list(error="Invalid Parameter Value Error."))
-	}
+	# generate filter expression based on filter input
+	filter_exprs <- generate_filter_expressions(filter)
 
 	# get data from database
 	hnf1b_db_report_table <- pool %>% 
 		tbl("report_view") %>%
-		arrange(!!!syms(sort_list)) %>%
-		collect()
+		collect() %>%
+		arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
+		filter(!!!rlang::parse_exprs(filter_exprs))
 
-	# find the current row of the requested page_after entry
-	page_after_row <- (hnf1b_db_report_table %>%
-		mutate(row = row_number()) %>%
-		filter(report_id == page_after)
-		)$row
+	# select fields from table based on input using the helper function "select_tibble_fields"
+	hnf1b_db_report_table <- select_tibble_fields(hnf1b_db_report_table, fields, "report_id")
 
-	if ( length(page_after_row) == 0 ){
-		page_after_row <- 0
-		page_after_row_next <- ( hnf1b_db_report_table %>%
-			filter(row_number() == page_after_row + page_size + 1) )$report_id
-	} else {
-		page_after_row_next <- ( hnf1b_db_report_table %>%
-			filter(row_number() == page_after_row + page_size) )$report_id
-	}
+	# use the helper generate_cursor_pagination_info to generate cursor pagination information from a tibble
+	hnf1b_db_report_table <- generate_cursor_pagination_info(hnf1b_db_report_table, `page[size]`, `page[after]`, "report_id")
 
-	# find next and prev item row
-	page_after_row_prev <- ( hnf1b_db_report_table %>%
-		filter(row_number() == page_after_row - page_size) )$report_id
-	page_after_row_last <- ( hnf1b_db_report_table %>%
-		filter(row_number() ==  page_size * (page_count - 1) ) )$report_id
-		
-	# filter by row
-	hnf1b_db_report_collected <- hnf1b_db_report_table %>%
-		filter(row_number() > page_after_row & row_number() <= page_after_row + page_size)
+	# compute execution time
+	end_time <- Sys.time()
+	execution_time <- as.character(paste0(round(end_time - start_time, 2), " secs"))
 
-	# generate links for self, next and prev pages
-	self <- paste0("http://", dw$host, ":", dw$port_self, "/api/reports/?sort=", sort, "&page[after]=", `page[after]`, "&page[size]=", `page[size]`)
-	if ( length(page_after_row_prev) == 0 ){
-		prev <- "null"
-	} else
-	{
-		prev <- paste0("http://", dw$host, ":", dw$port_self, "/api/reports?sort=", sort, "&page[after]=", page_after_row_prev, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_next) == 0 ){
-		`next` <- "null"
-	} else
-	{
-		`next` <- paste0("http://", dw$host, ":", dw$port_self, "/api/reports?sort=", sort, "&page[after]=", page_after_row_next, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_last) == 0 ){
-		last <- "null"
-	} else
-	{
-		last <- paste0("http://", dw$host, ":", dw$port_self, "/api/reports?sort=", sort, "&page[after]=", page_after_row_last, "&page[size]=", `page[size]`)
-	}
+	# add columns to the meta information from generate_cursor_pagination_info function return
+	meta <- hnf1b_db_report_table$meta %>%
+		add_column(as_tibble(list("sort" = sort, "filter" = filter, "fields" = fields, "executionTime" = execution_time))) 
 
-	links <- as_tibble(list("prev" = prev, "self" = self, "next" = `next`, "last" = last))
+	# add host, port and other information to links from the link information from generate_cursor_pagination_info function return
+	links <- hnf1b_db_report_table$links %>%
+  		pivot_longer(everything(), names_to = "type", values_to = "link") %>%
+		mutate(link = case_when(
+			link != "null" ~ paste0("http://", dw$host, ":", dw$port_self, "/api/entity?sort=", sort, ifelse(filter != "", paste0("&filter=", filter), ""), ifelse(fields != "", paste0("&fields=", fields), ""),  link),
+			link == "null" ~ "null"
+		)) %>%
+  		pivot_wider(everything(), names_from = "type", values_from = "link")
 
-	# 
-	list(links = links, data = hnf1b_db_report_collected)
-}
-
-
-#* @tag report
-## get infos for a single report by report_id
-#* @serializer json list(na="string")
-#' @get /api/report/<report_id>
-function(report_id) {
-
-	report <- as.integer(URLdecode(report_id))
-
-	# get data from database and filter
-	report_collected <- pool %>% 
-		tbl("report_view") %>%
-		filter(report_id == report) %>%
-		arrange(report_id) %>%
-		collect()
+	# generate object to return
+	list(links = links, meta = meta, data = hnf1b_db_report_table$data)
 }
 
 ## Report endpoints
@@ -241,37 +176,15 @@ function(report_id) {
 ## get all individuals
 #* @serializer json list(na="string")
 #' @get /api/individuals
-function(res, sort = "individual_id", `page[after]` = 0, `page[size]` = "all") {
+function(res, sort = "individual_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
-	# get number of rows in individual table
-	hnf1b_db_individual_rows <- (pool %>% 
-		tbl("individual") %>%
-		summarise(n = n()) %>%
-		collect()
-		)$n
+	start_time <- Sys.time()
 
-	# split the sort input by comma and check if individual_id in the resulting list, if not append to the list for unique sorting
-	sort_list <- str_split(str_squish(sort), ",")[[1]]
-	
-	if ( !("individual_id" %in% sort) ){
-		sort_list <- append(sort, "individual_id")
-	}
+	# generate sort expression based on sort input
+	sort_exprs <- generate_sort_expressions(sort, unique_id = "individual_id")
 
-	# check if `page[size]` is either "all" or a valid integer and convert or assign values accordingly
-	if ( `page[size]` == "all" ){
-		page_after <- 0
-		page_size <- hnf1b_db_individual_rows
-		page_count <- ceiling(hnf1b_db_individual_rows/page_size)
-	} else if ( is.numeric(as.integer(`page[size]`)) )
-	{
-		page_after <- as.integer(`page[after]`)
-		page_size <- as.integer(`page[size]`)
-		page_count <- ceiling(hnf1b_db_individual_rows/page_size)
-	} else
-	{
-		res$status <- 400 #Bad Request
-		return(list(error="Invalid Parameter Value Error."))
-	}
+	# generate filter expression based on filter input
+	filter_exprs <- generate_filter_expressions(filter)
 
 	# get data from database
 	hnf1b_db_individual_table <- pool %>% 
@@ -283,62 +196,35 @@ function(res, sort = "individual_id", `page[after]` = 0, `page[size]` = "all") {
 	hnf1b_db_individual_plus_report_table <- hnf1b_db_individual_table %>% 
 		left_join(hnf1b_db_report_table, by = c("individual_id")) %>%
 		collect() %>%
-		arrange(desc(report_date)) %>%
-		arrange(!!!syms(sort_list)) %>%
-		nest(reports = -c(individual_id, sex, individual_DOI))
+		nest(reports = -c(individual_id, sex, individual_DOI)) %>%
+		arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
+		filter(!!!rlang::parse_exprs(filter_exprs))
 
-	# find the current row of the requested page_after entry
-	page_after_row <- (hnf1b_db_individual_plus_report_table %>%
-		mutate(row = row_number()) %>%
-		filter(individual_id == page_after)
-		)$row
+	# select fields from table based on input using the helper function "select_tibble_fields"
+	hnf1b_db_individual_plus_report_table <- select_tibble_fields(hnf1b_db_individual_plus_report_table, fields, "individual_id")
 
-	if ( length(page_after_row) == 0 ){
-		page_after_row <- 0
-		page_after_row_next <- ( hnf1b_db_individual_plus_report_table %>%
-			filter(row_number() == page_after_row + page_size + 1) )$individual_id
-	} else {
-		page_after_row_next <- ( hnf1b_db_individual_plus_report_table %>%
-			filter(row_number() == page_after_row + page_size) )$individual_id
-	}
+	# use the helper generate_cursor_pagination_info to generate cursor pagination information from a tibble
+	hnf1b_db_individual_plus_report_table_pagination_info <- generate_cursor_pagination_info(hnf1b_db_individual_plus_report_table, `page[size]`, `page[after]`, "individual_id")
 
-	# find next and prev item row
-	page_after_row_prev <- ( hnf1b_db_individual_plus_report_table %>%
-		filter(row_number() == page_after_row - page_size) )$individual_id
-	page_after_row_last <- ( hnf1b_db_individual_plus_report_table %>%
-		filter(row_number() ==  page_size * (page_count - 1) ) )$individual_id
-		
-	# filter by row
-	hnf1b_db_report_collected <- hnf1b_db_individual_plus_report_table %>%
-		filter(row_number() > page_after_row & row_number() <= page_after_row + page_size)
+	# compute execution time
+	end_time <- Sys.time()
+	execution_time <- as.character(paste0(round(end_time - start_time, 2), " secs"))
 
-	# generate links for self, next and prev pages
-	self <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals/?sort=", sort, "&page[after]=", `page[after]`, "&page[size]=", `page[size]`)
-	if ( length(page_after_row_prev) == 0 ){
-		prev <- "null"
-	} else
-	{
-		prev <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals?sort=", sort, "&page[after]=", page_after_row_prev, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_next) == 0 ){
-		`next` <- "null"
-	} else
-	{
-		`next` <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals?sort=", sort, "&page[after]=", page_after_row_next, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_last) == 0 ){
-		last <- "null"
-	} else
-	{
-		last <- paste0("http://", dw$host, ":", dw$port_self, "/api/individuals?sort=", sort, "&page[after]=", page_after_row_last, "&page[size]=", `page[size]`)
-	}
+	# add columns to the meta information from generate_cursor_pagination_info function return
+	meta <- hnf1b_db_individual_plus_report_table_pagination_info$meta %>%
+		add_column(as_tibble(list("sort" = sort, "filter" = filter, "fields" = fields, "executionTime" = execution_time))) 
 
-	links <- as_tibble(list("prev" = prev, "self" = self, "next" = `next`, "last" = last))
+	# add host, port and other information to links from the link information from generate_cursor_pagination_info function return
+	links <- hnf1b_db_individual_plus_report_table_pagination_info$links %>%
+  		pivot_longer(everything(), names_to = "type", values_to = "link") %>%
+		mutate(link = case_when(
+			link != "null" ~ paste0("http://", dw$host, ":", dw$port_self, "/api/entity?sort=", sort, ifelse(filter != "", paste0("&filter=", filter), ""), ifelse(fields != "", paste0("&fields=", fields), ""),  link),
+			link == "null" ~ "null"
+		)) %>%
+  		pivot_wider(everything(), names_from = "type", values_from = "link")
 
-	# 
-	list(links = links, data = hnf1b_db_report_collected)
+	# generate object to return
+	list(links = links, meta = meta, data = hnf1b_db_individual_plus_report_table_pagination_info$data)
 }
 
 ## Individual endpoints
@@ -353,96 +239,48 @@ function(res, sort = "individual_id", `page[after]` = 0, `page[size]` = "all") {
 ## get all variants
 #* @serializer json list(na="string")
 #' @get /api/variants
-function(res, sort = "variant_id", `page[after]` = 0, `page[size]` = "all") {
+function(res, sort = "variant_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
-	# get number of rows in report_variant_view
-	hnf1b_db_variant_rows <- (pool %>% 
-		tbl("report_variant_view") %>%
-		summarise(n = n()) %>%
-		collect()
-		)$n
+	start_time <- Sys.time()
 
-	# split the sort input by comma and check if variant_ids in the resulting list, if not append to the list for unique sorting
-	sort_list <- str_split(str_squish(sort), ",")[[1]]
-	
-	if ( !("variant_id" %in% sort) ){
-		sort_list <- append(sort, "variant_id")
-	}
+	# generate sort expression based on sort input
+	sort_exprs <- generate_sort_expressions(sort, unique_id = "report_id")
 
-	# check if `page[size]` is either "all" or a valid integer and convert or assign values accordingly
-	if ( `page[size]` == "all" ){
-		page_after <- 0
-		page_size <- hnf1b_db_variant_rows
-		page_count <- ceiling(hnf1b_db_variant_rows/page_size)
-	} else if ( is.numeric(as.integer(`page[size]`)) )
-	{
-		page_after <- as.integer(`page[after]`)
-		page_size <- as.integer(`page[size]`)
-		page_count <- ceiling(hnf1b_db_variant_rows/page_size)
-	} else
-	{
-		res$status <- 400 #Bad Request
-		return(list(error="Invalid Parameter Value Error."))
-	}
+	# generate filter expression based on filter input
+	filter_exprs <- generate_filter_expressions(filter)
 
 	# get data from database
 	hnf1b_db_variant_table <- pool %>% 
 		tbl("report_variant_view") %>%
-		arrange(!!!syms(sort_list)) %>%
-		collect()
+		collect() %>%
+		arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
+		filter(!!!rlang::parse_exprs(filter_exprs))
 
-	# find the current row of the requested page_after entry
-	page_after_row <- (hnf1b_db_variant_table %>%
-		mutate(row = row_number()) %>%
-		filter(variant_id == page_after)
-		)$row
+	# select fields from table based on input using the helper function "select_tibble_fields"
+	hnf1b_db_variant_table <- select_tibble_fields(hnf1b_db_variant_table, fields, "variant_id")
 
-	if ( length(page_after_row) == 0 ){
-		page_after_row <- 0
-		page_after_row_next <- ( hnf1b_db_variant_table %>%
-			filter(row_number() == page_after_row + page_size + 1) )$variant_id
-	} else {
-		page_after_row_next <- ( hnf1b_db_variant_table %>%
-			filter(row_number() == page_after_row + page_size) )$variant_id
-	}
+	# use the helper generate_cursor_pagination_info to generate cursor pagination information from a tibble
+	hnf1b_db_variant_table_pagination_info <- generate_cursor_pagination_info(hnf1b_db_variant_table, `page[size]`, `page[after]`, "variant_id")
 
-	# find next and prev item row
-	page_after_row_prev <- ( hnf1b_db_variant_table %>%
-		filter(row_number() == page_after_row - page_size) )$variant_id
-	page_after_row_last <- ( hnf1b_db_variant_table %>%
-		filter(row_number() ==  page_size * (page_count - 1) ) )$variant_id
-		
-	# filter by row
-	hnf1b_db_variant_collected <- hnf1b_db_variant_table %>%
-		filter(row_number() > page_after_row & row_number() <= page_after_row + page_size)
+	# compute execution time
+	end_time <- Sys.time()
+	execution_time <- as.character(paste0(round(end_time - start_time, 2), " secs"))
 
-	# generate links for self, next and prev pages
-	self <- paste0("http://", dw$host, ":", dw$port_self, "/api/variants/?sort=", sort, "&page[after]=", `page[after]`, "&page[size]=", `page[size]`)
-	if ( length(page_after_row_prev) == 0 ){
-		prev <- "null"
-	} else
-	{
-		prev <- paste0("http://", dw$host, ":", dw$port_self, "/api/variants?sort=", sort, "&page[after]=", page_after_row_prev, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_next) == 0 ){
-		`next` <- "null"
-	} else
-	{
-		`next` <- paste0("http://", dw$host, ":", dw$port_self, "/api/variants?sort=", sort, "&page[after]=", page_after_row_next, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_last) == 0 ){
-		last <- "null"
-	} else
-	{
-		last <- paste0("http://", dw$host, ":", dw$port_self, "/api/variants?sort=", sort, "&page[after]=", page_after_row_last, "&page[size]=", `page[size]`)
-	}
+	# add columns to the meta information from generate_cursor_pagination_info function return
+	meta <- hnf1b_db_variant_table_pagination_info$meta %>%
+		add_column(as_tibble(list("sort" = sort, "filter" = filter, "fields" = fields, "executionTime" = execution_time))) 
 
-	links <- as_tibble(list("prev" = prev, "self" = self, "next" = `next`, "last" = last))
+	# add host, port and other information to links from the link information from generate_cursor_pagination_info function return
+	links <- hnf1b_db_variant_table_pagination_info$links %>%
+  		pivot_longer(everything(), names_to = "type", values_to = "link") %>%
+		mutate(link = case_when(
+			link != "null" ~ paste0("http://", dw$host, ":", dw$port_self, "/api/entity?sort=", sort, ifelse(filter != "", paste0("&filter=", filter), ""), ifelse(fields != "", paste0("&fields=", fields), ""),  link),
+			link == "null" ~ "null"
+		)) %>%
+  		pivot_wider(everything(), names_from = "type", values_from = "link")
 
-	# 
-	list(links = links, data = hnf1b_db_variant_collected)
+	# generate object to return
+	list(links = links, meta = meta, data = hnf1b_db_variant_table_pagination_info$data)
 }
 
 
@@ -458,96 +296,48 @@ function(res, sort = "variant_id", `page[after]` = 0, `page[size]` = "all") {
 ## get all publications
 #* @serializer json list(na="string")
 #' @get /api/publications
-function(res, sort = "publication_id", `page[after]` = 0, `page[size]` = "all") {
+function(res, sort = "publication_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
-	# get number of rows in publication
-	hnf1b_db_publication_rows <- (pool %>% 
-		tbl("publication") %>%
-		summarise(n = n()) %>%
-		collect()
-		)$n
+	start_time <- Sys.time()
 
-	# split the sort input by comma and check if publication_ids in the resulting list, if not append to the list for unique sorting
-	sort_list <- str_split(str_squish(sort), ",")[[1]]
-	
-	if ( !("publication_id" %in% sort) ){
-		sort_list <- append(sort, "publication_id")
-	}
+	# generate sort expression based on sort input
+	sort_exprs <- generate_sort_expressions(sort, unique_id = "publication_id")
 
-	# check if `page[size]` is either "all" or a valid integer and convert or assign values accordingly
-	if ( `page[size]` == "all" ){
-		page_after <- 0
-		page_size <- hnf1b_db_publication_rows
-		page_count <- ceiling(hnf1b_db_publication_rows/page_size)
-	} else if ( is.numeric(as.integer(`page[size]`)) )
-	{
-		page_after <- as.integer(`page[after]`)
-		page_size <- as.integer(`page[size]`)
-		page_count <- ceiling(hnf1b_db_publication_rows/page_size)
-	} else
-	{
-		res$status <- 400 #Bad Request
-		return(list(error="Invalid Parameter Value Error."))
-	}
+	# generate filter expression based on filter input
+	filter_exprs <- generate_filter_expressions(filter)
 
 	# get data from database
 	hnf1b_db_publication_table <- pool %>% 
 		tbl("publication") %>%
-		arrange(!!!syms(sort_list)) %>%
-		collect()
+		collect() %>%
+		arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
+		filter(!!!rlang::parse_exprs(filter_exprs))
 
-	# find the current row of the requested page_after entry
-	page_after_row <- (hnf1b_db_publication_table %>%
-		mutate(row = row_number()) %>%
-		filter(publication_id == page_after)
-		)$row
+	# select fields from table based on input using the helper function "select_tibble_fields"
+	hnf1b_db_publication_table <- select_tibble_fields(hnf1b_db_publication_table, fields, "publication_id")
 
-	if ( length(page_after_row) == 0 ){
-		page_after_row <- 0
-		page_after_row_next <- ( hnf1b_db_publication_table %>%
-			filter(row_number() == page_after_row + page_size + 1) )$publication_id
-	} else {
-		page_after_row_next <- ( hnf1b_db_publication_table %>%
-			filter(row_number() == page_after_row + page_size) )$publication_id
-	}
+	# use the helper generate_cursor_pagination_info to generate cursor pagination information from a tibble
+	hnf1b_db_publication_table_pagination_info <- generate_cursor_pagination_info(hnf1b_db_publication_table, `page[size]`, `page[after]`, "publication_id")
 
-	# find next and prev item row
-	page_after_row_prev <- ( hnf1b_db_publication_table %>%
-		filter(row_number() == page_after_row - page_size) )$publication_id
-	page_after_row_last <- ( hnf1b_db_publication_table %>%
-		filter(row_number() ==  page_size * (page_count - 1) ) )$publication_id
-		
-	# filter by row
-	hnf1b_db_publication_collected <- hnf1b_db_publication_table %>%
-		filter(row_number() > page_after_row & row_number() <= page_after_row + page_size)
+	# compute execution time
+	end_time <- Sys.time()
+	execution_time <- as.character(paste0(round(end_time - start_time, 2), " secs"))
 
-	# generate links for self, next and prev pages
-	self <- paste0("http://", dw$host, ":", dw$port_self, "/api/publications/?sort=", sort, "&page[after]=", `page[after]`, "&page[size]=", `page[size]`)
-	if ( length(page_after_row_prev) == 0 ){
-		prev <- "null"
-	} else
-	{
-		prev <- paste0("http://", dw$host, ":", dw$port_self, "/api/publications?sort=", sort, "&page[after]=", page_after_row_prev, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_next) == 0 ){
-		`next` <- "null"
-	} else
-	{
-		`next` <- paste0("http://", dw$host, ":", dw$port_self, "/api/publications?sort=", sort, "&page[after]=", page_after_row_next, "&page[size]=", `page[size]`)
-	}
-	
-	if ( length(page_after_row_last) == 0 ){
-		last <- "null"
-	} else
-	{
-		last <- paste0("http://", dw$host, ":", dw$port_self, "/api/publications?sort=", sort, "&page[after]=", page_after_row_last, "&page[size]=", `page[size]`)
-	}
+	# add columns to the meta information from generate_cursor_pagination_info function return
+	meta <- hnf1b_db_publication_table_pagination_info$meta %>%
+		add_column(as_tibble(list("sort" = sort, "filter" = filter, "fields" = fields, "executionTime" = execution_time))) 
 
-	links <- as_tibble(list("prev" = prev, "self" = self, "next" = `next`, "last" = last))
+	# add host, port and other information to links from the link information from generate_cursor_pagination_info function return
+	links <- hnf1b_db_publication_table_pagination_info$links %>%
+  		pivot_longer(everything(), names_to = "type", values_to = "link") %>%
+		mutate(link = case_when(
+			link != "null" ~ paste0("http://", dw$host, ":", dw$port_self, "/api/entity?sort=", sort, ifelse(filter != "", paste0("&filter=", filter), ""), ifelse(fields != "", paste0("&fields=", fields), ""),  link),
+			link == "null" ~ "null"
+		)) %>%
+  		pivot_wider(everything(), names_from = "type", values_from = "link")
 
-	# 
-	list(links = links, data = hnf1b_db_publication_collected)
+	# generate object to return
+	list(links = links, meta = meta, data = hnf1b_db_publication_table_pagination_info$data)
 }
 
 ## Publication endpoints
