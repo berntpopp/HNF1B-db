@@ -671,7 +671,7 @@ function() {
 		tbl("publication") %>%
 		select(publication_id, publication_type, publication_date) %>%
 		collect() %>%
-		filter(publication_date != "NULL") %>%
+		filter(!is.na(publication_date)) %>%
 		mutate(publication_date = as.Date(publication_date))
 
 	make_publications_plot(hnf1b_db_publications)
@@ -696,7 +696,6 @@ function() {
 		left_join(hnf1b_db_report_table, by = c("individual_id")) %>%
 		collect() %>%
 		arrange(desc(report_date)) %>%
-		mutate(report_date = na_if(report_date, "NULL")) %>%
 		mutate(report_date = 
 			case_when(
 				is.na(report_date) ~ Sys.Date(),
@@ -725,7 +724,7 @@ function() {
 		tbl("report_phenotype_view") %>% 
 		collect() %>%
 		arrange(individual_id, phenotype_name) %>%
-		filter(phenotype_name != "NULL") %>%
+		filter(!is.na(phenotype_name)) %>%
 		select(individual_id, phenotype_name, described) %>%
 		mutate(described = 
 			case_when(
