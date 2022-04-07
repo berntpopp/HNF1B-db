@@ -750,7 +750,7 @@ function() {
 				described == 0 ~ "not reported",
 			)
 		) %>%
-		summarise(count = n()) %>%
+		summarise(count = n(), .groups = 'drop') %>%
 		ungroup() %>%
 		pivot_wider(names_from = described, values_from = count) %>%
 		filter(yes/(yes + no + `not reported`) >0.15) %>%
