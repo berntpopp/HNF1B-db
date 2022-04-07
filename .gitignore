@@ -1,2 +1,5 @@
 api/.Rhistory
-*.png
+
+# Ignore the results directory in api folde
+api/results/
+.png
