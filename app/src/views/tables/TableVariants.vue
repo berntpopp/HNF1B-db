@@ -9,7 +9,7 @@
 
             <v-sheet
               min-height="70vh"
-              rounded="lg"
+              outlined
             >
   
             <v-overlay
@@ -77,7 +77,7 @@
 
 <script>
 export default {
-  name: 'Tables',
+  name: 'TableVariants',
   data() {
         return {
           variants: [],

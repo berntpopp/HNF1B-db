@@ -8,14 +8,20 @@
           >
             <v-sheet
               min-height="70vh"
-              rounded="lg"
+              outlined
             >
             <div class="pa-2">  
               <v-expansion-panels>
                 <v-expansion-panel>
                     <v-expansion-panel-header>About HNF1B-db</v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      To standardize our own cohort and curate the clinical and genetic spectrum from the literature, we curated a list of 30 clinical features associated with HNF1B-disease based on HPO-terms. Next, we developed a web-based application (available under curating.HNF1B.org) for comprehensive data input and analysis from patient histories or published literature within the time span from 1997 to 2020.
+                      To standardize our own cohort and curate the clinical and genetic spectrum from the literature, we curated a list of 30 clinical features associated with HNF1B-disease based on HPO-terms. Next, we developed a web-based application (available at HNF1B.org or hnf1b.uni-leipzig.de) for comprehensive data input and analysis from patient histories or published literature within the time span from 1997 to 2020.
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>The HNF1B gene</v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                    Pathogenic variants in the <span class="font-italic">HNF1B</span>-gene are associated with a variety of inherited kidney diseases ranging from renal cysts and diabetes syndrome (RCAD) and CAKUT to autosomal dominant tubulointerstitial kidney disease (ADTKD). In addition, variable extrarenal manifestations, such as abnormalities of the genital tract (vaginal aplasia, uterus malformation), gout, pancreatic insufficiency, electrolyte abnormalities, liver disease, neurodevelopmental and neuropsychological disorders have been linked to <span class="font-italic">HNF1B </span>-defects (MIM #189907).
                     </v-expansion-panel-content>
                   </v-expansion-panel>
                   <v-expansion-panel>

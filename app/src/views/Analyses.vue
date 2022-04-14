@@ -8,7 +8,7 @@
           >
             <v-sheet
               min-height="70vh"
-              rounded="lg"
+              outlined
             >
               Analyses
             </v-sheet>

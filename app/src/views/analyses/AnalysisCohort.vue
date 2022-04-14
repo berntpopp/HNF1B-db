@@ -6,63 +6,106 @@
             sm="12"
           >
 
-              <v-overlay
-                :absolute="absolute"
-                :opacity="opacity"
-                :value="loading"
-                :color="color"
+            <v-sheet
+              min-height="70vh"
+              outlined
+            >
+  
+            <v-overlay
+              :absolute="absolute"
+              :opacity="opacity"
+              :value="loading"
+              :color="color"
+            >
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
+            </v-overlay>
+
+<!-- Tabs section -->
+            <v-tabs
+              v-model="tab"
+              background-color="transparent"
+              color="basil"
+              grow
+            >
+              <v-tab
+                v-for="item in items"
+                :key="item"
               >
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </v-overlay>
+                {{ item }}
+              </v-tab>
+            </v-tabs>
 
+            <v-tabs-items v-model="tab">
 
-  <v-card
-    color="white"
-  >
-    <v-card-title class="text-h5 blue lighten-2">
-      Search HNF1B-db
-    </v-card-title>
-    <v-card-text>
-      <!--// database statistics //-->
-        The database currently contains <span class="font-weight-bold"> {{ statistics.individuals_count }} individuals</span> 
-        with <span class="font-weight-bold"> {{ statistics.variants_count }} distinct variants</span>
-        from <span class="font-weight-bold"> {{ statistics.reports_count }} reports</span> in
-        <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications</span>.
-      <!--// database statistics //-->
-    </v-card-text>
-    <v-card-text>
-      <v-autocomplete
-        color="black"
-        hide-no-data
-        hide-selected
-        item-text="Description"
-        item-value="API"
-        label="Individuals, reports, publications and variants"
-        placeholder="Start typing to Search"
-        prepend-icon="mdi-database-search"
-        return-object
-      ></v-autocomplete>
-    </v-card-text>
-    <v-divider></v-divider>
-    <v-expand-transition>
-    </v-expand-transition>
-  </v-card>
+              <v-tab-item
+                key="Publications over time"
+              >
+                <v-container fill-height>
+                    <v-row justify="center" align="center">
+                        <v-col cols="12" sm="4">
 
+                          <v-img
+                            :src="image_publications"
+                          ></v-img>
+
+                        </v-col>
+                    </v-row>
+                </v-container>
+              </v-tab-item>
+
+              <v-tab-item
+                key="Cohort characteristic"
+              >
+                <v-container fill-height>
+                    <v-row justify="center" align="center">
+                        <v-col cols="12" sm="4">
+
+                          <v-img
+                            :src="image_cohort"
+                          ></v-img>
+
+                        </v-col>
+                    </v-row>
+                </v-container>
+              </v-tab-item>
+
+              <v-tab-item
+                key="Phenotypes reported"
+              >
+                <v-container fill-height>
+                    <v-row justify="center" align="center">
+                        <v-col cols="12" sm="4">
+
+                            <v-img
+                              :src="image_phenotype"
+                            ></v-img>
+
+                        </v-col>
+                    </v-row>
+                </v-container>
+              </v-tab-item>
+          
+            </v-tabs-items>
+<!-- Tabs section -->
+
+            </v-sheet>
           </v-col>
         </v-row>
+        
       </v-container>
 </template>
 
 <script>
 
   export default {
-    name: 'Home',
+    name: 'Publications over time',
   data() {
         return {
-          statistics: { "reports_count": 0, "publications_count": 0, "individuals_count": 0, "variants_count": 0 },
+          tab: null,
+          items: [ 'Publications over time', 'Cohort characteristic', 'Phenotypes reported' ],
           absolute: true,
           opacity: 1,
           color: "#FFFFFF",

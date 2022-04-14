@@ -9,7 +9,7 @@
 
             <v-sheet
               min-height="70vh"
-              rounded="lg"
+              outlined
             >
   
             <v-overlay
@@ -85,7 +85,7 @@
 
 <script>
 export default {
-  name: 'Tables',
+  name: 'TableIndividuals',
   data() {
         return {
           stoplights_style: {"born": "success", "fetus": "primary"},
