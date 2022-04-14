@@ -27,11 +27,68 @@
     </v-card-title>
     <v-card-text>
       <!--// database statistics //-->
-        The database currently contains <span class="font-weight-bold"> {{ statistics.individuals_count }} individuals</span> 
-        with <span class="font-weight-bold"> {{ statistics.variants_count }} distinct variants</span>
-        from <span class="font-weight-bold"> {{ statistics.reports_count }} reports</span> in
-        <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications</span>.
+        The database currently contains 
+
+        <v-chip
+          color="lime lighten-2"
+          class="ma-2"
+          small
+          link
+          to="/table_individuals"
+        >
+          <span class="font-weight-bold">{{ statistics.individuals_count }} individuals</span> 
+          <v-icon right>
+            mdi-account
+          </v-icon>
+        </v-chip>
+
+        with 
+
+        <v-chip
+          color="pink lighten-4"
+          class="ma-2"
+          small
+          link
+          to="/table_variants"
+        >
+          <span class="font-weight-bold"> {{ statistics.variants_count }} distinct variants</span>
+        <v-icon right>
+            mdi-dna
+          </v-icon>
+        </v-chip>
+
+
+        from 
+
+        <v-chip
+          color="deep-orange lighten-2"
+          class="ma-2"
+          small
+          link
+          to="/table_reports"
+        >
+          <span class="font-weight-bold"> {{ statistics.reports_count }} reports</span>
+          <v-icon right>
+            mdi-newspaper-variant
+          </v-icon>
+        </v-chip>
+
+        in
+
+        <v-chip
+          color="cyan accent-2"
+          class="ma-2"
+          small
+          link
+          to="/table_publications"
+        >
+          <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications</span>
+          <v-icon right>
+            mdi-book-open-blank-variant
+          </v-icon>
+        </v-chip>
       <!--// database statistics //-->
+
     </v-card-text>
     <v-card-text>
       <v-autocomplete

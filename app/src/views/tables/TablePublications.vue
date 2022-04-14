@@ -59,7 +59,7 @@
                       x-small
                     >
                       pub{{ item.publication_id }}
-                    <v-icon right>
+                      <v-icon right>
                         mdi-book-open-blank-variant
                       </v-icon>
                     </v-chip>
