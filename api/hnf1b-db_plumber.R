@@ -118,7 +118,7 @@ function(req, res) {
 
 #* @tag report
 ## get all reports
-#* @serializer json list(na="string")
+#* @serializer json list(na="null")
 #' @get /api/reports
 function(res, sort = "report_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
@@ -174,7 +174,7 @@ function(res, sort = "report_id", filter = "", fields = "", `page[after]` = 0, `
 
 #* @tag individual
 ## get all individuals
-#* @serializer json list(na="string")
+#* @serializer json list(na="null")
 #' @get /api/individuals
 function(res, sort = "individual_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
@@ -237,7 +237,7 @@ function(res, sort = "individual_id", filter = "", fields = "", `page[after]` = 
 
 #* @tag variant
 ## get all variants
-#* @serializer json list(na="string")
+#* @serializer json list(na="null")
 #' @get /api/variants
 function(res, sort = "variant_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
@@ -294,7 +294,7 @@ function(res, sort = "variant_id", filter = "", fields = "", `page[after]` = 0, 
 
 #* @tag publication
 ## get all publications
-#* @serializer json list(na="string")
+#* @serializer json list(na="null")
 #' @get /api/publications
 function(res, sort = "publication_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
 
@@ -350,7 +350,7 @@ function(res, sort = "publication_id", filter = "", fields = "", `page[after]` =
 
 #* @tag statistics
 ## get statistics of the database entries
-#* @serializer json list(na="string")
+#* @serializer json list(na="null")
 #' @get /api/statistics
 function() {
 
