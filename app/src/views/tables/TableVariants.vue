@@ -50,7 +50,22 @@
                   :search="search"
                   item-key="name"
                   class="elevation-1"
-                ></v-data-table>
+                >
+
+                  <template v-slot:[`item.variant_id`]="{ item }">
+                    <v-chip
+                      color="pink lighten-4"
+                      class="ma-2"
+                      x-small
+                    >
+                      var{{ item.variant_id }}
+                    <v-icon right>
+                        mdi-dna
+                      </v-icon>
+                    </v-chip>
+                  </template>
+
+                </v-data-table>
             </div>
             </v-sheet>
           </v-col>

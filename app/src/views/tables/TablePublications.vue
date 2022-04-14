@@ -50,7 +50,22 @@
                   :search="search"
                   item-key="name"
                   class="elevation-1"
-                ></v-data-table>
+                >
+
+                  <template v-slot:[`item.publication_id`]="{ item }">
+                    <v-chip
+                      color="cyan accent-2"
+                      class="ma-2"
+                      x-small
+                    >
+                      pub{{ item.publication_id }}
+                    <v-icon right>
+                        mdi-book-open-blank-variant
+                      </v-icon>
+                    </v-chip>
+                  </template>
+
+                </v-data-table>
             </div>
             </v-sheet>
           </v-col>
@@ -67,7 +82,7 @@ export default {
         return {
           publications: [],
           headers:[
-            { text:'Publication', value: 'publication_id'  },
+            { text:'Publication', value: 'publication_id' },
             { text:"Type", value:"publication_type" },
             { text:"PMID", value:"PMID" },
             { text:"DOI", value:"DOI" },

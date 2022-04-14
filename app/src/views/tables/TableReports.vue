@@ -53,10 +53,53 @@
                   class="elevation-1"
                 >
 
+                <template v-slot:[`item.report_id`]="{ item }">
+                  <v-chip
+                    color="deep-orange lighten-2"
+                    class="ma-2"
+                    x-small
+                  >
+                    rep{{ item.report_id }}
+                    <v-icon right>
+                      mdi-newspaper-variant
+                    </v-icon>
+                  </v-chip>
+                </template>
+
+                <template v-slot:[`item.individual_id`]="{ item }">
+                  <v-chip
+                    color="lime lighten-2"
+                    class="ma-2"
+                    x-small
+                  >
+                    ind{{ item.individual_id }}
+                    <v-icon right>
+                      mdi-account
+                    </v-icon>
+                  </v-chip>
+                </template>
+                
+                <template v-slot:[`item.reported_multiple`]="{ item }">
+                  <v-icon
+                    small
+                  >
+                    {{ logical_symbol[item.reported_multiple] }}
+                  </v-icon>
+                </template>
+
+                <template v-slot:[`item.sex_reported`]="{ item }">
+                  <v-icon
+                    small
+                  >
+                    {{ sex_symbol[item.sex_reported] }}
+                  </v-icon>
+                </template>
+
                 <template v-slot:[`item.cohort`]="{ item }">
                   <v-chip
                     :color="stoplights_style[item.cohort]"
-                    dark
+                    class="ma-2"
+                    x-small
                   >
                     {{ item.cohort }}
                   </v-chip>
@@ -77,10 +120,12 @@ export default {
   name: 'Tables',
   data() {
         return {
-          reports: [],
           stoplights_style: {"born": "success", "fetus": "primary"},
+          sex_symbol: {"female": "mdi-gender-female", "male": "mdi-gender-male", "unspecified": "mdi-help-circle-outline"},
+          logical_symbol: {"1": "mdi-check-circle-outline", "0": "mdi-minus-circle-outline"},
+          reports: [],
           headers:[
-            { text:'Report', value: 'report_id'  },
+            { text:'Report', value: 'report_id' },
             { text:"Individual", value:"individual_id" },
             { text:"Reported multiple", value:"reported_multiple" },
             { text:"Sex", value:"sex_reported" },

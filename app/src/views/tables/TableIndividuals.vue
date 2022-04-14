@@ -50,7 +50,30 @@
                   :search="search"
                   item-key="name"
                   class="elevation-1"
-                ></v-data-table>
+                >
+
+                <template v-slot:[`item.individual_id`]="{ item }">
+                  <v-chip
+                    color="lime lighten-2"
+                    class="ma-2"
+                    x-small
+                  >
+                    ind{{ item.individual_id }}
+                   <v-icon right>
+                      mdi-account
+                    </v-icon>
+                  </v-chip>
+                </template>
+
+                <template v-slot:[`item.sex`]="{ item }">
+                  <v-icon
+                    small
+                  >
+                    {{ sex_symbol[item.sex] }}
+                  </v-icon>
+                </template>
+                
+                </v-data-table>
             </div>
             </v-sheet>
           </v-col>
@@ -65,6 +88,9 @@ export default {
   name: 'Tables',
   data() {
         return {
+          stoplights_style: {"born": "success", "fetus": "primary"},
+          sex_symbol: {"female": "mdi-gender-female", "male": "mdi-gender-male", "unspecified": "mdi-help-circle-outline"},
+          logical_symbol: {"1": "mdi-check-circle-outline", "0": "mdi-minus-circle-outline"},
           individuals: [],
           headers:[
             { text:'Individual', value: 'individual_id' },
