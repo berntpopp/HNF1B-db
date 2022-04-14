@@ -1,14 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import TableReports from '../views/TableReports.vue'
-import TableIndividuals from '../views/TableIndividuals.vue'
-import TablePublications from '../views/TablePublications.vue'
-import TableVariants from '../views/TableVariants.vue'
-import Analyses from '../views/Analyses.vue'
-import Search from '../views/Search.vue'
-import Scoring from '../views/Scoring.vue'
-import About from '../views/About.vue'
 
 Vue.use(VueRouter)
 
@@ -16,51 +7,53 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: () => import(/* webpackChunkName: "Home" */ '@/views/Home.vue')
   },
   {
     path: '/table_reports',
     name: 'TableReports',
-    component: TableReports
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TableReports.vue')
   },
   {
     path: '/table_individuals',
     name: 'TableIndividuals',
-    component: TableIndividuals
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TableIndividuals.vue')
   },
   {
     path: '/table_publications',
     name: 'TablePublications',
-    component: TablePublications
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TablePublications.vue')
   },
   {
     path: '/table_variants',
     name: 'TableVariants',
-    component: TableVariants
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TableVariants.vue')
   },
   {
     path: '/analyses',
     name: 'Analyses',
-    component: Analyses
+    component: () => import(/* webpackChunkName: "Home" */ '@/views/Analyses.vue')
   },
   {
     path: '/search',
     name: 'Search',
-    component: Search
+    component: () => import(/* webpackChunkName: "Home" */ '@/views/Search.vue')
   },
   {
     path: '/scoring',
     name: 'Scoring',
-    component: Scoring
+    component: () => import(/* webpackChunkName: "Home" */ '@/views/Scoring.vue')
   },
   {
     path: '/about',
     name: 'About',
-    component: About
+    component: () => import(/* webpackChunkName: "Home" */ '@/views/About.vue')
   }
 ]
 
 const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
   routes
 })
 

@@ -51,7 +51,18 @@
                   :search="search"
                   item-key="name"
                   class="elevation-1"
-                ></v-data-table>
+                >
+
+                <template v-slot:[`item.cohort`]="{ item }">
+                  <v-chip
+                    :color="stoplights_style[item.cohort]"
+                    dark
+                  >
+                    {{ item.cohort }}
+                  </v-chip>
+                </template>
+
+                </v-data-table>
             </div>
             </v-sheet>
           </v-col>
@@ -67,6 +78,7 @@ export default {
   data() {
         return {
           reports: [],
+          stoplights_style: {"born": "success", "fetus": "primary"},
           headers:[
             { text:'Report', value: 'report_id'  },
             { text:"Individual", value:"individual_id" },
