@@ -12,22 +12,22 @@ const routes = [
   {
     path: '/table_reports',
     name: 'TableReports',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TableReports.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableReports.vue')
   },
   {
     path: '/table_individuals',
     name: 'TableIndividuals',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TableIndividuals.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableIndividuals.vue')
   },
   {
     path: '/table_publications',
     name: 'TablePublications',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TablePublications.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TablePublications.vue')
   },
   {
     path: '/table_variants',
     name: 'TableVariants',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/TableVariants.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableVariants.vue')
   },
   {
     path: '/analyses',
