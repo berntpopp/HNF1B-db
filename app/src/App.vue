@@ -47,6 +47,35 @@
       </v-card>
     </v-menu>
 
+    <v-menu 
+      offset-y
+    >
+      <template v-slot:activator="{ on }">
+        <v-btn
+          text
+          v-on="on"
+        >
+        Analyses
+        </v-btn>
+      </template>
+    
+      <v-card>
+        <v-list dense>
+          <v-list-item
+            v-for="analysis in analyses"
+            :key="`notification-key-${analysis.id}`"
+            :to="analysis.to"
+            link
+          >
+            <v-list-item-title>
+              {{ analysis.title }}
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+
+      </v-card>
+    </v-menu>
+
     <v-btn text
       v-for="item in items"
       :key="item.title"
@@ -129,26 +158,30 @@
   export default {
     data: () => ({
       items: [
-        {title: 'Analyses', to: '/analyses', id: 'analyses'},
         {title: 'Search', to: '/search', id: 'search'},
         {title: 'Scoring', to: '/scoring', id: 'scoring'},
         {title: 'About', to: '/about', id: 'about'},
       ],
       items_small: [
-        {title: 'Reports', to: '/table_reports', id: 'tabe 1' },
-        {title: 'Individuals', to: '/table_individuals', id: 'tabe 2' },
-        {title: 'Publications', to: '/table_publications', id: 'tabe 3' },
-        {title: 'Variants', to: '/table_variants', id: 'tabe 4' },
-        {title: 'Analyses', to: '/analyses', id: 'analyses'},
+        {title: 'Reports', to: '/table_reports', id: 'table 1' },
+        {title: 'Individuals', to: '/table_individuals', id: 'table 2' },
+        {title: 'Publications', to: '/table_publications', id: 'table 3' },
+        {title: 'Variants', to: '/table_variants', id: 'table 4' },
+        {title: 'Cohort', to: '/analysis_cohort', id: 'analysis 1'},
+        {title: 'Individuals', to: '/analysis_genotype_phenotype', id: 'analysis 2'},
         {title: 'Search', to: '/search', id: 'search'},
         {title: 'Scoring', to: '/scoring', id: 'scoring'},
         {title: 'About', to: '/about', id: 'about'},
       ],
       tables: [
-        {title: 'Reports', to: '/table_reports', id: 'tabe 1'},
-        {title: 'Individuals', to: '/table_individuals', id: 'tabe 2'},
-        {title: 'Publications', to: '/table_publications', id: 'tabe 3'},
-        {title: 'Variants', to: '/table_variants', id: 'tabe 4'},
+        {title: 'Reports', to: '/table_reports', id: 'table 1'},
+        {title: 'Individuals', to: '/table_individuals', id: 'table 2'},
+        {title: 'Publications', to: '/table_publications', id: 'table 3'},
+        {title: 'Variants', to: '/table_variants', id: 'table 4'},
+      ],
+      analyses: [
+        {title: 'Cohort characteristics', to: '/analysis_cohort', id: 'analysis 1'},
+        {title: 'Genotype phenotype', to: '/analysis_genotype_phenotype', id: 'analysis 2'},
       ],
       footer_items: [
         {icon: 'mdi-github', to: 'https://github.com/berntpopp/HNF1B-db', target: '_blank'},

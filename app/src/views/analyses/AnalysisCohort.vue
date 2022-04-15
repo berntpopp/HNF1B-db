@@ -101,7 +101,7 @@
 <script>
 
   export default {
-    name: 'Publications over time',
+    name: 'Cohort characteristics',
   data() {
         return {
           tab: null,
