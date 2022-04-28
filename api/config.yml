@@ -16,8 +16,8 @@ default:
     user: bernt
     password: "HNF1B-db"
     server: "0.0.0.0"
-    host: "127.0.0.1"
-    port: "6612"
+    host: "hnf1b_mysql"
+    port: "3306"
     port_self: "6668"
     secret: mHzU/}bny4-==rm0]9~bsq.2Ob2`lHgu2#+K(/Dih#7bN@KmMLf\AK9y:Inf+FN
     refresh: 360
