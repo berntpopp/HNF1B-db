@@ -176,7 +176,12 @@ function(res, sort = "report_id", filter = "", fields = "", `page[after]` = 0, `
 ## get all individuals
 #* @serializer json list(na="null")
 #' @get /api/individuals
-function(res, sort = "individual_id", filter = "", fields = "", `page[after]` = 0, `page[size]` = "all") {
+function(res,
+  sort = "individual_id",
+  filter = "",
+  fields = "",
+  `page[after]` = 0,
+  `page[size]` = "all") {
 
   start_time <- Sys.time()
 
@@ -189,7 +194,7 @@ function(res, sort = "individual_id", filter = "", fields = "", `page[after]` = 
   # get data from database
   hnf1b_db_individual_table <- pool %>%
     tbl("individual") %>%
-    collect() %>%
+    collect()
 
   hnf1b_db_report_phenotype_nested <- pool %>%
     tbl("report_phenotype_view") %>%
@@ -202,7 +207,7 @@ function(res, sort = "individual_id", filter = "", fields = "", `page[after]` = 
     left_join(hnf1b_db_report_phenotype_nested, by = c("report_id", "individual_id"))
 
   hnf1b_db_individual_plus_report_table <- hnf1b_db_individual_table %>%
-    left_join(hnf1b_db_report_table, by = c("report_id", "individual_id")) %>%
+    left_join(hnf1b_db_report_table, by = c("individual_id")) %>%
     nest(reports = -c(individual_id, sex, individual_DOI)) %>%
     arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
     filter(!!!rlang::parse_exprs(filter_exprs))

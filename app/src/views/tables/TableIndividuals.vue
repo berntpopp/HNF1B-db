@@ -48,15 +48,77 @@
                   :items="individuals"
                   :headers="headers"
                   :search="search"
-                  item-key="name"
+                  :single-expand="singleExpand"
+                  :expanded.sync="expanded"
+                  show-expand
+                  item-key="individual_id"
                   class="elevation-1"
                 >
+
+                <template v-slot:expanded-item="{ headers, item }">
+                  <td :colspan="headers.length">
+
+                    <v-data-table
+                      dense
+                      :items="item.reports"
+                      item-key="report_id"
+                      :headers="headers_reports"
+                      class="elevation-1"
+                      hide-default-footer
+                      disable-pagination
+                      disable-filtering
+                    >
+
+                      <template v-slot:[`item.report_id`]="{ item }">
+                        <v-chip
+                          color="deep-orange lighten-2"
+                          class="ma-2"
+                          x-small
+                        >
+                          rep{{ item.report_id }}
+                          <v-icon right>
+                            mdi-newspaper-variant
+                          </v-icon>
+                        </v-chip>
+                      </template>
+
+                      <template v-slot:[`item.cohort`]="{ item }">
+                        <v-chip
+                          :color="stoplights_style[item.cohort]"
+                          class="ma-2"
+                          x-small
+                        >
+                          {{ item.cohort }}
+                        </v-chip>
+                      </template>
+
+                      <template v-slot:[`item.phenotypes`]="{ item }">
+                        
+                        <template v-for="phenotype in item.phenotypes">
+                        <v-chip
+                          class="ma-0"
+                          x-small
+                          v-if="phenotype.described === 'yes'"
+                          :key="phenotype.phenotype_id"
+                        >
+                          {{ phenotype.phenotype_name }}
+
+                        </v-chip>
+                      </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </td>
+                </template>
 
                 <template v-slot:[`item.individual_id`]="{ item }">
                   <v-chip
                     color="lime lighten-2"
                     class="ma-2"
                     x-small
+                    link
+                    :to="'/individual/' + item.individual_id"
                   >
                     ind{{ item.individual_id }}
                    <v-icon right>
@@ -97,12 +159,22 @@ export default {
             { text:"Sex", value:"sex" },
             { text:"DOI", value:"individual_DOI" },
           ],
-          search: '',
-          totalRows: 1,
-          absolute: true,
-          opacity: 1,
-          color: "#FFFFFF",
-          loading: true
+          headers_reports:[
+            { text:'Report', value: 'report_id' },
+            { text:'Date', value: 'report_date' },
+            { text:"Cohort", value:"cohort" },
+            { text:"Age", value:"report_age" },
+            { text:"Onset", value:"onset_age" },
+            { text:"Phenotype", value:"phenotypes" },
+          ],
+        expanded: [],
+        singleExpand: true,
+        search: '',
+        totalRows: 1,
+        absolute: true,
+        opacity: 1,
+        color: "#FFFFFF",
+        loading: true
         }
       },
       computed: {
@@ -122,7 +194,7 @@ export default {
             console.error(e);
           }
           this.loading = false;
-        }
+        },
       }
   }
 </script>
