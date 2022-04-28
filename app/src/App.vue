@@ -163,8 +163,8 @@
         {title: 'About', to: '/about', id: 'about'},
       ],
       items_small: [
-        {title: 'Reports', to: '/table_reports', id: 'table 1' },
-        {title: 'Individuals', to: '/table_individuals', id: 'table 2' },
+        {title: 'Individuals', to: '/table_individuals', id: 'table 1' },
+        {title: 'Reports', to: '/table_reports', id: 'table 2' },
         {title: 'Publications', to: '/table_publications', id: 'table 3' },
         {title: 'Variants', to: '/table_variants', id: 'table 4' },
         {title: 'Cohort', to: '/analysis_cohort', id: 'analysis 1'},
@@ -174,8 +174,8 @@
         {title: 'About', to: '/about', id: 'about'},
       ],
       tables: [
-        {title: 'Reports', to: '/table_reports', id: 'table 1'},
-        {title: 'Individuals', to: '/table_individuals', id: 'table 2'},
+        {title: 'Individuals', to: '/table_individuals', id: 'table 1'},
+        {title: 'Reports', to: '/table_reports', id: 'table 2'},
         {title: 'Publications', to: '/table_publications', id: 'table 3'},
         {title: 'Variants', to: '/table_variants', id: 'table 4'},
       ],
