@@ -97,7 +97,7 @@
 
                 <template v-slot:[`item.cohort`]="{ item }">
                   <v-chip
-                    :color="stoplights_style[item.cohort]"
+                    :color="cohort_style[item.cohort]"
                     class="ma-2"
                     x-small
                   >
@@ -120,7 +120,7 @@ export default {
   name: 'TableReports',
   data() {
         return {
-          stoplights_style: {"born": "success", "fetus": "primary"},
+          cohort_style: {"born": "success", "fetus": "primary"},
           sex_symbol: {"female": "mdi-gender-female", "male": "mdi-gender-male", "unspecified": "mdi-help-circle-outline"},
           logical_symbol: {"1": "mdi-check-circle-outline", "0": "mdi-minus-circle-outline"},
           reports: [],

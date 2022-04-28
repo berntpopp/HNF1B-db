@@ -84,7 +84,7 @@
 
                       <template v-slot:[`item.cohort`]="{ item }">
                         <v-chip
-                          :color="stoplights_style[item.cohort]"
+                          :color="cohort_color[item.cohort]"
                           class="ma-2"
                           x-small
                         >
@@ -95,16 +95,22 @@
                       <template v-slot:[`item.phenotypes`]="{ item }">
                         
                         <template v-for="phenotype in item.phenotypes">
-                        <v-chip
-                          class="ma-0"
-                          x-small
-                          v-if="phenotype.described === 'yes'"
-                          :key="phenotype.phenotype_id"
-                        >
-                          {{ phenotype.phenotype_name }}
+                          <v-chip
+                            class="ma-0"
+                            x-small
+                            v-if="phenotype.described === 'yes'"
+                            :key="phenotype.phenotype_id"
+                            :color="reported_phenotype_color[phenotype.described]"
+                          >
+                            <v-icon
+                              x-small
+                            >
+                              {{ reported_phenotype_symbol[phenotype.described] }}
+                            </v-icon>
+                            {{ phenotype.phenotype_name }}
 
-                        </v-chip>
-                      </template>
+                          </v-chip>
+                        </template>
                       </template>
 
                     </v-data-table>
@@ -150,9 +156,13 @@ export default {
   name: 'TableIndividuals',
   data() {
         return {
-          stoplights_style: {"born": "success", "fetus": "primary"},
+          cohort_color: {"born": "success", "fetus": "primary"},
           sex_symbol: {"female": "mdi-gender-female", "male": "mdi-gender-male", "unspecified": "mdi-help-circle-outline"},
           logical_symbol: {"1": "mdi-check-circle-outline", "0": "mdi-minus-circle-outline"},
+          reported_phenotype_color: {"yes": "teal lighten-1", "no": "light-blue", "not reported": "white"},
+          reported_phenotype_symbol: {"yes": "mdi-plus-circle-outline", "no": "mdi-minus-circle-outline", "not reported": "mdi-help-circle-outline"},
+          sex_symbol: {"female": "mdi-gender-female", "male": "mdi-gender-male", "unspecified": "mdi-help-circle-outline"},
+          cohort_style: {"born": "success", "fetus": "primary"},
           individuals: [],
           headers:[
             { text:'Individual', value: 'individual_id' },
