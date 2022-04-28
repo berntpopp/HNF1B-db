@@ -112,7 +112,6 @@
 
                 {{ phenotype.phenotype_name }}
 
-                <span>{{ phenotype.phenotype_id }}</span>
             </v-chip>
           </template>
           </div>
