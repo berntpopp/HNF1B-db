@@ -547,6 +547,46 @@ function(res) {
 
 
 #* @tag statistics
+#* gets reported phenotypes in a cohort
+#* @serializer json list(na="string")
+#' @get /api/statistics/phenotypes_in_cohort
+function(res) {
+
+  start_time <- Sys.time()
+
+  # get phenotypes
+  phenotype_view <- pool %>%
+    tbl("report_phenotype_view") %>%
+    collect() %>%
+    arrange(individual_id, phenotype_name) %>%
+    select(individual_id, group = phenotype_name, described) %>%
+    group_by(individual_id, group) %>%
+    filter(described == max(described)) %>%
+    ungroup() %>%
+    group_by(group, described) %>%
+    summarise(count = n(), .groups = "drop") %>%
+    ungroup() %>%
+    pivot_wider(names_from = described, values_from = count) %>%
+    filter(yes / (yes + no + `not reported`) > 0.10) %>%
+    pivot_longer(cols = no:yes, names_to = c("described"), values_to = "count") %>%
+    pivot_wider(names_from = described, values_from = count)
+
+  # compute execution time
+  end_time <- Sys.time()
+  execution_time <- as.character(paste0(round(end_time - start_time, 2),
+  " secs"))
+
+  # add columns to the meta information from
+  # generate_cursor_pag_inf function return
+  meta <- tibble::as_tibble(list(
+    "executionTime" = execution_time))
+
+  # generate object to return
+  list(meta = meta, data = phenotype_view)
+}
+
+
+#* @tag statistics
 ## get statistics of the database entries
 #* @serializer json list(na="null")
 #' @get /api/statistics

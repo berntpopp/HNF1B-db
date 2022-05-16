@@ -47,9 +47,9 @@
                     <v-row justify="center" align="center">
                         <v-col cols="12" sm="4">
 
-                        <!-- Content -->
-                        <div id="my_dataviz" class="svg-container"></div>
-                        <!-- Content -->
+                        <!-- Content publications plot-->
+                        <div id="publications_dataviz" class="svg-container"></div>
+                        <!-- Content publications plot-->
 
                         </v-col>
                     </v-row>
@@ -79,9 +79,9 @@
                     <v-row justify="center" align="center">
                         <v-col cols="12" sm="4">
 
-                            <v-img
-                              :src="image_phenotype"
-                            ></v-img>
+                        <!-- Content phenotype plot-->
+                        <div id="phenotype_dataviz" class="svg-container"></div>
+                        <!-- Content phenotype plot-->
 
                         </v-col>
                     </v-row>
@@ -172,12 +172,12 @@
           height = 400 - margin.top - margin.bottom;
 
       // first remove svg
-      d3.select("#my_dataviz")
+      d3.select("#publications_dataviz")
         .select("svg")
         .remove();
 
       // append the svg object to the body of the page
-      const svg = d3.select("#my_dataviz")
+      const svg = d3.select("#publications_dataviz")
         .append("svg")
         .attr("viewBox", `0 0 600 400`)
         .attr("preserveAspectRatio", "xMinYMin meet")
@@ -233,7 +233,7 @@
           .style("fill", "none")
 
       // create a tooltip
-      const tooltip = d3.select("#my_dataviz")
+      const tooltip = d3.select("#publications_dataviz")
         .append("div")
         .style("opacity", 0)
         .attr("class", "tooltip")
