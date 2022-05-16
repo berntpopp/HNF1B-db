@@ -65,6 +65,24 @@
                     </v-chip>
                   </template>
 
+                  <template v-slot:[`item.PMID`]="{ item }">
+                    <a
+                      :href="'https://pubmed.ncbi.nlm.nih.gov/' + item.PMID"
+                      target="_blank"
+                    >
+                      {{ item.PMID }}
+                    </a>
+                  </template>
+
+                  <template v-slot:[`item.DOI`]="{ item }">
+                    <a
+                      :href="'https://doi.org/' + item.DOI"
+                      target="_blank"
+                    >
+                      {{ item.DOI }}
+                    </a>
+                  </template>
+
                 </v-data-table>
             </div>
             </v-sheet>
