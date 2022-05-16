@@ -5,5 +5,6 @@ default-jdk \
 ## used to build rJava and other packages
 libbz2-dev \
 libicu-dev \
-liblzma-dev
-RUN install2.r Rcpp plumber DBI RMariaDB jsonlite config jose plotly RCurl stringdist xlsx easyPubMed rvest lubridate pool memoise coop cowplot
+liblzma-dev \
+libsodium-dev
+RUN Rscript -e 'install.packages(c("Rcpp", "plumber", "DBI", "RMariaDB", "jsonlite", "config", "jose", "RCurl", "stringdist", "xlsx", "easyPubMed", "rvest", "lubridate", "pool", "memoise", "coop", "cowplot"), repos="https://cloud.r-project.org")'
