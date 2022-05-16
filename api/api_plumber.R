@@ -20,6 +20,7 @@ library(lubridate)
 library(pool)
 library(memoise)
 library(coop)
+library(timetk)
 ##-------------------------------------------------------------------##
 
 
@@ -493,6 +494,57 @@ function(res,
 
 ##-------------------------------------------------------------------##
 ## Statistics endpoints
+
+#* @tag statistics
+#* gets publication development over time
+#* @serializer json list(na="string")
+#' @get /api/statistics/publications_over_time
+function(res) {
+
+  start_time <- Sys.time()
+
+  # get publication from the publication view
+  publications <- pool %>%
+    tbl("publication") %>%
+    select(publication_id, publication_type, publication_date) %>%
+    collect() %>%
+    filter(!is.na(publication_date)) %>%
+    mutate(publication_date = as.Date(publication_date)) %>%
+    mutate(count = 1) %>%
+    arrange(publication_date) %>%
+    group_by(publication_type) %>%
+    summarise_by_time(
+      .date_var = publication_date,
+      .by       = "month", # Setup for monthly aggregation
+      # Summarization
+      count  = sum(count)
+    ) %>%
+    mutate(cumulative_count = cumsum(count)) %>%
+    ungroup() %>%
+    mutate(publication_date = strftime(publication_date, "%Y-%m-%d"))
+
+  # generate object to return
+  publications_nested <- publications %>%
+    nest_by(publication_type, .key = "values") %>%
+    ungroup() %>%
+    select("group" = publication_type, values)
+
+  # compute execution time
+  end_time <- Sys.time()
+  execution_time <- as.character(paste0(round(end_time - start_time, 2),
+  " secs"))
+
+  # add columns to the meta information from
+  # generate_cursor_pag_inf function return
+  meta <- tibble::as_tibble(list(
+    "max_count" = max(publications$count),
+    "max_cumulative_count" = max(publications$cumulative_count),
+    "executionTime" = execution_time))
+
+  # generate object to return
+  list(meta = meta, data = publications_nested)
+}
+
 
 #* @tag statistics
 ## get statistics of the database entries
