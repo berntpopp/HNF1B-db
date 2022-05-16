@@ -11,7 +11,6 @@ library(RMariaDB)
 library(jsonlite)
 library(config)
 library(jose)
-library(plotly)
 library(RCurl)
 library(stringdist)
 library(xlsx)
@@ -28,7 +27,6 @@ library(coop)
 ##-------------------------------------------------------------------##
 dw <- config::get(Sys.getenv("API_CONFIG"))
 ##-------------------------------------------------------------------##
-
 
 
 
@@ -58,8 +56,8 @@ pool <- dbPool(
 # Define global functions
 
 # load source files
-source("functions/plot-functions.R")
-source("functions/helper-functions.R")
+source("functions/plot-functions.R", local = TRUE)
+source("functions/helper-functions.R", local = TRUE)
 
 # Memoise functions
 make_publications_plot_mem <- memoise(make_publications_plot)
@@ -229,7 +227,7 @@ function(res,
     tbl("individual") %>%
     collect()
 
-  hnf1b_db_report_phenotype_nested <- pool %>%
+  report_phenotype_nested <- pool %>%
     tbl("report_phenotype_view") %>%
     collect() %>%
     nest(phenotypes = -c(report_id, individual_id))
@@ -237,7 +235,7 @@ function(res,
   hnf1b_db_report_table <- pool %>%
     tbl("report_view") %>%
     collect() %>%
-    left_join(hnf1b_db_report_phenotype_nested, by = c("report_id",
+    left_join(report_phenotype_nested, by = c("report_id",
       "individual_id"))
 
   individual_plus_report_table <- hnf1b_db_individual_table %>%
@@ -343,7 +341,7 @@ function(res,
 
   # use the helper generate_cursor_pagination_info
   # to generate cursor pagination information from a tibble
-  hnf1b_db_variant_table_pag_info <- generate_cursor_pagination_info(
+  hvariant_table_pag_info <- generate_cursor_pagination_info(
     hnf1b_db_variant_table,
     `page[size]`,
     `page[after]`,
@@ -357,7 +355,7 @@ function(res,
 
   # add columns to the meta information from
   # generate_cursor_pagination_info function return
-  meta <- hnf1b_db_variant_table_pag_info$meta %>%
+  meta <- hvariant_table_pag_info$meta %>%
     add_column(as_tibble(list("sort" = sort,
       "filter" = filter,
       "fields" = fields,
@@ -366,7 +364,7 @@ function(res,
 
   # add host, port and other information to links from the link
   # information from generate_cursor_pagination_info function return
-  links <- hnf1b_db_variant_table_pag_info$links %>%
+  links <- hvariant_table_pag_info$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
@@ -383,7 +381,7 @@ function(res,
       pivot_wider(everything(), names_from = "type", values_from = "link")
 
   # generate object to return
-  list(links = links, meta = meta, data = hnf1b_db_variant_table_pag_info$data)
+  list(links = links, meta = meta, data = hvariant_table_pag_info$data)
 }
 
 
@@ -595,22 +593,25 @@ function() {
   ## set factors
   hnf1b_db_phenotypes$phenotype_name <- factor(
     hnf1b_db_phenotypes$phenotype_name,
-    levels=(hnf1b_db_phenotypes %>%
+    levels = (hnf1b_db_phenotypes %>%
       filter(described == "yes") %>%
       arrange(count))$phenotype_name
     )
 
   phenotype_plot <- ggplot(hnf1b_db_phenotypes,
-      aes(fill=described,
-      x=count, y=phenotype_name)) +
-    geom_bar(position="fill", stat="identity") +
-    scale_fill_manual(values=c("#5F9EA0", "#E1B378", "black")) +
-    geom_vline(xintercept=0.14, linetype="dashed", color = "red", size=0.7) +
+      aes(fill = described,
+      x = count, y = phenotype_name)) +
+    geom_bar(position = "fill", stat = "identity") +
+    scale_fill_manual(values = c("#5F9EA0", "#E1B378", "black")) +
+    geom_vline(xintercept = 0.14,
+      linetype = "dashed",
+      color = "red",
+      size = 0.7) +
     theme_classic() +
     theme(axis.text.x = element_text(angle = 0, hjust = 0),
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
-      legend.position="top")
+      legend.position = "top")
 
   file <- "results/phenotype_plot.png"
   ggsave(file, phenotype_plot,
