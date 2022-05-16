@@ -159,7 +159,6 @@
     data: () => ({
       items: [
         {title: 'Search', to: '/search', id: 'search'},
-        {title: 'Scoring', to: '/scoring', id: 'scoring'},
         {title: 'About', to: '/about', id: 'about'},
       ],
       items_small: [
@@ -170,7 +169,6 @@
         {title: 'Cohort', to: '/analysis_cohort', id: 'analysis 1'},
         {title: 'Individuals', to: '/analysis_genotype_phenotype', id: 'analysis 2'},
         {title: 'Search', to: '/search', id: 'search'},
-        {title: 'Scoring', to: '/scoring', id: 'scoring'},
         {title: 'About', to: '/about', id: 'about'},
       ],
       tables: [
