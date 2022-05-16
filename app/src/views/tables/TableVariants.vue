@@ -57,6 +57,8 @@
                       color="pink lighten-4"
                       class="ma-2"
                       x-small
+                      link
+                      :to="'/variant/' + item.variant_id"
                     >
                       var{{ item.variant_id }}
                     <v-icon right>

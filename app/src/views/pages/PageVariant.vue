@@ -27,14 +27,14 @@
             <div 
               class="text-lg-h6"
             >
-              <h3>Publication: 
+              <h3>Variant: 
                 <v-chip
-                  color="cyan accent-2"
+                  color="pink lighten-4"
                   class="ma-2"
                 >
-                  pub{{ $route.params.publication_id }}
+                  var{{ $route.params.variant_id }}
                   <v-icon right>
-                    mdi-book-open-blank-variant
+                    mdi-dna
                   </v-icon>
                 </v-chip>
               </h3>
@@ -47,39 +47,36 @@
   >
       <v-list-item>
       <v-list-item-content>
+
         <v-list-item>
-          PMID:
-          <a
-            :href="'https://pubmed.ncbi.nlm.nih.gov/' + publication[0].PMID"
-            target="_blank"
+          <v-chip
+            class="ma-2"
           >
-            {{ publication[0].PMID }}
-          </a>
+            {{ variant[0].variant_type }}
+          </v-chip>
         </v-list-item>
 
         <v-list-item>
-          DOI:
-          <a
-            :href="'https://doi.org/' + publication[0].DOI"
-            target="_blank"
-          >
-            {{ publication[0].DOI }}
-          </a>
+          Annotation date: {{ variant[0].variant_annotation_date }}
         </v-list-item>
 
         <v-divider inset> </v-divider>
             
         <v-list-item>
-          Review date:
-          {{ publication[0].publication_entry_date }}
+          <b>Transcript: </b>
+          {{ variant[0].transcript }}
         </v-list-item>
 
         <v-list-item>
-          <b>Title:</b> {{ publication[0].title }}
+          <b>HGVS: </b> {{ variant[0].c_dot }}, {{ variant[0].p_dot }}
         </v-list-item>
 
         <v-list-item>
-          <b>Abstract:</b> {{ publication[0].abstract }}
+          <b>VCF: </b> {{ variant[0].variant_vcf_hg19 }}
+        </v-list-item>
+
+        <v-list-item>
+          <b>INFO: </b> {{ variant[0].INFO }}
         </v-list-item>
 
       </v-list-item-content>
@@ -97,28 +94,23 @@
 
 <script>
 export default {
-  name: 'PagePublication',
+  name: 'PageVariant',
   data() {
         return {
-          publication: [
+          variant: [
             {
-              "publication_id": null,
-              "publication_alias": null,
-              "publication_type": null,
-              "publication_user_id": null,
-              "publication_entry_date": null,
-              "PMID": null,
-              "DOI": null,
-              "PDF": null,
-              "title": null,
-              "abstract": null,
-              "publication_date": null,
-              "journal_abbreviation": null,
-              "journal": null,
-              "keywords": null,
-              "firstauthor_lastname": null,
-              "firstauthor_firstname": null,
-              "update_date": null
+              "variant_id": null,
+              "variant_report_status": null,
+              "variant_annotation_source": null,
+              "variant_annotation_date": null,
+              "variant_type": null,
+              "variant_vcf_hg19": null,
+              "ID": null,
+              "INFO": null,
+              "transcript": null,
+              "c_dot": null,
+              "p_dot": null,
+              "reports": null
             }
           ],
           absolute: true,
@@ -134,19 +126,19 @@ export default {
       computed: {
       },
       created() {
-        this.loadPublicationData();
+        this.loadVariantData();
       },
       mounted() {
       },
       methods: {
-        async loadPublicationData() {
+        async loadVariantData() {
           this.loading = true;
 
-          let apiUrl = process.env.VUE_APP_API_URL + '/api/publications?filter=equals(publication_id,' + this.$route.params.publication_id + ')';
+          let apiUrl = process.env.VUE_APP_API_URL + '/api/variants?filter=equals(variant_id,' + this.$route.params.variant_id + ')';
 
           try {
             let response = await this.axios.get(apiUrl);
-            this.publication = response.data.data;
+            this.variant = response.data.data;
 
           } catch (e) {
             console.error(e);

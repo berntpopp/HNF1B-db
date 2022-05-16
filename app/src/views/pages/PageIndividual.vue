@@ -31,7 +31,6 @@
                 <v-chip
                   color="lime lighten-2"
                   class="ma-2"
-                  small
                 >
                   ind{{ $route.params.individual_id }}
                   <v-icon right>

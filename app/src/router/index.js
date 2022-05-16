@@ -62,6 +62,10 @@ const routes = [
     path: '/publication/:publication_id',
     component: () => import(/* webpackChunkName: "Pages" */ '@/views/pages/PagePublication.vue')
   },
+  {
+    path: '/variant/:variant_id',
+    component: () => import(/* webpackChunkName: "Pages" */ '@/views/pages/PageVariant.vue')
+  },
 ]
 
 const router = new VueRouter({
