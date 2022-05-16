@@ -57,7 +57,6 @@
           </v-icon>
         </v-chip>
 
-
         from 
 
         <v-chip

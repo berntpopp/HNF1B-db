@@ -58,6 +58,8 @@
                     color="deep-orange lighten-2"
                     class="ma-2"
                     x-small
+                    link
+                    :to="'/report/' + item.report_id"
                   >
                     rep{{ item.report_id }}
                     <v-icon right>
@@ -71,6 +73,8 @@
                     color="lime lighten-2"
                     class="ma-2"
                     x-small
+                    link
+                    :to="'/individual/' + item.individual_id"
                   >
                     ind{{ item.individual_id }}
                     <v-icon right>

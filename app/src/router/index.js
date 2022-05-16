@@ -66,6 +66,10 @@ const routes = [
     path: '/variant/:variant_id',
     component: () => import(/* webpackChunkName: "Pages" */ '@/views/pages/PageVariant.vue')
   },
+  {
+    path: '/report/:report_id',
+    component: () => import(/* webpackChunkName: "Pages" */ '@/views/pages/PageReport.vue')
+  },
 ]
 
 const router = new VueRouter({
