@@ -58,6 +58,10 @@ const routes = [
     path: '/individual/:individual_id',
     component: () => import(/* webpackChunkName: "Pages" */ '@/views/pages/PageIndividual.vue')
   },
+  {
+    path: '/publication/:publication_id',
+    component: () => import(/* webpackChunkName: "Pages" */ '@/views/pages/PagePublication.vue')
+  },
 ]
 
 const router = new VueRouter({

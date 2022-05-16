@@ -7,8 +7,10 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@riophae/vue-treeselect": "^0.4.0",
     "axios": "^0.21.4",
     "core-js": "^3.6.5",
+    "d3": "^7.4.4",
     "plotly.js-cartesian-dist-min": "^2.6.0",
     "vue": "^2.6.11",
     "vue-axios": "^3.3.7",

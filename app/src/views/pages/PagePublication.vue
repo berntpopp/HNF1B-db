@@ -27,13 +27,13 @@
             <div 
               class="text-lg-h6"
             >
-              <h3>Individual: 
+              <h3>Publication: 
                 <v-chip
                   color="lime lighten-2"
                   class="ma-2"
                   small
                 >
-                  ind{{ $route.params.individual_id }}
+                  pub{{ $route.params.publication_id }}
                   <v-icon right>
                     mdi-account
                   </v-icon>
@@ -45,79 +45,43 @@
   <v-card
     class="mx-auto my-2"
     max-width="800"
-    v-for="item in individual[0].reports" :key="item.report_id"
   >
       <v-list-item>
       <v-list-item-content>
-        <v-list-item-title class="text-h5">
-          Report:
-          <v-chip
-            color="deep-orange lighten-2"
-            class="ma-2"
-            small
-          > rep{{ item.report_id }}
-            <v-icon right>
-              mdi-newspaper-variant
-            </v-icon>
-          </v-chip>
-        </v-list-item-title>
+        <v-list-item>
+          PMID:
+          <a
+            :href="'https://pubmed.ncbi.nlm.nih.gov/' + publication[0].PMID"
+            target="_blank"
+          >
+            {{ publication[0].PMID }}
+          </a>
+        </v-list-item>
+
+        <v-list-item>
+          DOI:
+          <a
+            :href="'https://doi.org/' + publication[0].DOI"
+            target="_blank"
+          >
+            {{ publication[0].DOI }}
+          </a>
+        </v-list-item>
 
         <v-divider inset> </v-divider>
             
         <v-list-item>
-          Report date: {{ item.report_date }}
-          <v-spacer></v-spacer>
-          Reviewed on: {{ item.report_review_date }}
+          Review date:
+          {{ publication[0].publication_entry_date }}
         </v-list-item>
 
         <v-list-item>
-          Age reported: {{ item.report_age }}
-          <v-spacer></v-spacer>
-          Sex reported: 
-          <v-icon
-              small
-          >
-            {{ sex_symbol[item.sex_reported] }}
-          </v-icon>
+          <b>Title:</b> {{ publication[0].title }}
         </v-list-item>
 
         <v-list-item>
-          Age onset: {{ item.onset_age }}
-          <v-spacer></v-spacer>
-          Cohort: 
-          <v-chip
-            :color="cohort_style[item.cohort]"
-            class="ma-2"
-            x-small
-          >
-            {{ item.cohort }}
-          </v-chip>
+          <b>Abstract:</b> {{ publication[0].abstract }}
         </v-list-item>
-
-        <v-list-item>
-          Phenotypes: 
-          <div>
-          <template v-for="phenotype in item.phenotypes">
-            <v-chip
-              class="ma-0"
-              x-small
-              :key="phenotype.phenotype_id"
-              :color="reported_phenotype_color[phenotype.described]"
-            >
-                <v-icon
-                  x-small
-                >
-                  {{ reported_phenotype_symbol[phenotype.described] }}
-                </v-icon>
-
-                {{ phenotype.phenotype_name }}
-
-            </v-chip>
-          </template>
-          </div>
-        </v-list-item>
-
-
 
       </v-list-item-content>
     </v-list-item>
@@ -134,10 +98,30 @@
 
 <script>
 export default {
-  name: 'PageIndividual',
+  name: 'PagePublication',
   data() {
         return {
-          individual: [],
+          publication: [
+            {
+              "publication_id": null,
+              "publication_alias": null,
+              "publication_type": null,
+              "publication_user_id": null,
+              "publication_entry_date": null,
+              "PMID": null,
+              "DOI": null,
+              "PDF": null,
+              "title": null,
+              "abstract": null,
+              "publication_date": null,
+              "journal_abbreviation": null,
+              "journal": null,
+              "keywords": null,
+              "firstauthor_lastname": null,
+              "firstauthor_firstname": null,
+              "update_date": null
+            }
+          ],
           absolute: true,
           opacity: 1,
           color: "#FFFFFF",
@@ -151,19 +135,19 @@ export default {
       computed: {
       },
       created() {
-        this.loadIndividualData();
+        this.loadPublicationData();
       },
       mounted() {
       },
       methods: {
-        async loadIndividualData() {
+        async loadPublicationData() {
           this.loading = true;
 
-          let apiUrl = process.env.VUE_APP_API_URL + '/api/individuals?filter=equals(individual_id,' + this.$route.params.individual_id + ')';
+          let apiUrl = process.env.VUE_APP_API_URL + '/api/publications?filter=equals(publication_id,' + this.$route.params.publication_id + ')';
 
           try {
             let response = await this.axios.get(apiUrl);
-            this.individual = response.data.data;
+            this.publication = response.data.data;
 
           } catch (e) {
             console.error(e);

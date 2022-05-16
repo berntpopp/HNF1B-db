@@ -57,6 +57,8 @@
                       color="cyan accent-2"
                       class="ma-2"
                       x-small
+                      link
+                      :to="'/publication/' + item.publication_id"
                     >
                       pub{{ item.publication_id }}
                       <v-icon right>
