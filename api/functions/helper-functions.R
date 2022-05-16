@@ -43,34 +43,33 @@ generate_sort_expressions <- function(sort_string, unique_id = "entity_id") {
 # need to implement whether the respective columns exist
 # need to implement allowed Operations as input argument
 generate_filter_expressions <- function(filter_string,
-  operations_allowed = "equals,contains,any") {
+    operations_allowed = "equals,contains,any") {
   # define supported operations
   operations_supported <- "equals,contains,any,and,or,not" %>%
-    str_split(pattern=",", simplify=TRUE) %>%
+    str_split(pattern = ",", simplify = TRUE) %>%
     str_replace_all(" ", "") %>%
     unique()
 
   # define supported logic
   logic_supported <- "and,or,not" %>%
-    str_split(pattern=",", simplify=TRUE) %>%
+    str_split(pattern = ",", simplify = TRUE) %>%
     str_replace_all(" ", "") %>%
     unique()
 
   # transform submitted operations to list
   operations_allowed <- URLdecode(operations_allowed) %>%
-    str_split(pattern=",", simplify=TRUE) %>%
+    str_split(pattern = ",", simplify = TRUE) %>%
     str_replace_all(" ", "") %>%
     unique()
 
   filter_string <- URLdecode(filter_string) %>%
     str_trim()
 
-  logical_operator <- stringr::str_extract(string =
-      filter_string,
+  logical_operator <- stringr::str_extract(string = filter_string,
       pattern = ".+?\\(") %>%
     stringr::str_remove_all("\\(")
 
-  if (logical_operator %in% logic_supported){
+  if (logical_operator %in% logic_supported) {
     filter_string <- filter_string %>%
       stringr::str_extract(pattern = "(?<=\\().*(?=\\))")
   } else {
@@ -80,72 +79,47 @@ generate_filter_expressions <- function(filter_string,
     # check if requested operations are supported, if not through error
   if (all(operations_allowed %in% operations_supported)) {
     if (filter_string != "") {
-      #
+      # compute filter expressions
       filter_tibble <- as_tibble(str_split(str_squish(filter_string),
-        "\\),")[[1]]) %>%
+          "\\),")[[1]]) %>%
         separate(value, c("logic", "column_value"), sep = "\\(") %>%
-        separate(column_value,
-          c("column", "filter_value"),
+        separate(column_value, c("column", "filter_value"),
           sep = "\\,",
           extra = "merge") %>%
         mutate(filter_value = str_remove_all(filter_value, "'|\\)")) %>%
         mutate(exprs = case_when(
-          column == "any" &
-          logic == "contains" ~
+          column == "any" & logic == "contains" ~
             paste0("if_any(everything(), ~str_detect(.x, '",
-              filter_value,
-              "'))"),
-          column == "all" &
-          logic == "contains" ~
+              filter_value, "'))"),
+          column == "all" & logic == "contains" ~
             paste0("if_all(everything(), ~str_detect(.x, '",
-              filter_value,
-              "'))"),
-          !(column %in% c("all", "any")) &
-            logic == "contains" ~
-              paste0("str_detect(", column, ", '", filter_value, "')"),
-          column == "any" &
-          logic == "equals" ~
+              filter_value, "'))"),
+          !(column %in% c("all", "any")) & logic == "contains" ~
+            paste0("str_detect(", column, ", '", filter_value, "')"),
+          column == "any" & logic == "equals" ~
             paste0("if_any(everything(), ~str_detect(.x, '^",
-              filter_value,
-              "$'))"),
-          column == "all" &
-          logic == "equals" ~
+              filter_value, "$'))"),
+          column == "all" & logic == "equals" ~
             paste0("if_all(everything(), ~str_detect(.x, '^",
-              filter_value,
-              "$'))"),
-          !(column %in% c("all", "any")) &
-            logic == "equals" ~
-              paste0("str_detect(",
-                column,
-                ", '^",
-                filter_value,
-                "$')"),
-          column == "any" &
-          logic == "any" ~
+              filter_value, "$'))"),
+          !(column %in% c("all", "any")) & logic == "equals" ~
+            paste0("str_detect(", column, ", '^", filter_value, "$')"),
+          column == "any" & logic == "any" ~
             paste0("if_any(everything(), ~str_detect(.x, ",
-              str_replace_all(paste0("'^",
-                filter_value,
-                "$')"),
-              pattern = "\\,",
-              replacement = "$|^"), ")"),
-          column == "all" &
-          logic == "any" ~
+              str_replace_all(paste0("'^", filter_value, "$')"),
+                pattern = "\\,",
+                replacement = "$|^"), ")"),
+          column == "all" & logic == "any" ~
             paste0("if_all(everything(), ~str_detect(.x, ",
+              str_replace_all(paste0("'^", filter_value, "$')"),
+                pattern = "\\,",
+                replacement = "$|^"), ")"),
+          !(column %in% c("all", "any")) & logic == "any" ~
+            paste0("str_detect(", column, ", ",
               str_replace_all(paste0("'^",
                 filter_value, "$')"),
                 pattern = "\\,",
-                replacement = "$|^"),
-                ")"),
-          !(column %in% c("all", "any")) &
-          logic == "any" ~
-            paste0("str_detect(",
-              column,
-              ", ",
-              str_replace_all(paste0("'^",
-                filter_value, "$')"),
-                pattern = "\\,",
-                replacement = "$|^")
-              ),
+                replacement = "$|^")),
         )) %>%
         filter(logic %in% operations_allowed) %>%
         filter(!is.na(exprs))
@@ -154,15 +128,13 @@ generate_filter_expressions <- function(filter_string,
 
       # compute filter string based on input logic
       if (logical_operator == "and") {
-        filter_expression <- str_c(filter_list,
-        collapse = " & ")
+        filter_expression <- str_c(filter_list, collapse = " & ")
       } else if (logical_operator == "or") {
-        filter_expression <- str_c(filter_list,
-        collapse = " | ")
+        filter_expression <- str_c(filter_list, collapse = " | ")
       } else if (logical_operator == "not") {
         filter_expression <- paste0("!( ",
-          str_c(filter_list,
-          collapse = " | "), " )")
+          str_c(filter_list, collapse = " | "),
+          " )")
       }
 
       return(filter_expression)

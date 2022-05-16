@@ -327,22 +327,38 @@ function(res,
   filter_exprs <- generate_filter_expressions(filter)
 
   # get data from database
-  hnf1b_db_variant_table <- pool %>%
+  variant_table <- pool %>%
     tbl("report_variant_view") %>%
     collect() %>%
     arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
     filter(!!!rlang::parse_exprs(filter_exprs))
 
+  variants <- variant_table %>%
+    select(-individual_id, -report_id, -detection_method, -segregation) %>%
+    unique()
+
+  variants_reports <- variant_table %>%
+    select(variant_id,
+      individual_id,
+      report_id,
+      detection_method,
+      segregation) %>%
+    nest_by(variant_id, .key = "reports") %>%
+    ungroup()
+
+  variant_table_nested <- variants %>%
+    left_join(variants_reports, by=c("variant_id"))
+
   # select fields from table based on input
   # using the helper function "select_tibble_fields"
-  hnf1b_db_variant_table <- select_tibble_fields(hnf1b_db_variant_table,
+  variant_table_nested <- select_tibble_fields(variant_table_nested,
     fields,
     "variant_id")
 
   # use the helper generate_cursor_pagination_info
   # to generate cursor pagination information from a tibble
-  hvariant_table_pag_info <- generate_cursor_pagination_info(
-    hnf1b_db_variant_table,
+  variant_table_nested_pag_info <- generate_cursor_pagination_info(
+    variant_table_nested,
     `page[size]`,
     `page[after]`,
     "variant_id"
@@ -355,7 +371,7 @@ function(res,
 
   # add columns to the meta information from
   # generate_cursor_pagination_info function return
-  meta <- hvariant_table_pag_info$meta %>%
+  meta <- variant_table_nested_pag_info$meta %>%
     add_column(as_tibble(list("sort" = sort,
       "filter" = filter,
       "fields" = fields,
@@ -364,7 +380,7 @@ function(res,
 
   # add host, port and other information to links from the link
   # information from generate_cursor_pagination_info function return
-  links <- hvariant_table_pag_info$links %>%
+  links <- variant_table_nested_pag_info$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
@@ -381,7 +397,7 @@ function(res,
       pivot_wider(everything(), names_from = "type", values_from = "link")
 
   # generate object to return
-  list(links = links, meta = meta, data = hvariant_table_pag_info$data)
+  list(links = links, meta = meta, data = variant_table_nested_pag_info$data)
 }
 
 

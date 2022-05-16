@@ -83,8 +83,6 @@ export default {
           variants: [],
           headers:[
             { text:'Variant', value: 'variant_id' },
-            { text:"Method", value:"detection_method" },
-            { text:"Segregation", value:"segregation" },
             { text:"Type", value:"variant_type" },
             { text:"VCF", value:"variant_vcf_hg19" },
             { text:"Transcript", value:"c_dot" },
