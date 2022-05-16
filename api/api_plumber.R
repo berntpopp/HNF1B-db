@@ -1,4 +1,4 @@
-# hnf1b-db_plumber.R
+# api_plumber.R
 ## to do: adapt "serializer json list(na="null")"
 
 ##-------------------------------------------------------------------##
