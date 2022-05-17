@@ -37,7 +37,7 @@ const routes = [
   {
     path: '/analysis_cohort',
     name: 'AnalysisCohort',
-    component: () => import(/* webpackChunkName: "Home" */ '@/views/analyses/AnalysisCohort.vue')
+    component: () => import(/* webpackChunkName: "Analyses" */ '@/views/analyses/AnalysisCohort.vue')
   },
   {
     path: '/analysis_genotype_phenotype',
