@@ -568,7 +568,8 @@ function(res) {
     ungroup() %>%
     pivot_wider(names_from = described, values_from = count) %>%
     filter(yes / (yes + no + `not reported`) > 0.10) %>%
-    pivot_longer(cols = no:yes, names_to = c("described"), values_to = "count") %>%
+    pivot_longer(cols = no:yes, names_to = c("described"),
+      values_to = "count") %>%
     pivot_wider(names_from = described, values_from = count)
 
   # compute execution time
@@ -587,6 +588,82 @@ function(res) {
 
 
 #* @tag statistics
+#* gets cohort characteristicscomponents
+#* @serializer json list(na="string")
+#' @get /api/statistics/cohort_characteristics
+function(res) {
+
+  start_time <- Sys.time()
+
+  # get phenotypes
+  # get data from individual table and report view and combine
+  hnf1b_db_individual_table <- pool %>%
+    tbl("individual")
+
+  hnf1b_db_report_table <- pool %>%
+    tbl("report_view")
+
+  individual_plus_report_table <- hnf1b_db_individual_table %>%
+    left_join(hnf1b_db_report_table, by = c("individual_id")) %>%
+    collect() %>%
+    arrange(desc(report_date)) %>%
+    mutate(report_date =
+      case_when(
+        is.na(report_date) ~ Sys.Date(),
+        !is.na(report_date) ~ as.Date(report_date)
+      )
+    ) %>%
+    group_by(individual_id) %>%
+    filter(report_date == max(report_date)) %>%
+    select(individual_id, sex, report_date, cohort, reported_multiple) %>%
+    arrange(individual_id) %>%
+    ungroup()
+
+    # generate indivdual sublists
+    individual_sex <- individual_plus_report_table %>%
+        group_by(sex) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = sex, values_from = count)
+
+    individual_cohort <- individual_plus_report_table %>%
+        group_by(cohort) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = cohort, values_from = count)
+
+    individual_multiple <- individual_plus_report_table %>%
+        group_by(reported_multiple) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        mutate(reported_multiple =
+        case_when(
+            reported_multiple == 1 ~ "multiple",
+            reported_multiple == 0 ~ "single"
+        )
+        ) %>%
+        pivot_wider(names_from = reported_multiple, values_from = count)
+
+    cohort_characteristics <- list(sex = individual_sex,
+        cohort = individual_cohort,
+        reported = individual_multiple)
+
+  # compute execution time
+  end_time <- Sys.time()
+  execution_time <- as.character(paste0(round(end_time - start_time, 2),
+  " secs"))
+
+  # add columns to the meta information from
+  # generate_cursor_pag_inf function return
+  meta <- tibble::as_tibble(list(
+    "executionTime" = execution_time))
+
+  # generate object to return
+  list(meta = meta, data = cohort_characteristics)
+}
+
+
+#* @tag statistics
 ## get statistics of the database entries
 #* @serializer json list(na="null")
 #' @get /api/statistics
@@ -597,8 +674,8 @@ function() {
     tbl("statistics") %>%
     collect()
 
+  # generate object to return
   statistics
-
 }
 
 
