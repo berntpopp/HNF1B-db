@@ -44,7 +44,7 @@
   <v-card
     class="mx-auto my-2"
     max-width="800"
-    v-for="item in individual[0].reports" :key="item.report_id"
+    v-for="item in individual.reports" :key="item.report_id"
   >
       <v-list-item>
       <v-list-item-content>
@@ -136,7 +136,7 @@ export default {
   name: 'PageIndividual',
   data() {
         return {
-          individual: [],
+          individual: {},
           absolute: true,
           opacity: 1,
           color: "#FFFFFF",
@@ -162,7 +162,7 @@ export default {
 
           try {
             let response = await this.axios.get(apiUrl);
-            this.individual = response.data.data;
+            this.individual = response.data.data[0];
 
           } catch (e) {
             console.error(e);
