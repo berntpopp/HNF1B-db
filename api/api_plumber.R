@@ -402,6 +402,27 @@ function(res,
 }
 
 
+#* @tag variant
+## get all HNF1B domains
+#* @serializer json list(na="null")
+#' @get /api/domains
+function(feature_key = "protein,domain,site") {
+
+  # split feature_key input
+  # to do: add check for input and whetehr the values exists in the table
+  feature_key_tibble <- as_tibble(str_split(feature_key, ",")[[1]]) %>%
+    select(key = value)
+
+  # get data from database
+  domain_table <- pool %>%
+    tbl("domains") %>%
+    collect() %>%
+    filter(FeatureKey %in% feature_key_tibble$key)
+
+  # generate object to return
+  list(data = domain_table)
+}
+
 ## Variant endpoints
 ##-------------------------------------------------------------------##
 

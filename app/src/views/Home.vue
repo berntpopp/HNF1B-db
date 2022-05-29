@@ -1,121 +1,136 @@
 <template>
-       <v-container>
-        <v-row>
-          <v-col
-            cols="12"
-            sm="12"
-          >
+  <v-container>
+  <v-row>
+    <v-col
+      cols="12"
+      sm="12"
+    >
 
-              <v-overlay
-                :absolute="absolute"
-                :opacity="opacity"
-                :value="loading"
-                :color="color"
+        <v-overlay
+          :absolute="absolute"
+          :opacity="opacity"
+          :value="loading"
+          :color="color"
+        >
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
+        </v-overlay>
+
+
+        <v-card
+          color="white"
+        >
+          <v-card-title class="text-h5 blue lighten-2">
+            Search HNF1B-db
+          </v-card-title>
+          <v-card-text>
+            <!--// database statistics //-->
+              The database currently contains 
+
+              <v-chip
+                color="lime lighten-2"
+                class="ma-2"
+                small
+                link
+                to="/table_individuals"
               >
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </v-overlay>
+                <span class="font-weight-bold">{{ statistics.individuals_count }} individuals</span> 
+                <v-icon right>
+                  mdi-account
+                </v-icon>
+              </v-chip>
 
+              with 
 
-  <v-card
-    color="white"
-  >
-    <v-card-title class="text-h5 blue lighten-2">
-      Search HNF1B-db
-    </v-card-title>
-    <v-card-text>
-      <!--// database statistics //-->
-        The database currently contains 
+              <v-chip
+                color="pink lighten-4"
+                class="ma-2"
+                small
+                link
+                to="/table_variants"
+              >
+                <span class="font-weight-bold"> {{ statistics.variants_count }} distinct variants</span>
+              <v-icon right>
+                  mdi-dna
+                </v-icon>
+              </v-chip>
 
-        <v-chip
-          color="lime lighten-2"
-          class="ma-2"
-          small
-          link
-          to="/table_individuals"
-        >
-          <span class="font-weight-bold">{{ statistics.individuals_count }} individuals</span> 
-          <v-icon right>
-            mdi-account
-          </v-icon>
-        </v-chip>
+              from 
 
-        with 
+              <v-chip
+                color="deep-orange lighten-2"
+                class="ma-2"
+                small
+                link
+                to="/table_reports"
+              >
+                <span class="font-weight-bold"> {{ statistics.reports_count }} reports</span>
+                <v-icon right>
+                  mdi-newspaper-variant
+                </v-icon>
+              </v-chip>
 
-        <v-chip
-          color="pink lighten-4"
-          class="ma-2"
-          small
-          link
-          to="/table_variants"
-        >
-          <span class="font-weight-bold"> {{ statistics.variants_count }} distinct variants</span>
-        <v-icon right>
-            mdi-dna
-          </v-icon>
-        </v-chip>
+              in
 
-        from 
+              <v-chip
+                color="cyan accent-2"
+                class="ma-2"
+                small
+                link
+                to="/table_publications"
+              >
+                <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications</span>
+                <v-icon right>
+                  mdi-book-open-blank-variant
+                </v-icon>
+              </v-chip>
+            <!--// database statistics //-->
 
-        <v-chip
-          color="deep-orange lighten-2"
-          class="ma-2"
-          small
-          link
-          to="/table_reports"
-        >
-          <span class="font-weight-bold"> {{ statistics.reports_count }} reports</span>
-          <v-icon right>
-            mdi-newspaper-variant
-          </v-icon>
-        </v-chip>
+          </v-card-text>
+          <v-card-text>
+            <v-autocomplete
+              color="black"
+              hide-no-data
+              hide-selected
+              item-text="Description"
+              item-value="API"
+              label="Individuals, reports, publications and variants"
+              placeholder="Start typing to Search"
+              prepend-icon="mdi-database-search"
+              return-object
+            ></v-autocomplete>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-expand-transition>
+          </v-expand-transition>
+        </v-card>
 
-        in
+        <v-card>
+          <v-card-title class="text-h5 blue lighten-2">
+            Variants in HNF1B
+          </v-card-title>
 
-        <v-chip
-          color="cyan accent-2"
-          class="ma-2"
-          small
-          link
-          to="/table_publications"
-        >
-          <span class="font-weight-bold"> {{ statistics.publications_count }} reviewed publications</span>
-          <v-icon right>
-            mdi-book-open-blank-variant
-          </v-icon>
-        </v-chip>
-      <!--// database statistics //-->
+          <v-card-text>
+            <ProteinLinearPlot></ProteinLinearPlot>
+          </v-card-text>
 
-    </v-card-text>
-    <v-card-text>
-      <v-autocomplete
-        color="black"
-        hide-no-data
-        hide-selected
-        item-text="Description"
-        item-value="API"
-        label="Individuals, reports, publications and variants"
-        placeholder="Start typing to Search"
-        prepend-icon="mdi-database-search"
-        return-object
-      ></v-autocomplete>
-    </v-card-text>
-    <v-divider></v-divider>
-    <v-expand-transition>
-    </v-expand-transition>
-  </v-card>
+        </v-card>
 
-          </v-col>
-        </v-row>
-      </v-container>
+    </v-col>
+  </v-row>
+</v-container>
 </template>
 
 <script>
+import ProteinLinearPlot from '@/components/ProteinLinearPlot.vue';
 
   export default {
     name: 'Home',
+    components: {
+      ProteinLinearPlot
+    },
   data() {
         return {
           statistics: { "reports_count": 0, "publications_count": 0, "individuals_count": 0, "variants_count": 0 },
