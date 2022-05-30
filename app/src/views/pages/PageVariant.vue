@@ -52,7 +52,17 @@
           <v-chip
             class="ma-2"
           >
-            {{ variant[0].variant_type }}
+            {{ variant[0].variant_class }}
+          </v-chip>
+          <v-chip
+            class="ma-2"
+          >
+            {{ variant[0].IMPACT }}
+          </v-chip>
+          <v-chip
+            class="ma-2"
+          >
+            {{ variant[0].EFFECT }}
           </v-chip>
         </v-list-item>
 
@@ -64,19 +74,27 @@
             
         <v-list-item>
           <b>Transcript: </b>
-          {{ variant[0].transcript }}
+          {{ variant[0].FEATUREID }}
         </v-list-item>
 
         <v-list-item>
-          <b>HGVS: </b> {{ variant[0].c_dot }}, {{ variant[0].p_dot }}
+          <b>HGVS: </b> {{ variant[0].HGVS_C }}, {{ variant[0].HGVS_P }}
         </v-list-item>
 
         <v-list-item>
-          <b>VCF: </b> {{ variant[0].variant_vcf_hg19 }}
+          <b>VCF (hg19): </b> {{ variant[0].vcf_hg19 }}
         </v-list-item>
 
         <v-list-item>
-          <b>INFO: </b> {{ variant[0].INFO }}
+          <b>INFO (hg19): </b> {{ variant[0].INFO_hg19 }}
+        </v-list-item>
+
+        <v-list-item>
+          <b>VCF (hg38): </b> {{ variant[0].vcf_hg38 }}
+        </v-list-item>
+
+        <v-list-item>
+          <b>INFO (hg38): </b> {{ variant[0].INFO_hg38 }}
         </v-list-item>
 
       </v-list-item-content>
@@ -103,13 +121,13 @@ export default {
               "variant_report_status": null,
               "variant_annotation_source": null,
               "variant_annotation_date": null,
-              "variant_type": null,
-              "variant_vcf_hg19": null,
+              "variant_class": null,
+              "vcf_hg19": null,
               "ID": null,
-              "INFO": null,
-              "transcript": null,
-              "c_dot": null,
-              "p_dot": null,
+              "INFO_hg19": null,
+              "FEATUREID": null,
+              "HGVS_C": null,
+              "HGVS_P": null,
               "reports": null
             }
           ],
@@ -139,6 +157,8 @@ export default {
           try {
             let response = await this.axios.get(apiUrl);
             this.variant = response.data.data;
+
+console.log(this.variant);
 
           } catch (e) {
             console.error(e);

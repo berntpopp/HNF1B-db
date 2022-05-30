@@ -59,7 +59,7 @@
             // Parse the Data
             const data = this.itemsPhenotype;
 
-            // List of subgroups = header of the csv files = soil condition here
+            // List of subgroups = header of the csv files
             const subgroups = ["yes", "no", "not reported"]
 
             // List of groups = species here = value of the first column called group -> I show them on the X axis

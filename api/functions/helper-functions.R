@@ -1,5 +1,6 @@
 # generate sort expressions to parse
-generate_sort_expressions <- function(sort_string, unique_id = "entity_id") {
+generate_sort_expressions <- function(sort_string,
+  unique_id = "individual_id") {
 
   # split the sort input by comma and compute directions
   # based on presence of + or - in front of the string
@@ -26,7 +27,7 @@ generate_sort_expressions <- function(sort_string, unique_id = "entity_id") {
 
     sort_list <- sort_tibble$exprs
 
-    # and check if entity_idis in the resulting list,
+    # and check if unique_id is in the resulting list,
     # if not append to the list for unique sorting
   if (!(unique_id %in% sort_list |
     paste0("desc(", unique_id, ")") %in% sort_list)){
@@ -150,7 +151,7 @@ generate_filter_expressions <- function(filter_string,
 # select requested fields from tibble
 select_tibble_fields <- function(selection_tibble,
   fields_requested,
-  unique_id = "entity_id") {
+  unique_id = "individual_id") {
 
   # get column names from selection_tibble
   tibble_colnames <- colnames(selection_tibble)
@@ -188,9 +189,9 @@ select_tibble_fields <- function(selection_tibble,
 generate_cursor_pagination_info <- function(pagination_tibble,
   page_size = "all",
   page_after = 0,
-  pagination_identifier = "entity_id") {
+  pagination_identifier = "individual_id") {
 
-  # get number of rows in filtered ndd_entity_view
+  # get number of rows in filtered pagination_tibble
   pagination_tibble_rows <- (pagination_tibble %>%
     summarise(n = n()))$n
 

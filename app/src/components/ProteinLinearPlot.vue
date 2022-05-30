@@ -20,23 +20,26 @@
       methods: {
         async loadDomainData() {
 
-        let apiUrl = process.env.VUE_APP_API_URL + '/api/domains';
+        let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';
+        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&filter=any(variant_class,SNV,deletion,insertion)&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED&page[after]=0&page[size]=181';
 
         try {
-          let response = await this.axios.get(apiUrl);
+          let responseDomains = await this.axios.get(apiUrlDomains);
+          let responseVariants = await this.axios.get(apiUrlVariants);
 
-          const itemsDomains = response.data.data;
+          const itemsDomains = responseDomains.data.data;
+          const itemsVariants = responseVariants.data.data;
 
-          this.generateLinearProteinGraph(itemsDomains);
+          this.generateLinearProteinGraph(itemsDomains, itemsVariants);
 
         } catch (e) {
           console.error(e);
         }
       },
-      generateLinearProteinGraph(domain_input) {
+      generateLinearProteinGraph(domain_input, variant_input) {
 
       // set the dimensions and margins of the graph
-      const margin = {top: 20, right: 50, bottom: 0, left: 50},
+      const margin = {top: 50, right: 50, bottom: 0, left: 50},
           height = 120 ;
 
       // set height multiplicator
@@ -76,6 +79,12 @@
         const maxLength = Math.max(...domain_input.map(o => o.length));
         const maxLengthScaled = Math.max(...domain_input.map(o => o.length)) * length_factor;
 
+        const variant_data = variant_input.map(obj => {
+          return {...obj, 
+            Protein_position: obj.Protein_position,
+          };
+        });
+
         // Add x axis
         const x = d3.scaleLinear()
           .domain([ 0, maxLength ])
@@ -87,8 +96,70 @@
 
         // Add Y axis
         const y = d3.scaleLinear()
-          .domain([0, 30])
+          .domain([0, 50])
           .range([ height, 0 ]);
+
+
+// create a tooltip
+const tooltip = d3.select("#protein_linear_dataviz")
+  .append("div")
+  .style("opacity", 0)
+  .attr("class", "tooltip")
+  .style("background-color", "white")
+  .style("border", "solid")
+  .style("border-width", "1px")
+  .style("border-radius", "5px")
+  .style("padding", "2px")
+
+// Three function that change the tooltip when user hover / move / leave a cell
+// layerX/Y replaced by clientX/Y
+const mouseover = function(event,d) {
+  tooltip
+    .style("opacity", 1)
+}
+const mousemove = function(event,d) {
+  tooltip
+    .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + " [CADD: " + d.CADD_PHRED + "]")
+    .style("left", `${event.layerX+10}px`)
+    .style("top", `${event.layerY+10}px`)
+}
+const mouseleave = function(event,d) {
+  tooltip
+    .style("opacity", 0)
+}
+
+// color palette = one color per subgroup
+const color = d3.scaleOrdinal()
+  .domain(["HIGH", "MODERATE", "LOW", "MODIFIER"])
+  .range(['#FE5F55','#90CAF9','#C7EFCF','#FFFFFF'])
+
+// Lolli lines
+svg.selectAll("myLines")
+  .data(variant_data)
+  .enter()
+  .append("line")
+    .attr("x1", function(d) { return x(d.Protein_position); })
+    .attr("x2", function(d) { return x(d.Protein_position); })
+    .attr("y1", function(d) { return y(d.CADD_PHRED + 15); })
+    .attr("y2", y(15))
+    .attr("stroke", "grey")
+
+// Lolli circles
+svg.selectAll("myCircles")
+  .data(variant_data)
+  .enter()
+  .append("a")
+  .attr("xlink:href", function(d) { return "/variant/" + d.variant_id; })
+  .append("circle")
+    .attr("cx", function(d) { return x(d.Protein_position); })
+    .attr("cy", function(d) { return y(d.CADD_PHRED + 15); })
+    .attr("r", "4")
+    .style("fill", function(d) { return color(d.IMPACT); })
+    .attr("stroke", "black")
+  .on("mouseover", mouseover)
+  .on("mousemove", mousemove)
+  .on("mouseleave", mouseleave)
+
 
         // Show the bars for the domains
         svg.selectAll("myBars")
@@ -105,7 +176,7 @@
           .attr("transform", `translate(0,${height})`);
 
         // add labels dor domain bars
-        svg.selectAll("myLegend")
+        svg.selectAll("myLabels")
           .data(domain_data)
           .join('g')
           .append("text")
