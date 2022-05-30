@@ -18,12 +18,12 @@
           ></v-progress-circular>
         </v-overlay>
 
-
         <v-card
           color="white"
+          class="my-2"
         >
           <v-card-title class="text-h5 blue lighten-2">
-            Search HNF1B-db
+            Welcome to HNF1B-db
           </v-card-title>
           <v-card-text>
             <!--// database statistics //-->
@@ -89,6 +89,7 @@
             <!--// database statistics //-->
 
           </v-card-text>
+
           <v-card-text>
             <v-autocomplete
               color="black"
@@ -107,12 +108,17 @@
           </v-expand-transition>
         </v-card>
 
-        <v-card>
+        <v-card
+          color="white"
+          class="my-2"
+        >
           <v-card-title class="text-h5 blue lighten-2">
-            Variants in HNF1B
+            Small HNF1B variants
           </v-card-title>
 
-          <v-card-text>
+          <v-card-text
+            class="d-flex justify-center"
+          >
             <ProteinLinearPlot></ProteinLinearPlot>
           </v-card-text>
 
