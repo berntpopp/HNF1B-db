@@ -21,7 +21,7 @@
         async loadDomainData() {
 
         let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';
-        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&filter=any(variant_class,SNV,deletion,insertion)&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED&page[after]=0&page[size]=181';
+        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&filter=any(variant_class,SNV,deletion,insertion)&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page[after]=0&page[size]=all';
 
         try {
           let responseDomains = await this.axios.get(apiUrlDomains);
@@ -119,7 +119,7 @@ const mouseover = function(event,d) {
 }
 const mousemove = function(event,d) {
   tooltip
-    .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + " [CADD: " + d.CADD_PHRED + "]")
+    .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + " [CADD: " + d.CADD_PHRED + "]" + " [Classification: " + d.verdict_classification + "]")
     .style("left", `${event.layerX+10}px`)
     .style("top", `${event.layerY+10}px`)
 }
@@ -175,7 +175,7 @@ svg.selectAll("myCircles")
             .attr('fill', d => d.color)
           .attr("transform", `translate(0,${height})`);
 
-        // add labels dor domain bars
+        // add labels for domain bars
         svg.selectAll("myLabels")
           .data(domain_data)
           .join('g')
