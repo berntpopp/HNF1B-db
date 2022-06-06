@@ -97,6 +97,22 @@
           <b>INFO (hg38): </b> {{ variant[0].INFO_hg38 }}
         </v-list-item>
 
+        <v-list-item>
+          <b>Verdict classification: </b> {{ variant[0].verdict_classification }} 
+        </v-list-item>
+
+        <v-list-item>
+          <b>Criteria classification: </b> 
+            <v-chip
+              v-for="criterion in variant[0].criteria_classification"
+              :key="`criterion-list-${criterion}`"
+                  color="orange lighten-4"
+            >
+                {{ criterion }}
+            </v-chip>
+          
+        </v-list-item>
+
       </v-list-item-content>
     </v-list-item>
 
