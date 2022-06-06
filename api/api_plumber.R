@@ -336,6 +336,7 @@ function(res,
 
   variants <- variant_table %>%
     select(-individual_id, -report_id, -detection_method, -segregation) %>%
+    mutate(criteria_classification = as.list(str_split(criteria_classification, pattern =", "))) %>% 
     unique()
 
   variants_reports <- variant_table %>%
@@ -348,7 +349,7 @@ function(res,
     ungroup()
 
   variant_table_nested <- variants %>%
-    left_join(variants_reports, by=c("variant_id"))
+    left_join(variants_reports, by = c("variant_id"))
 
   # select fields from table based on input
   # using the helper function "select_tibble_fields"
