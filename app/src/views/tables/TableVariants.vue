@@ -85,10 +85,11 @@ export default {
           variants: [],
           headers:[
             { text:'Variant', value: 'variant_id' },
-            { text:"Type", value:"variant_class" },
-            { text:"VCF", value:"vcf_hg19" },
-            { text:"Transcript", value:"HGVS_C" },
-            { text:"Protein", value:"HGVS_P" }
+            { text:"Type", value: "variant_class" },
+            { text:"VCF", value: "vcf_hg19" },
+            { text:"Transcript", value: "HGVS_C" },
+            { text:"Protein", value: "HGVS_P" },
+            { text:"Classification", value: "verdict_classification" }
           ],
           search: '',
           totalRows: 1,
