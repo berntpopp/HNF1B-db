@@ -584,6 +584,7 @@ function(res) {
     select(individual_id, group = phenotype_name, described) %>%
     group_by(individual_id, group) %>%
     filter(described == max(described)) %>%
+    unique() %>%
     ungroup() %>%
     group_by(group, described) %>%
     summarise(count = n(), .groups = "drop") %>%

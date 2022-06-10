@@ -1,7 +1,9 @@
 <template>
+  <v-container>
     <!-- Content linear protein plot -->
     <div id="protein_linear_dataviz" class="svg-container"></div>
     <!-- Content linear protein plot -->
+  </v-container>
 </template>
 
 
@@ -103,8 +105,9 @@
 // create a tooltip
 const tooltip = d3.select("#protein_linear_dataviz")
   .append("div")
-  .style("opacity", 0)
+  .attr('id', 'tooltip')
   .attr("class", "tooltip")
+  .style("opacity", 0)
   .style("background-color", "white")
   .style("border", "solid")
   .style("border-width", "1px")
@@ -120,8 +123,8 @@ const mouseover = function(event,d) {
 const mousemove = function(event,d) {
   tooltip
     .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + " [CADD: " + d.CADD_PHRED + "]" + " [Classification: " + d.verdict_classification + "]")
-    .style("left", `${event.layerX+10}px`)
-    .style("top", `${event.layerY+10}px`)
+    .style("left", (event.layerX + 10 ) + 'px')
+    .style("top", (event.layerY + 10 ) + 'px');
 }
 const mouseleave = function(event,d) {
   tooltip
