@@ -69,16 +69,12 @@
               };
             });
 
-console.log(this.itemsPublication);
-
       // generate array of all categories
       const allCategories = this.itemsPublication.map(item => item.group);
       const maxCount = this.itemsPublicationMeta[0].max_cumulative_count;
       const allValues = this.itemsPublication.map( (u) => [
         u.values.map(f => f.publication_date[0]),
       ]).flat(2);
-
-console.log(allValues);
 
       // A color scale: one color for each group
       const myColor = d3.scaleOrdinal()

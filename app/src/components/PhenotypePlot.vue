@@ -112,19 +112,27 @@
             const mouseover = function(event, d) {
                 const subgroupName = d3.select(this.parentNode).datum().key;
                 const subgroupValue = d.data[subgroupName];
+
                 tooltip
                     .html("subgroup: " + subgroupName + "<br>" + "Value: " + subgroupValue)
-                    .style("opacity", 1)
+                    .style("opacity", 1);
 
+                d3.select(this)
+                    .style("stroke", "black");
             }
+
             const mousemove = function(event, d) {
                 tooltip.style("transform","translateY(-55%)")
                     .style("left",(event.x)/2+"px")
-                    .style("top",(event.y)/2-30+"px")
+                    .style("top",(event.y)/2-30+"px");
             }
+
             const mouseleave = function(event, d) {
                 tooltip
-                .style("opacity", 0)
+                .style("opacity", 0);
+
+            d3.select(this)
+                .style("stroke", "grey");
             }
 
             // Show the bars

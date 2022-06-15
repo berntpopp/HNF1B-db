@@ -159,8 +159,6 @@ export default {
           try {
             let response = await this.axios.get(apiUrl);
             this.variant = response.data.data;
-            console.log(this.variant);
-
 
           } catch (e) {
             console.error(e);
