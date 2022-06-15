@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <!-- Content linear protein plot -->
     <div id="protein_linear_dataviz" class="svg-container"></div>
     <!-- Content linear protein plot -->

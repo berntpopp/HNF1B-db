@@ -255,7 +255,7 @@ function(res,
 
   # use the helper generate_cursor_pagination_info
   # to generate cursor pagination information from a tibble
-  individual_plus_report_pag_info <-
+  ind_plus_report_pag_info <-
   generate_cursor_pagination_info(
     individual_plus_report_table,
     `page[size]`,
@@ -269,7 +269,7 @@ function(res,
 
   # add columns to the meta information from
   # generate_cursor_pagination_info function return
-  meta <- individual_plus_report_pag_info$meta %>%
+  meta <- ind_plus_report_pag_info$meta %>%
     add_column(as_tibble(list("sort" = sort,
     "filter" = filter,
     "fields" = fields,
@@ -277,7 +277,7 @@ function(res,
 
   # add host, port and other information to links from
   # the link information from generate_cursor_pagination_info function return
-  links <- individual_plus_report_pag_info$links %>%
+  links <- ind_plus_report_pag_info$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
@@ -296,7 +296,7 @@ function(res,
   # generate object to return
   list(links = links,
     meta = meta,
-    data = individual_plus_report_pag_info$data
+    data = ind_plus_report_pag_info$data
   )
 }
 
@@ -336,7 +336,8 @@ function(res,
 
   variants <- variant_table %>%
     select(-individual_id, -report_id, -detection_method, -segregation) %>%
-    mutate(criteria_classification = as.list(str_split(criteria_classification, pattern =", "))) %>% 
+    mutate(criteria_classification = as.list(str_split(criteria_classification,
+      pattern = ", "))) %>%
     unique()
 
   variants_reports <- variant_table %>%

@@ -1,5 +1,5 @@
 <template>
-       <v-container>
+       <v-container fluid>
         <v-row>
 
           <v-col
@@ -8,8 +8,9 @@
           >
 
             <v-sheet
-              min-height="70vh"
+              min-height="80vh"
               outlined
+              class="px-2"
             >
   
             <v-overlay
@@ -42,79 +43,54 @@
   
 
   <v-card
-    class="mx-auto my-2"
-    max-width="800"
+    class="mx-auto px-2 py-2"
+    elevation="8"
+    outlined
   >
-      <v-list-item>
-      <v-list-item-content>
+ 
+      <v-data-table
+      dense
+      :items="variant"
+      :headers="headers"
+      item-key="variant_id"
+      class="elevation-1"
+      mobile-breakpoint="1200"
+      disable-pagination
+      hide-default-footer
+    >
 
-        <v-list-item>
-          <v-chip
-            class="ma-2"
-          >
-            {{ variant[0].variant_class }}
-          </v-chip>
-          <v-chip
-            class="ma-2"
-          >
-            {{ variant[0].IMPACT }}
-          </v-chip>
-          <v-chip
-            class="ma-2"
-          >
-            {{ variant[0].EFFECT }}
-          </v-chip>
-        </v-list-item>
+      <template v-slot:[`item.variant_class`]="{ item }">
+        <v-chip
+          class="ma-1"
+          small
+        >
+          {{ item.variant_class }}
+        </v-chip>
+        <v-chip
+          class="ma-1"
+          small
+        >
+          {{ item.IMPACT }}
+        </v-chip>
+      </template>
 
-        <v-list-item>
-          Annotation date: {{ variant[0].variant_annotation_date }}
-        </v-list-item>
+      <template v-slot:[`item.HGVS_C`]="{ item }">
+          {{ item.HGVS_C }}, {{ item.HGVS_P }}
+      </template>
 
-        <v-divider inset> </v-divider>
-            
-        <v-list-item>
-          <b>Transcript: </b>
-          {{ variant[0].FEATUREID }}
-        </v-list-item>
-
-        <v-list-item>
-          <b>HGVS: </b> {{ variant[0].HGVS_C }}, {{ variant[0].HGVS_P }}
-        </v-list-item>
-
-        <v-list-item>
-          <b>VCF (hg19): </b> {{ variant[0].vcf_hg19 }}
-        </v-list-item>
-
-        <v-list-item>
-          <b>INFO (hg19): </b> {{ variant[0].INFO_hg19 }}
-        </v-list-item>
-
-        <v-list-item>
-          <b>VCF (hg38): </b> {{ variant[0].vcf_hg38 }}
-        </v-list-item>
-
-        <v-list-item>
-          <b>INFO (hg38): </b> {{ variant[0].INFO_hg38 }}
-        </v-list-item>
-
-        <v-list-item>
-          <b>Verdict classification: </b> {{ variant[0].verdict_classification }} 
-        </v-list-item>
-
-        <v-list-item>
-          <b>Criteria classification: </b> 
+      <template v-slot:[`item.criteria_classification`]="{ item }">
             <v-chip
-              v-for="criterion in variant[0].criteria_classification"
+              small
+              class="ma-1"
+              v-for="criterion in item.criteria_classification"
               :key="`criterion-list-${criterion}`"
-                  color="orange lighten-4"
+              color="orange lighten-4"
             >
-                {{ criterion }}
+              {{ criterion }}
             </v-chip>
-          
-        </v-list-item>
+      </template>
 
-      </v-list-item-content>
-    </v-list-item>
+    </v-data-table>
 
   </v-card>
 
@@ -147,6 +123,16 @@ export default {
               "reports": null
             }
           ],
+          headers:[
+            { text:'Annotation date', value: 'variant_annotation_date', sortable: false},
+            { text:'Type', value: 'variant_class', sortable: false},
+            { text:'Effect', value: 'EFFECT', sortable: false},
+            { text:'Transcript', value: 'FEATUREID', sortable: false},
+            { text:'HGVS', value: 'HGVS_C', sortable: false},
+            { text:'VCF', value: 'vcf_hg19', sortable: false},
+            { text:'Verdict classification', value: 'verdict_classification', sortable: false},
+            { text:'Criteria classification', value: 'criteria_classification', sortable: false},
+          ],
           absolute: true,
           opacity: 1,
           color: "#FFFFFF",
@@ -160,9 +146,9 @@ export default {
       computed: {
       },
       created() {
-        this.loadVariantData();
       },
       mounted() {
+        this.loadVariantData();
       },
       methods: {
         async loadVariantData() {
@@ -173,8 +159,8 @@ export default {
           try {
             let response = await this.axios.get(apiUrl);
             this.variant = response.data.data;
+            console.log(this.variant);
 
-console.log(this.variant);
 
           } catch (e) {
             console.error(e);
@@ -184,3 +170,10 @@ console.log(this.variant);
       }
   }
 </script>
+
+
+<style>  
+.v-data-table__wrapper > table > tbody > tr:hover {
+  background: inherit !important;
+}
+</style>
