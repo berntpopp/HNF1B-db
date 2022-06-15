@@ -6,7 +6,7 @@
           >
 
             <v-sheet
-              min-height="70vh"
+              min-height="80vh"
               outlined
             >
 
@@ -16,6 +16,7 @@
                 {{ item.tab }}
               </v-tab>
             </v-tabs>
+
             <v-tabs-items v-model="tab">
               <v-tab-item v-for="item in items" :key="item.tab">
                 <v-card flat>

@@ -130,3 +130,21 @@
 
   }
 </script>
+
+
+<style scoped>
+  .svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</style>

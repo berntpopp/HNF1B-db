@@ -8,7 +8,7 @@
           >
 
             <v-sheet
-              min-height="70vh"
+              min-height="80vh"
               outlined
             >
   

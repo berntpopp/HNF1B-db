@@ -7,7 +7,7 @@
             sm="12"
           >
             <v-sheet
-              min-height="70vh"
+              min-height="80vh"
               outlined
             >
               Search

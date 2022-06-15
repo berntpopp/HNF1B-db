@@ -189,6 +189,8 @@ console.log(allValues);
     display: inline-block;
     position: relative;
     width: 100%;
+    max-width: 1200px;
+    vertical-align: top;
     overflow: hidden;
 }
 .svg-content {
