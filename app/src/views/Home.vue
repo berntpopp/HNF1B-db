@@ -157,7 +157,7 @@ import ProteinLinearPlot from '@/components/ProteinLinearPlot.vue';
       methods: {
         async loadStatisticsData() {
           this.loading = true;
-          let apiUrl = process.env.VUE_APP_API_URL + '/api/statistics';
+          let apiUrl = process.env.VUE_APP_API_URL + '/api/statistics/database_statistics';
           try {
             let response = await this.axios.get(apiUrl);
 
