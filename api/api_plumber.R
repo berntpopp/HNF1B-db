@@ -609,7 +609,7 @@ function(res) {
 
 
 #* @tag statistics
-#* gets cohort characteristicscomponents
+#* gets cohort characteristics
 #* @serializer json list(na="string")
 #' @get /api/statistics/cohort_characteristics
 function(res) {
@@ -681,6 +681,98 @@ function(res) {
 
   # generate object to return
   list(meta = meta, data = cohort_characteristics)
+}
+
+
+#* @tag statistics
+#* gets variant characteristics
+#* @serializer json list(na="string")
+#' @get /api/statistics/variant_characteristics
+function(res) {
+
+  start_time <- Sys.time()
+
+  # get variants
+  # get data from report_variant_view
+  variant_table <- pool %>%
+    tbl("report_variant_view") %>%
+    collect() %>%
+    select(variant_id,
+        detection_method,
+        segregation,
+        variant_class,
+        IMPACT,
+        EFFECT,
+        verdict_classification) %>%
+    arrange(variant_id)
+
+    # generate sublists
+    variant_detection_method <- variant_table %>%
+        group_by(detection_method) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = detection_method, values_from = count)
+
+    variant_segregation <- variant_table %>%
+        group_by(segregation) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = segregation, values_from = count)
+
+    variant_class <- variant_table %>%
+        select(-detection_method, -segregation) %>%
+        unique() %>%
+        group_by(variant_class) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = variant_class, values_from = count)
+
+    variant_impact <- variant_table %>%
+        select(-detection_method, -segregation) %>%
+        unique() %>%
+        group_by(IMPACT) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = IMPACT, values_from = count)
+
+    variant_effect <- variant_table %>%
+        select(-detection_method, -segregation) %>%
+        unique() %>%
+        group_by(EFFECT) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = EFFECT, values_from = count)
+
+    variant_classification <- variant_table %>%
+        select(-detection_method, -segregation) %>%
+        unique() %>%
+        group_by(verdict_classification) %>%
+        summarise(count = n()) %>%
+        ungroup() %>%
+        pivot_wider(names_from = verdict_classification, values_from = count)
+
+  # combine into one list
+    variant_characteristics <- list(
+        detection_method = variant_detection_method,
+        segregation = variant_segregation,
+        class = variant_class,
+        impact = variant_impact,
+        effect = variant_effect,
+        classification = variant_classification
+    )
+
+  # compute execution time
+  end_time <- Sys.time()
+  execution_time <- as.character(paste0(round(end_time - start_time, 2),
+  " secs"))
+
+  # add columns to the meta information from
+  # generate_cursor_pag_inf function return
+  meta <- tibble::as_tibble(list(
+    "executionTime" = execution_time))
+
+  # generate object to return
+  list(meta = meta, data = variant_characteristics)
 }
 
 

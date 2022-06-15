@@ -30,11 +30,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableVariants.vue')
   },
   {
-    path: '/analyses',
-    name: 'Analyses',
-    component: () => import(/* webpackChunkName: "Home" */ '@/views/Analyses.vue')
-  },
-  {
     path: '/analysis_cohort',
     name: 'AnalysisCohort',
     component: () => import(/* webpackChunkName: "Analyses" */ '@/views/analyses/AnalysisCohort.vue')

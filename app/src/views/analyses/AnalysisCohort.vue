@@ -39,13 +39,15 @@
 import PhenotypePlot from '@/components/PhenotypePlot.vue';
 import PublicationsPlot from '@/components/PublicationsPlot.vue';
 import CohortPlot from '@/components/CohortPlot.vue';
+import VariantPlot from '@/components/VariantPlot.vue';
 
   export default {
     name: 'CohortCharacteristics',
     components: {
       PhenotypePlot,
       PublicationsPlot,
-      CohortPlot
+      CohortPlot,
+      VariantPlot
     },
   data() {
         return {
@@ -53,7 +55,8 @@ import CohortPlot from '@/components/CohortPlot.vue';
           items: [
             { tab: 'Publications', content: 'PublicationsPlot' },
             { tab: 'Phenotype', content: 'PhenotypePlot' },
-            { tab: 'Cohort', content: 'CohortPlot' }
+            { tab: 'Cohort', content: 'CohortPlot' },
+            { tab: 'Variants', content: 'VariantPlot' }
           ],
         }
       },
