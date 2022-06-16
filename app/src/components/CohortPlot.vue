@@ -134,8 +134,13 @@
           }
 
           const mouseleave = function(event, d) {
-            d3.select(this)
-              .style("stroke", "white");
+            tooltip
+            .style("opacity", 0)
+            .style("left", '-100px')
+            .style("top", '-100px');
+
+              d3.select(this)
+                .style("stroke", "white");
           };
 
 

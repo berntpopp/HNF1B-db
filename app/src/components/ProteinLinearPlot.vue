@@ -72,7 +72,6 @@
         const filter_variant_class = 'any(variant_class,' + this.variant_class_select.join(',') + ')';
         const filter_classification = 'any(verdict_classification,' + this.classification_select.join(',') + ')';
         const filter_expression = '&filter=' + filter_variant_class + ',' + filter_classification + ',' + this.variant_filter;
-        console.log(this.variant_filter);
 
         // define API URLs
         let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';
@@ -185,7 +184,9 @@ const mousemove = function(event,d) {
 }
 const mouseleave = function(event,d) {
   tooltip
-    .style("opacity", 0);
+    .style("opacity", 0)
+    .style("left", '-100px')
+    .style("top", '-100px');
   
   d3.select(this)
       .style("stroke-width", 1)

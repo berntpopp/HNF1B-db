@@ -135,6 +135,8 @@
       const mouseleave = function(event,d) {
         tooltip
           .style("opacity", 0)
+          .style("left", '-100px')
+          .style("top", '-100px');
       }
 
       // Add the points
