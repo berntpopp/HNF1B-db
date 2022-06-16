@@ -1,5 +1,35 @@
 <template>
   <v-container fluid>
+
+    <!-- Controls-->
+    <v-row>
+      <v-col>
+
+        <v-select
+          :items="classification_options"
+          v-model="classification_select"
+          label="Classification"
+          outlined
+          multiple
+          chips
+        ></v-select>
+
+      </v-col>
+      <v-col>
+
+        <v-select
+          :items="variant_class_options"
+          v-model="variant_class_select"
+          label="Variant class"
+          outlined
+          multiple
+          chips
+        ></v-select>
+
+      </v-col>
+    </v-row>
+    <!-- Controls-->
+
     <!-- Content linear protein plot -->
     <div id="protein_linear_dataviz" class="svg-container"></div>
     <!-- Content linear protein plot -->
@@ -14,16 +44,34 @@
     name: 'ProteinLinearPlot',
   data() {
         return {
+          classification_select: ['Pathogenic', 'Likely Pathogenic', 'Uncertain Significance', 'Likely Benign'],
+          classification_options: ['Pathogenic', 'Likely Pathogenic', 'Uncertain Significance', 'Likely Benign'],
+          variant_class_select: ['SNV', 'deletion', 'insertion', 'indel'],
+          variant_class_options: ['SNV', 'deletion', 'insertion', 'indel'],
         }
       },
       mounted() {
           this.loadDomainData();
       },
+      watch: {
+        classification_select(value) {
+          this.loadDomainData();
+        },
+        variant_class_select(value) {
+          this.loadDomainData();
+        },
+      },
       methods: {
         async loadDomainData() {
 
+        // compute the filter string by joining the filter object
+        const filter_variant_class = 'any(variant_class,' + this.variant_class_select.join(',') + ')';
+        const filter_classification = 'any(verdict_classification,' + this.classification_select.join(',') + ')';
+        const filter_expression = '&filter=' + filter_variant_class + ',' + filter_classification;
+
+        // define API URLs
         let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';
-        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page[after]=0&page[size]=all&filter=any(variant_class,SNV,deletion,insertion)';
+        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page[after]=0&page[size]=all' + filter_expression;
 
         try {
           let responseDomains = await this.axios.get(apiUrlDomains);
