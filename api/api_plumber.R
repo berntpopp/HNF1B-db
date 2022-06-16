@@ -579,19 +579,21 @@ function(res) {
     tbl("report_phenotype_view") %>%
     collect() %>%
     arrange(individual_id, phenotype_name) %>%
-    select(individual_id, group = phenotype_name, described) %>%
+    select(individual_id, group = phenotype_name, described, described_id) %>%
     group_by(individual_id, group) %>%
-    filter(described == max(described)) %>%
+    filter(described_id == min(described_id)) %>%
     unique() %>%
     ungroup() %>%
+    select(-described_id) %>%
     group_by(group, described) %>%
     summarise(count = n(), .groups = "drop") %>%
     ungroup() %>%
     pivot_wider(names_from = described, values_from = count) %>%
-    filter(yes / (yes + no + `not reported`) > 0.10) %>%
+    filter(yes / (yes + no) > 0.10) %>%
     pivot_longer(cols = no:yes, names_to = c("described"),
       values_to = "count") %>%
-    pivot_wider(names_from = described, values_from = count)
+    pivot_wider(names_from = described, values_from = count) %>%
+    arrange(desc(yes))
 
   # compute execution time
   end_time <- Sys.time()
