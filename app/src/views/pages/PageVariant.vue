@@ -92,7 +92,15 @@
 
     </v-data-table>
 
+
+          <v-card-text
+            class="d-flex justify-center"
+          >
+            <ProteinLinearPlot :show_controls="false" :variant_filter="'equals(variant_id,' + this.$route.params.variant_id + ')'"></ProteinLinearPlot>
+          </v-card-text>
+
   </v-card>
+
 
             </v-sheet>
           </v-col>
@@ -103,8 +111,13 @@
 
 
 <script>
+import ProteinLinearPlot from '@/components/ProteinLinearPlot.vue';
+
 export default {
   name: 'PageVariant',
+  components: {
+    ProteinLinearPlot
+  },
   data() {
         return {
           variant: [
