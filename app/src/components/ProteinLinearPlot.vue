@@ -23,7 +23,7 @@
         async loadDomainData() {
 
         let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';
-        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&filter=any(variant_class,SNV,deletion,insertion)&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page[after]=0&page[size]=all';
+        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page[after]=0&page[size]=all&filter=any(variant_class,SNV,deletion,insertion)';
 
         try {
           let responseDomains = await this.axios.get(apiUrlDomains);
@@ -112,23 +112,31 @@ const tooltip = d3.select("#protein_linear_dataviz")
   .style("border", "solid")
   .style("border-width", "1px")
   .style("border-radius", "5px")
-  .style("padding", "2px")
+  .style("padding", "2px");
 
 // Three function that change the tooltip when user hover / move / leave a cell
 // layerX/Y replaced by clientX/Y
 const mouseover = function(event,d) {
   tooltip
-    .style("opacity", 1)
+    .style("opacity", 1);
+  
+  d3.select(this)
+      .style("stroke-width", 2)
+      .style("stroke", "black");
 }
 const mousemove = function(event,d) {
   tooltip
-    .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + " [CADD: " + d.CADD_PHRED + "]" + " [Classification: " + d.verdict_classification + "]")
-    .style("left", (event.layerX + 10 ) + 'px')
-    .style("top", (event.layerY + 10 ) + 'px');
+    .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + "<br /> [CADD: " + d.CADD_PHRED + "]" + "<br /> [Classification: " + d.verdict_classification + "]")
+    .style("left", (event.clientX + 20 ) + 'px')
+    .style("top", (event.clientY + 10 ) + 'px');
 }
 const mouseleave = function(event,d) {
   tooltip
-    .style("opacity", 0)
+    .style("opacity", 0);
+  
+  d3.select(this)
+      .style("stroke-width", 1)
+      .style("stroke", "grey");
 }
 
 // color palette = one color per subgroup
@@ -158,7 +166,7 @@ svg.selectAll("myCircles")
     .attr("cy", function(d) { return y(d.CADD_PHRED + 15); })
     .attr("r", "4")
     .style("fill", function(d) { return color(d.IMPACT); })
-    .attr("stroke", "black")
+    .attr("stroke", "grey")
   .on("mouseover", mouseover)
   .on("mousemove", mousemove)
   .on("mouseleave", mouseleave)
@@ -211,5 +219,13 @@ svg.selectAll("myCircles")
     position: relative;
     top: 0;
     left: 0;
+}
+</style>
+
+
+<style>
+.tooltip {
+  display: inline;
+  position: fixed;
 }
 </style>

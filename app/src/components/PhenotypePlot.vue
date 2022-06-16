@@ -123,8 +123,8 @@
 
             const mousemove = function(event, d) {
                 tooltip.style("transform","translateY(-55%)")
-                    .style("left",(event.x)/2+"px")
-                    .style("top",(event.y)/2-30+"px");
+                    .style("left", (event.clientX + 20 ) + 'px')
+                    .style("top", (event.clientY + 10 ) + 'px');
             }
 
             const mouseleave = function(event, d) {
@@ -174,5 +174,13 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+</style>
+
+
+<style>
+.tooltip {
+  display: inline;
+  position: fixed;
 }
 </style>

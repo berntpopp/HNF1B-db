@@ -129,8 +129,8 @@
       const mousemove = function(event,d) {
         tooltip
           .html("Count: " + d.cumulative_count + "<br>Date: " + d.publication_date_text)
-          .style("left", `${event.layerX+20}px`)
-          .style("top", `${event.layerY+20}px`)
+            .style("left", (event.clientX + 20 ) + 'px')
+            .style("top", (event.clientY + 10 ) + 'px');
       }
       const mouseleave = function(event,d) {
         tooltip
@@ -194,5 +194,13 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+</style>
+
+
+<style>
+.tooltip {
+  display: inline;
+  position: fixed;
 }
 </style>
