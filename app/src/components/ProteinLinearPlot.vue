@@ -2,7 +2,7 @@
   <v-container fluid>
 
     <!-- Controls-->
-    <v-row>
+    <v-row v-if="show_controls">
       <v-col>
 
         <v-select
@@ -42,6 +42,10 @@
 
   export default {
     name: 'ProteinLinearPlot',
+    props: {
+      show_controls:  {type: Boolean,  default: false},
+      variant_filter:  {type: String,  default: ''},
+    },
   data() {
         return {
           classification_select: ['Pathogenic', 'Likely Pathogenic', 'Uncertain Significance', 'Likely Benign'],
@@ -67,7 +71,8 @@
         // compute the filter string by joining the filter object
         const filter_variant_class = 'any(variant_class,' + this.variant_class_select.join(',') + ')';
         const filter_classification = 'any(verdict_classification,' + this.classification_select.join(',') + ')';
-        const filter_expression = '&filter=' + filter_variant_class + ',' + filter_classification;
+        const filter_expression = '&filter=' + filter_variant_class + ',' + filter_classification + ',' + this.variant_filter;
+        console.log(this.variant_filter);
 
         // define API URLs
         let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';

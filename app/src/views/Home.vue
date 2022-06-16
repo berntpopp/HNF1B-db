@@ -119,7 +119,7 @@
           <v-card-text
             class="d-flex justify-center"
           >
-            <ProteinLinearPlot></ProteinLinearPlot>
+            <ProteinLinearPlot :show_controls="true"></ProteinLinearPlot>
           </v-card-text>
 
         </v-card>
