@@ -1,18 +1,34 @@
 <template>
-  <v-app id="HNF1B-db">
+  <v-app id="hnf1b-db">
 
 <v-app-bar
   app
 >
   <v-toolbar-title>
-    <v-tab
-    to="/"
+    <v-btn
+      x-large
+      to="/"
     >
-      <img
+      <v-img
         src="../public/HNF1B-db_logo.png"
-
-      />
-    </v-tab>
+        max-width="184"
+        max-height="40"
+        alt="HNF1B database logo"
+      >
+        <template v-slot:placeholder>
+          <v-row
+            class="fill-height ma-0"
+            align="center"
+            justify="center"
+          >
+            <v-progress-circular
+              indeterminate
+              color="grey lighten-5"
+            ></v-progress-circular>
+          </v-row>
+        </template>
+      </v-img>
+    </v-btn>
   </v-toolbar-title>
 
   <v-spacer></v-spacer>
@@ -23,6 +39,7 @@
     >
       <template v-slot:activator="{ on }">
         <v-btn
+          :ripple="false"
           text
           v-on="on"
         >
@@ -52,6 +69,7 @@
     >
       <template v-slot:activator="{ on }">
         <v-btn
+          :ripple="false"
           text
           v-on="on"
         >
@@ -76,7 +94,9 @@
       </v-card>
     </v-menu>
 
-    <v-btn text
+    <v-btn
+      :ripple="false"
+      text
       v-for="item in items"
       :key="item.title"
       :to="item.to"
@@ -92,8 +112,9 @@
     >
         <template v-slot:activator="{ on }">
         <v-btn
-            text
-            v-on="on"
+          :ripple="false"
+          text
+          v-on="on"
         >
         <v-icon
         dark
@@ -132,20 +153,22 @@
     <v-footer padless>
       <v-card-text class="text-center">
         <v-btn
+          :ripple="false"
           v-for="footer_item in footer_items"
           :key="footer_item.icon"
           class="mx-4"
           icon
+          :href="footer_item.to" 
+          :target="footer_item.target"
+          :aria-label="footer_item.icon"
         >
-        <v-btn 
-        icon 
-        :href="footer_item.to" 
-        :target="footer_item.target"
-        >
-          <v-icon size="24px">
+
+          <v-icon
+            aria-hidden="true"
+            size="24px"
+          >
             {{ footer_item.icon }}
           </v-icon>
-        </v-btn>
         </v-btn>
       </v-card-text>
     </v-footer>

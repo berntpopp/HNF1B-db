@@ -154,76 +154,77 @@
           .range([ height, 0 ]);
 
 
-// create a tooltip
-const tooltip = d3.select("#protein_linear_dataviz")
-  .append("div")
-  .attr('id', 'tooltip')
-  .attr("class", "tooltip")
-  .style("opacity", 0)
-  .style("background-color", "white")
-  .style("border", "solid")
-  .style("border-width", "1px")
-  .style("border-radius", "5px")
-  .style("padding", "2px");
+        // create a tooltip
+        const tooltip = d3.select("#protein_linear_dataviz")
+          .append("div")
+          .attr('id', 'tooltip')
+          .attr("class", "tooltip")
+          .style("opacity", 0)
+          .style("background-color", "white")
+          .style("border", "solid")
+          .style("border-width", "1px")
+          .style("border-radius", "5px")
+          .style("padding", "2px");
 
-// Three function that change the tooltip when user hover / move / leave a cell
-// layerX/Y replaced by clientX/Y
-const mouseover = function(event,d) {
-  tooltip
-    .style("opacity", 1);
-  
-  d3.select(this)
-      .style("stroke-width", 2)
-      .style("stroke", "black");
-}
-const mousemove = function(event,d) {
-  tooltip
-    .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + "<br /> [CADD: " + d.CADD_PHRED + "]" + "<br /> [Classification: " + d.verdict_classification + "]")
-    .style("left", (event.clientX + 20 ) + 'px')
-    .style("top", (event.clientY + 10 ) + 'px');
-}
-const mouseleave = function(event,d) {
-  tooltip
-    .style("opacity", 0)
-    .style("left", '-100px')
-    .style("top", '-100px');
-  
-  d3.select(this)
-      .style("stroke-width", 1)
-      .style("stroke", "grey");
-}
+        // Three function that change the tooltip when user hover / move / leave a cell
+        // layerX/Y replaced by clientX/Y
+        const mouseover = function(event,d) {
+          tooltip
+            .style("opacity", 1);
+          
+          d3.select(this)
+              .style("stroke-width", 2)
+              .style("stroke", "black");
+        }
+        const mousemove = function(event,d) {
+          tooltip
+            .html(d.FEATUREID + ": " +d.HGVS_C + ", " + d.HGVS_P + "<br /> [CADD: " + d.CADD_PHRED + "]" + "<br /> [Classification: " + d.verdict_classification + "]")
+            .style("left", (event.clientX + 20 ) + 'px')
+            .style("top", (event.clientY + 10 ) + 'px');
+        }
+        const mouseleave = function(event,d) {
+          tooltip
+            .style("opacity", 0)
+            .style("left", '-100px')
+            .style("top", '-100px');
+          
+          d3.select(this)
+              .style("stroke-width", 1)
+              .style("stroke", "grey");
+        }
 
-// color palette = one color per subgroup
-const color = d3.scaleOrdinal()
-  .domain(["HIGH", "MODERATE", "LOW", "MODIFIER"])
-  .range(['#FE5F55','#90CAF9','#C7EFCF','#FFFFFF'])
+        // color palette = one color per subgroup
+        const color = d3.scaleOrdinal()
+          .domain(["HIGH", "MODERATE", "LOW", "MODIFIER"])
+          .range(['#FE5F55','#90CAF9','#C7EFCF','#FFFFFF'])
 
-// Lolli lines
-svg.selectAll("myLines")
-  .data(variant_data)
-  .enter()
-  .append("line")
-    .attr("x1", function(d) { return x(d.Protein_position); })
-    .attr("x2", function(d) { return x(d.Protein_position); })
-    .attr("y1", function(d) { return y(d.CADD_PHRED + 15); })
-    .attr("y2", y(15))
-    .attr("stroke", "grey")
+        // Lolli lines
+        svg.selectAll("myLines")
+          .data(variant_data)
+          .enter()
+          .append("line")
+            .attr("x1", function(d) { return x(d.Protein_position); })
+            .attr("x2", function(d) { return x(d.Protein_position); })
+            .attr("y1", function(d) { return y(d.CADD_PHRED + 15); })
+            .attr("y2", y(15))
+            .attr("stroke", "grey")
 
-// Lolli circles
-svg.selectAll("myCircles")
-  .data(variant_data)
-  .enter()
-  .append("a")
-  .attr("xlink:href", function(d) { return "/variant/" + d.variant_id; })
-  .append("circle")
-    .attr("cx", function(d) { return x(d.Protein_position); })
-    .attr("cy", function(d) { return y(d.CADD_PHRED + 15); })
-    .attr("r", "4")
-    .style("fill", function(d) { return color(d.IMPACT); })
-    .attr("stroke", "grey")
-  .on("mouseover", mouseover)
-  .on("mousemove", mousemove)
-  .on("mouseleave", mouseleave)
+        // Lolli circles
+        svg.selectAll("myCircles")
+          .data(variant_data)
+          .enter()
+          .append("a")
+          .attr("href", function(d) { return "/variant/" + d.variant_id; })
+          .attr('aria-label', function(d) { return "variant " + d.variant_id; })
+          .append("circle")
+            .attr("cx", function(d) { return x(d.Protein_position); })
+            .attr("cy", function(d) { return y(d.CADD_PHRED + 15); })
+            .attr("r", "4")
+            .style("fill", function(d) { return color(d.IMPACT); })
+            .attr("stroke", "grey")
+          .on("mouseover", mouseover)
+          .on("mousemove", mousemove)
+          .on("mouseleave", mouseleave)
 
 
         // Show the bars for the domains
