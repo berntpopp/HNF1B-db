@@ -72,9 +72,15 @@
       // generate array of all categories
       const allCategories = this.itemsPublication.map(item => item.group);
       const maxCount = this.itemsPublicationMeta[0].max_cumulative_count;
-      const allValues = this.itemsPublication.map( (u) => [
-        u.values.map(f => f.publication_date[0]),
-      ]).flat(2);
+
+      // generate flat array of all timepoints to compute x axis exent
+      const extent_date = [];
+
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data[i].values.length; j++) {
+          extent_date.push(data[i].values[j])
+        };
+      };
 
       // A color scale: one color for each group
       const myColor = d3.scaleOrdinal()
@@ -83,7 +89,7 @@
 
       // Add X axis --> it is a date format
       const x = d3.scaleTime()
-        .domain(d3.extent(data[0].values, d => d.publication_date))
+        .domain(d3.extent(extent_date, d => d.publication_date))
         .range([ 0, width ]);
         svg.append("g")
           .attr("transform", `translate(0,${height})`)
