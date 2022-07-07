@@ -140,8 +140,8 @@ function(res,
   sort = "report_id",
   filter = "",
   fields = "",
-  `page[after]` = 0,
-  `page[size]` = "all") {
+  `page_after` = 0,
+  `page_size` = "all") {
 
   start_time <- Sys.time()
 
@@ -169,8 +169,8 @@ function(res,
   # to generate cursor pagination information from a tibble
   hnf1b_db_report_table <- generate_cursor_pagination_info(
     hnf1b_db_report_table,
-    `page[size]`,
-    `page[after]`,
+    `page_size`,
+    `page_after`,
     "report_id"
   )
 
@@ -225,8 +225,8 @@ function(res,
   sort = "individual_id",
   filter = "",
   fields = "",
-  `page[after]` = 0,
-  `page[size]` = "all") {
+  `page_after` = 0,
+  `page_size` = "all") {
 
   start_time <- Sys.time()
 
@@ -271,8 +271,8 @@ function(res,
   ind_plus_report_pag_info <-
   generate_cursor_pagination_info(
     individual_plus_report_table,
-    `page[size]`,
-    `page[after]`,
+    `page_size`,
+    `page_after`,
     "individual_id")
 
   # compute execution time
@@ -329,8 +329,8 @@ function(res,
   sort = "variant_id",
   filter = "",
   fields = "",
-  `page[after]` = 0,
-  `page[size]` = "all") {
+  `page_after` = 0,
+  `page_size` = "all") {
 
   start_time <- Sys.time()
 
@@ -375,8 +375,8 @@ function(res,
   # to generate cursor pagination information from a tibble
   variant_table_nested_pag_info <- generate_cursor_pagination_info(
     variant_table_nested,
-    `page[size]`,
-    `page[after]`,
+    `page_size`,
+    `page_after`,
     "variant_id"
   )
 
@@ -454,8 +454,8 @@ function(res,
   sort = "publication_id",
   filter = "",
   fields = "",
-  `page[after]` = 0,
-  `page[size]` = "all") {
+  `page_after` = 0,
+  `page_size` = "all") {
 
   start_time <- Sys.time()
 
@@ -482,8 +482,8 @@ function(res,
   # to generate cursor pagination information from a tibble
   publication_tab_pag_info <- generate_cursor_pagination_info(
     hnf1b_db_publication_table,
-    `page[size]`,
-    `page[after]`,
+    `page_size`,
+    `page_after`,
     "publication_id"
   )
 

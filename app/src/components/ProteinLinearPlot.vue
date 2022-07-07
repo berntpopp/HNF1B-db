@@ -75,7 +75,7 @@
 
         // define API URLs
         let apiUrlDomains = process.env.VUE_APP_API_URL + '/api/domains';
-        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page[after]=0&page[size]=all' + filter_expression;
+        let apiUrlVariants = process.env.VUE_APP_API_URL + '/api/variants?sort=variant_id&fields=variant_id,variant_class,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification&page_after=0&page_size=all' + filter_expression;
 
         try {
           let responseDomains = await this.axios.get(apiUrlDomains);
