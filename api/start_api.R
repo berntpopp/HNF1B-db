@@ -5,5 +5,4 @@ Sys.setenv(API_CONFIG = "hnf1b_db")
 setwd("/hnf1b_api_volume")
 
 root <- pr("api_plumber.R") %>%
-        pr_run(host = "0.0.0.0", port = 7779) %>%
-        pr_hook("exit", function() { poolClose(pool) })
+        pr_run(host = "0.0.0.0", port = 7779)

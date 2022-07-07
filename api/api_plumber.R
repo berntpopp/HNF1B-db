@@ -88,6 +88,22 @@ source("functions/helper-functions.R", local = TRUE)
 
 
 ##-------------------------------------------------------------------##
+## hooks
+
+#* @plumber
+function(pr) {
+
+  pr %>%
+    plumber::pr_hook("exit", function() {
+      pool::poolClose(pool)
+      message("Disconnected")
+    })
+}
+##-------------------------------------------------------------------##
+
+
+
+##-------------------------------------------------------------------##
 ## filters
 
 #* @filter cors
