@@ -164,10 +164,9 @@
 
 <style scoped>
   .svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
     max-width: 1200px;
+    width:100%;
+    margin: 0px auto;
     vertical-align: top;
     overflow: hidden;
 }

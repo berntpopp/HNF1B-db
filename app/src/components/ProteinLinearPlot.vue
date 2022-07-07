@@ -261,16 +261,15 @@ svg.selectAll("myCircles")
 
 <style scoped>
   .svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
     max-width: 1400px;
+    width:100%;
+    margin: 0px auto;
     vertical-align: top;
     overflow: hidden;
 }
 .svg-content {
     display: inline-block;
-    position: relative;
+    position: absolute;
     top: 0;
     left: 0;
 }
