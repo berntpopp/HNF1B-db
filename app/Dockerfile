@@ -1,4 +1,4 @@
-FROM node:lts-alpine as builder
+FROM node:14.19.3-bullseye as builder
 # make the 'app' folder the current working directory
 WORKDIR /app
 # copy both 'package.json' and 'package-lock.json' (if available)
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # nginx state for serving content
-FROM nginx:alpine
+FROM nginx:1.23.0
 RUN rm /etc/nginx/conf.d/default.conf
 COPY ./docker/nginx/prod.conf /etc/nginx/conf.d/
 # Set working directory to nginx asset directory
