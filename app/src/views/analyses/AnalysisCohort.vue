@@ -27,10 +27,10 @@
 </template>
 
 <script>
-import PhenotypePlot from "@/components/PhenotypePlot.vue";
-import PublicationsPlot from "@/components/PublicationsPlot.vue";
-import CohortPlot from "@/components/CohortPlot.vue";
-import VariantPlot from "@/components/VariantPlot.vue";
+import PhenotypePlot from "@/components/analyses/PhenotypePlot.vue";
+import PublicationsPlot from "@/components/analyses/PublicationsPlot.vue";
+import CohortPlot from "@/components/analyses/CohortPlot.vue";
+import VariantPlot from "@/components/analyses/VariantPlot.vue";
 
 export default {
   name: "CohortCharacteristics",

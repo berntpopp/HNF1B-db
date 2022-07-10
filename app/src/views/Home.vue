@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import ProteinLinearPlot from "@/components/ProteinLinearPlot.vue";
+import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
 
 export default {
   name: "Home",
