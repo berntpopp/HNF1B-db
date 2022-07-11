@@ -136,7 +136,10 @@ export default {
       // layerX/Y replaced by clientX/Y
       const mouseover = function (event, d) {
         tooltip.style("opacity", 1);
+        
+        d3.select(this).style("stroke", "black");
       };
+
       const mousemove = function (event, d) {
         tooltip
           .html(
@@ -148,11 +151,14 @@ export default {
           .style("left", event.clientX + 20 + "px")
           .style("top", event.clientY + 10 + "px");
       };
+
       const mouseleave = function (event, d) {
         tooltip
           .style("opacity", 0)
           .style("left", "-100px")
           .style("top", "-100px");
+
+        d3.select(this).style("stroke", "white");
       };
 
       // Add the points
