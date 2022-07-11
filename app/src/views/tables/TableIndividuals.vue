@@ -65,12 +65,12 @@
               :headers="headers"
               :single-expand="singleExpand"
               :expanded.sync="expanded"
+              show-expand
               :items-per-page="meta.perPage"
               :server-items-length="meta.totalItems"
-              show-expand
-              item-key="individual_id"
-              class="elevation-1"
               hide-default-footer
+              class="elevation-1"
+              item-key="individual_id"
             >
               <template v-slot:expanded-item="{ headers, item }">
                 <td :colspan="headers.length">
@@ -255,8 +255,6 @@ export default {
       this.loadDataFromAPI();
     },
     handlePageChange(value) {
-      console.log(value);
-      console.log(this.currentPage);
       if (value == 1) {
         this.meta.currentItemID = 0;
         this.loadDataFromAPI();
@@ -275,7 +273,7 @@ export default {
       // simulatte debounce behaviour
       // based on https://stackoverflow.com/questions/42133894/vue-js-how-to-properly-watch-for-nested-data
       // cancel pending call
-      clearTimeout(this._timerId)
+      clearTimeout(this._timerId);
       // delay new call 500ms
       this._timerId = setTimeout(() => {
         this.filter_string = this.filterObjToStr(this.filter);

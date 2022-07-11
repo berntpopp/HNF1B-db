@@ -21,22 +21,53 @@
             Search and filter the reviewed reports in a tabular view.
           </p>
 
-          <div class="pa-2">
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-            ></v-text-field>
+          <!-- User Interface controls -->
+          <div class="text-center pt-2">
+            <v-row no-gutters>
+              <v-col cols="8" class="px-1">
+                <v-text-field
+                  v-model="filter['any'].content"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                  dense
+                  outlined
+                ></v-text-field>
+              </v-col>
 
+              <v-col cols="1" class="px-1">
+                <v-select
+                  v-model="meta.perPage"
+                  :items="pageOptions"
+                  label="Items per page"
+                  dense
+                  outlined
+                ></v-select>
+              </v-col>
+
+              <v-col cols="3" class="px-1">
+                <v-pagination
+                  v-model="currentPage"
+                  :length="meta.totalPages"
+                  :total-visible="5"
+                  @input="handlePageChange"
+                ></v-pagination>
+              </v-col>
+            </v-row>
+          </div>
+          <!-- User Interface controls -->
+
+          <div class="pa-2">
             <v-data-table
               dense
               :items="reports"
               :headers="headers"
-              :search="search"
-              item-key="name"
+              :items-per-page="meta.perPage"
+              :server-items-length="meta.totalItems"
+              hide-default-footer
               class="elevation-1"
+              item-key="name"
             >
               <template v-slot:[`item.report_id`]="{ item }">
                 <v-chip
@@ -91,8 +122,11 @@
 
 
 <script>
+import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
+
 export default {
   name: "TableReports",
+  mixins: [urlParsingMixin],
   data() {
     return {
       cohort_style: { born: "success", fetus: "primary" },
@@ -115,26 +149,102 @@ export default {
         { text: "Age onset", value: "onset_age" },
         { text: "Age report", value: "report_age" },
       ],
-      search: "",
-      totalRows: 1,
       absolute: true,
       opacity: 1,
       color: "#FFFFFF",
       loading: true,
+      meta: {
+        perPage: 10,
+        currentPage: 1,
+        totalPages: 1,
+        prevItemID: null,
+        currentItemID: 0,
+        nextItemID: null,
+        lastItemID: null,
+        totalItems: 0,
+        sort: "",
+        fields: "",
+        executionTime: "",
+      },
+      filter: {
+        any: { content: null, join_char: null, operator: "contains" },
+      },
+      filter_string: "",
+      currentPage: 0,
+      pageOptions: [10, 25, 50, 200],
     };
   },
-  computed: {},
+  computed: {
+    perPage() {
+      return this.meta.perPage;
+    },
+  },
+  watch: {
+    filter: {
+      handler() {
+        this.filtered();
+      },
+      deep: true,
+    },
+    perPage: {
+      handler() {
+        this.meta.currentItemID = 0;
+        this.handlePerPageChange();
+      },
+    },
+  },
   mounted() {
-    this.loadReportsData();
+    this.loadDataFromAPI();
   },
   methods: {
-    async loadReportsData() {
+    handlePerPageChange() {
+      this.currentItemID = 0;
+      this.loadDataFromAPI();
+    },
+    handlePageChange(value) {
+      if (value == 1) {
+        this.meta.currentItemID = 0;
+        this.loadDataFromAPI();
+      } else if (value == this.meta.totalPages) {
+        this.meta.currentItemID = this.meta.lastItemID;
+        this.loadDataFromAPI();
+      } else if (value > this.meta.currentPage) {
+        this.meta.currentItemID = this.meta.nextItemID;
+        this.loadDataFromAPI();
+      } else if (value < this.meta.currentPage) {
+        this.meta.currentItemID = this.meta.prevItemID;
+        this.loadDataFromAPI();
+      }
+    },
+    filtered() {
+      // simulatte debounce behaviour
+      // based on https://stackoverflow.com/questions/42133894/vue-js-how-to-properly-watch-for-nested-data
+      // cancel pending call
+      clearTimeout(this._timerId);
+      // delay new call 500ms
+      this._timerId = setTimeout(() => {
+        this.filter_string = this.filterObjToStr(this.filter);
+        this.loadDataFromAPI();
+      }, 500);
+    },
+    async loadDataFromAPI() {
       this.loading = true;
-      let apiUrl = process.env.VUE_APP_API_URL + "/api/reports";
+
+      const urlParam =
+        "&filter=" +
+        this.filter_string +
+        "&page_after=" +
+        this.meta.currentItemID +
+        "&page_size=" +
+        this.meta.perPage;
+
+      const apiUrl = process.env.VUE_APP_API_URL + "/api/reports?" + urlParam;
+
       try {
         let response = await this.axios.get(apiUrl);
         this.reports = response.data.data;
-        this.totalRows = response.data.data.length;
+        this.meta = response.data.meta[0];
+        this.currentPage = response.data.meta[0].currentPage;
       } catch (e) {
         console.error(e);
       }
