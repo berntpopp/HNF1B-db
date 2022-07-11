@@ -29,8 +29,8 @@ generate_sort_expressions <- function(sort_string,
 
     # and check if unique_id is in the resulting list,
     # if not append to the list for unique sorting
-  if (!(unique_id %in% sort_list |
-    paste0("desc(", unique_id, ")") %in% sort_list)){
+  if (!(unique_id %in% sort_list ||
+    paste0("desc(", unique_id, ")") %in% sort_list)) {
       sort_list <- append(sort_list, unique_id)
   }
     return(sort_list)
@@ -159,7 +159,7 @@ select_tibble_fields <- function(selection_tibble,
   # check if fields_requested is empty string,
   # if so assign tibble_colnames to it, else
   # split the fields_requested input by comma
-  if (fields_requested != ""){
+  if (fields_requested != "") {
     fields_requested <- str_split(str_replace_all(fields_requested,
       fixed(" "), ""), ",")[[1]]
   } else {
@@ -168,13 +168,13 @@ select_tibble_fields <- function(selection_tibble,
 
     # check if unique_id variable is in the column names,
     # if not prepend to the list for unique sorting
-  if (!(unique_id %in% fields_requested)){
+  if (!(unique_id %in% fields_requested)) {
     fields_requested <- purrr::prepend(fields_requested, unique_id)
     fields_requested <- Filter(function(x) !identical("", x), fields_requested)
   }
 
     # check if requested column names exist in tibble, if error
-  if (all(fields_requested %in% tibble_colnames)){
+  if (all(fields_requested %in% tibble_colnames)) {
     selection_tibble <- selection_tibble %>%
     select(all_of(fields_requested))
   } else {
@@ -197,7 +197,7 @@ generate_cursor_pagination_info <- function(pagination_tibble,
 
   # check if page_size is either "all" or a valid
   # integer and convert or assign values accordingly
-  if (page_size == "all"){
+  if (page_size == "all") {
     page_after <- 0
     page_size <- pagination_tibble_rows
     page_count <- ceiling(pagination_tibble_rows / page_size)
@@ -214,7 +214,7 @@ generate_cursor_pagination_info <- function(pagination_tibble,
     filter(!!sym(pagination_identifier) == page_after)
     )$row
 
-  if (length(page_after_row) == 0){
+  if (length(page_after_row) == 0) {
     page_after_row <- 0
     page_after_row_next <- (pagination_tibble %>%
       filter(row_number() == page_after_row + page_size + 1) %>%
@@ -242,7 +242,7 @@ generate_cursor_pagination_info <- function(pagination_tibble,
   self <- paste0("&page_after=",
     page_after, "&page_size=",
     page_size)
-  if (length(page_after_row_prev) == 0){
+  if (length(page_after_row_prev) == 0) {
     prev <- "null"
   } else {
     prev <- paste0("&page_after=",
@@ -250,7 +250,7 @@ generate_cursor_pagination_info <- function(pagination_tibble,
       "&page_size=", page_size)
   }
 
-  if (length(page_after_row_next) == 0){
+  if (length(page_after_row_next) == 0) {
     `next` <- "null"
   } else {
     `next` <- paste0("&page_after=",
@@ -258,7 +258,7 @@ generate_cursor_pagination_info <- function(pagination_tibble,
       "&page_size=", page_size)
   }
 
-  if (length(page_after_row_last) == 0){
+  if (length(page_after_row_last) == 0) {
     last <- "null"
   } else {
     last <- paste0("&page_after=",
