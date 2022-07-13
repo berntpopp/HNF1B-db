@@ -23,7 +23,6 @@
       </v-toolbar-title>
 
 
-
       <v-toolbar-items class="hidden-sm-and-down">
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
@@ -77,6 +76,20 @@
           {{ item.title }}
         </v-btn>
       </v-toolbar-items>
+
+        <v-spacer></v-spacer>
+
+      <v-toolbar-items class="hidden-sm-and-down">
+        <v-btn
+          :ripple="false"
+          text
+          key="Login"
+          to="/login"
+        >
+          Login
+        </v-btn>
+      </v-toolbar-items>
+
 
       <v-spacer class="hidden-md-and-up"></v-spacer>
 
@@ -171,6 +184,7 @@ export default {
         id: "analysis 2",
       },
       { title: "About", to: "/about", id: "about" },
+      { title: "Login", to: "/login", id: "login" },
     ],
     tables: [
       { title: "Individuals", to: "/table_individuals", id: "table 1" },
