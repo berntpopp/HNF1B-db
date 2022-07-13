@@ -67,6 +67,19 @@
               </v-list-item-content>
             </v-list-item>
           </v-card>
+
+          <!-- Load Individuals table component element -->
+          <template v-if="!loading">
+          <TableIndividuals
+            :show-filter-controls="false"
+            :show-pagination-controls="false"
+            :filter-input="individuals_in_publication_filter"
+            header-label="Individuals"
+            header-sub-label="described in this publication"
+          />
+          </template>
+          <!-- Load Individuals table component element -->
+
         </v-sheet>
       </v-col>
     </v-row>
@@ -75,8 +88,16 @@
 
 
 <script>
+import TableIndividuals from "@/components/tables/TableIndividuals.vue";
+
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+
 export default {
   name: "PagePublication",
+  mixins: [colorAndSymbolsMixin],
+  components: {
+    TableIndividuals
+  },
   data() {
     return {
       publication: [
@@ -104,22 +125,8 @@ export default {
       opacity: 1,
       color: "#FFFFFF",
       loading: true,
-      reported_phenotype_color: {
-        yes: "teal lighten-1",
-        no: "light-blue",
-        "not reported": "white",
-      },
-      reported_phenotype_symbol: {
-        yes: "mdi-plus-circle-outline",
-        no: "mdi-minus-circle-outline",
-        "not reported": "mdi-help-circle-outline",
-      },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
-      cohort_style: { born: "success", fetus: "primary" },
+      individuals_in_publication: [],
+      individuals_in_publication_filter: "",
     };
   },
   computed: {},
@@ -140,6 +147,10 @@ export default {
       try {
         let response = await this.axios.get(apiUrl);
         this.publication = response.data.data;
+
+        this.individuals_in_publication = [...new Set(response.data.data[0].reports.map(item => item.individual_id))];
+        this.individuals_in_publication_filter = "contains(individual_id," + this.individuals_in_publication.join("|") + ")";
+
       } catch (e) {
         console.error(e);
       }

@@ -118,6 +118,7 @@
 <script>
 import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
 import TableIndividuals from "@/components/tables/TableIndividuals.vue";
+
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
