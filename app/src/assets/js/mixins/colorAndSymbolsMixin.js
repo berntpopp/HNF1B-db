@@ -53,7 +53,7 @@ export default {
             Moderate: "orange darken-2",
             Supporting: "orange lighten-1",
           },
-          L: {
+          B: {
             VeryStrong: "green darken-4",
             Strong: "green darken-2",
             Moderate: "green lighten-2",
