@@ -73,7 +73,7 @@
                 <v-chip
                   color="pink lighten-4"
                   class="ma-2"
-                  x-small
+                  small
                   link
                   :to="'/variant/' + item.variant_id"
                 >
@@ -81,6 +81,27 @@
                   <v-icon right> mdi-dna </v-icon>
                 </v-chip>
               </template>
+
+              <template v-slot:[`item.variant_class`]="{ item }">
+                <v-chip
+                  class="ma-1"
+                  small
+                  :color="variant_class_color[item.variant_class]"
+                  >
+                  {{ item.variant_class }}
+                </v-chip>
+              </template>
+
+              <template v-slot:[`item.verdict_classification`]="{ item }">
+                <v-chip
+                  small
+                  class="ma-1"
+                  :color="classification_color[item.verdict_classification]"
+                >
+                  {{ item.verdict_classification }}
+                </v-chip>
+              </template>
+
             </v-data-table>
           </div>
         </v-sheet>
@@ -92,17 +113,18 @@
 
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "TableVariants",
-  mixins: [urlParsingMixin],
+  mixins: [urlParsingMixin, colorAndSymbolsMixin],
   data() {
     return {
       variants: [],
       headers: [
         { text: "Variant", value: "variant_id" },
         { text: "Type", value: "variant_class" },
-        { text: "VCF", value: "vcf_hg19" },
+        { text: "VCF [hg19]", value: "vcf_hg19" },
         { text: "Transcript", value: "HGVS_C" },
         { text: "Protein", value: "HGVS_P" },
         { text: "Classification", value: "verdict_classification" },

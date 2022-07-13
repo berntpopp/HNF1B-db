@@ -10,7 +10,16 @@
           outlined
           multiple
           chips
-        ></v-select>
+        >
+          <template #selection="{ item }">
+            <v-chip
+              small
+              :color="classification_color[item]"
+            >
+              {{item}}
+            </v-chip>
+          </template>
+        </v-select>
       </v-col>
       <v-col>
         <v-select
@@ -20,7 +29,16 @@
           outlined
           multiple
           chips
-        ></v-select>
+        >
+          <template #selection="{ item }">
+            <v-chip
+              small
+              :color="variant_class_color[item]"
+            >
+              {{item}}
+            </v-chip>
+          </template>
+        </v-select>
       </v-col>
     </v-row>
     <!-- Controls-->
@@ -33,10 +51,12 @@
 
 
 <script>
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 import * as d3 from "d3";
 
 export default {
   name: "ProteinLinearPlot",
+  mixins: [colorAndSymbolsMixin],
   props: {
     show_controls: { type: Boolean, default: false },
     variant_filter: { type: String, default: "" },

@@ -73,7 +73,7 @@
                 <v-chip
                   color="deep-orange lighten-2"
                   class="ma-2"
-                  x-small
+                  small
                   link
                   :to="'/report/' + item.report_id"
                 >
@@ -86,7 +86,7 @@
                 <v-chip
                   color="lime lighten-2"
                   class="ma-2"
-                  x-small
+                  small
                   link
                   :to="'/individual/' + item.individual_id"
                 >
@@ -108,7 +108,11 @@
               </template>
 
               <template v-slot:[`item.cohort`]="{ item }">
-                <v-chip :color="cohort_style[item.cohort]" class="ma-2" x-small>
+                <v-chip
+                  :color="cohort_style[item.cohort]"
+                  class="ma-2"
+                  small
+                >
                   {{ item.cohort }}
                 </v-chip>
               </template>
@@ -123,22 +127,13 @@
 
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "TableReports",
-  mixins: [urlParsingMixin],
+  mixins: [urlParsingMixin, colorAndSymbolsMixin],
   data() {
     return {
-      cohort_style: { born: "success", fetus: "primary" },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
-      logical_symbol: {
-        1: "mdi-check-circle-outline",
-        0: "mdi-minus-circle-outline",
-      },
       reports: [],
       headers: [
         { text: "Report", value: "report_id" },

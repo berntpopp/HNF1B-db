@@ -73,7 +73,7 @@
                 <v-chip
                   color="cyan accent-2"
                   class="ma-2"
-                  x-small
+                  small
                   link
                   :to="'/publication/' + item.publication_id"
                 >
@@ -107,10 +107,11 @@
 
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "TablePublications",
-  mixins: [urlParsingMixin],
+  mixins: [urlParsingMixin, colorAndSymbolsMixin],
   data() {
     return {
       publications: [],

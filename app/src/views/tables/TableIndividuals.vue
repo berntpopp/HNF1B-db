@@ -88,7 +88,7 @@
                       <v-chip
                         color="deep-orange lighten-2"
                         class="ma-2"
-                        x-small
+                        small
                       >
                         rep{{ item.report_id }}
                         <v-icon right> mdi-newspaper-variant </v-icon>
@@ -99,7 +99,7 @@
                       <v-chip
                         :color="cohort_color[item.cohort]"
                         class="ma-2"
-                        x-small
+                        small
                       >
                         {{ item.cohort }}
                       </v-chip>
@@ -109,12 +109,13 @@
                       <template v-for="phenotype in item.phenotypes">
                         <v-chip
                           class="ma-0"
-                          x-small
+                          small
                           v-if="phenotype.described === 'yes'"
                           :key="phenotype.phenotype_id"
                           :color="reported_phenotype_color[phenotype.described]"
                         >
-                          <v-icon x-small>
+                          <v-icon
+                          >
                             {{ reported_phenotype_symbol[phenotype.described] }}
                           </v-icon>
                           {{ phenotype.phenotype_name }}
@@ -129,7 +130,7 @@
                 <v-chip
                   color="lime lighten-2"
                   class="ma-2"
-                  x-small
+                  small
                   link
                   :to="'/individual/' + item.individual_id"
                 >
@@ -154,38 +155,13 @@
 
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "TableIndividuals",
-  mixins: [urlParsingMixin],
+  mixins: [urlParsingMixin, colorAndSymbolsMixin],
   data() {
     return {
-      cohort_color: { born: "success", fetus: "primary" },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
-      logical_symbol: {
-        1: "mdi-check-circle-outline",
-        0: "mdi-minus-circle-outline",
-      },
-      reported_phenotype_color: {
-        yes: "teal lighten-1",
-        no: "light-blue",
-        "not reported": "white",
-      },
-      reported_phenotype_symbol: {
-        yes: "mdi-plus-circle-outline",
-        no: "mdi-minus-circle-outline",
-        "not reported": "mdi-help-circle-outline",
-      },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
-      cohort_style: { born: "success", fetus: "primary" },
       individuals: [],
       headers: [
         { text: "Individual", value: "individual_id" },

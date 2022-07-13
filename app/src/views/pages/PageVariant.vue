@@ -37,10 +37,18 @@
               hide-default-footer
             >
               <template v-slot:[`item.variant_class`]="{ item }">
-                <v-chip class="ma-1" small>
+                <v-chip
+                  class="ma-1"
+                  small
+                  :color="variant_class_color[item.variant_class]"
+                  >
                   {{ item.variant_class }}
                 </v-chip>
-                <v-chip class="ma-1" small>
+                <v-chip
+                  class="ma-1"
+                  small
+                  :color="impact_color[item.IMPACT]"
+                >
                   {{ item.IMPACT }}
                 </v-chip>
               </template>
@@ -49,13 +57,24 @@
                 {{ item.HGVS_C }}, {{ item.HGVS_P }}
               </template>
 
+
+              <template v-slot:[`item.verdict_classification`]="{ item }">
+                <v-chip
+                  small
+                  class="ma-1"
+                  :color="classification_color[item.verdict_classification]"
+                >
+                  {{ item.verdict_classification }}
+                </v-chip>
+              </template>
+
               <template v-slot:[`item.criteria_classification`]="{ item }">
                 <v-chip
                   small
                   class="ma-1"
                   v-for="criterion in item.criteria_classification"
                   :key="`criterion-list-${criterion}`"
-                  color="orange lighten-4"
+                  :color="criteria_color[criterion.charAt(0)][criterion.split('_')[1]]"
                 >
                   {{ criterion }}
                 </v-chip>
@@ -80,9 +99,11 @@
 
 <script>
 import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "PageVariant",
+  mixins: [colorAndSymbolsMixin],
   components: {
     ProteinLinearPlot,
   },
@@ -114,7 +135,7 @@ export default {
         { text: "Effect", value: "EFFECT", sortable: false },
         { text: "Transcript", value: "FEATUREID", sortable: false },
         { text: "HGVS", value: "HGVS_C", sortable: false },
-        { text: "VCF", value: "vcf_hg19", sortable: false },
+        { text: "VCF [hg19]", value: "vcf_hg19", sortable: false },
         {
           text: "Verdict classification",
           value: "verdict_classification",
@@ -130,22 +151,6 @@ export default {
       opacity: 1,
       color: "#FFFFFF",
       loading: true,
-      reported_phenotype_color: {
-        yes: "teal lighten-1",
-        no: "light-blue",
-        "not reported": "white",
-      },
-      reported_phenotype_symbol: {
-        yes: "mdi-plus-circle-outline",
-        no: "mdi-minus-circle-outline",
-        "not reported": "mdi-help-circle-outline",
-      },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
-      cohort_style: { born: "success", fetus: "primary" },
     };
   },
   computed: {},
