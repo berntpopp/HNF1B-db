@@ -466,22 +466,36 @@ function(res,
   filter_exprs <- generate_filter_expressions(filter)
 
   # get data from database
-  hnf1b_db_publication_table <- pool %>%
-    tbl("publication") %>%
+  publication_table <- pool %>%
+    tbl("report_publication_view") %>%
     collect() %>%
     arrange(!!!rlang::parse_exprs(sort_exprs)) %>%
     filter(!!!rlang::parse_exprs(filter_exprs))
 
+  publications <- publication_table %>%
+    select(-individual_id, -report_id) %>%
+    unique()
+
+  publications_reports <- publication_table %>%
+    select(publication_id,
+      individual_id,
+      report_id) %>%
+    nest_by(publication_id, .key = "reports") %>%
+    ungroup()
+
+  publication_table_nested <- publications %>%
+    left_join(publications_reports, by = c("publication_id"))
+
   # select fields from table based on input
   # using the helper function "select_tibble_fields"
-  hnf1b_db_publication_table <- select_tibble_fields(hnf1b_db_publication_table,
+  publication_table_nested <- select_tibble_fields(publication_table_nested,
     fields,
     "publication_id")
 
   # use the helper generate_cursor_pagination_info
   # to generate cursor pagination information from a tibble
   publication_tab_pag_info <- generate_cursor_pagination_info(
-    hnf1b_db_publication_table,
+    publication_table_nested,
     `page_size`,
     `page_after`,
     "publication_id"
