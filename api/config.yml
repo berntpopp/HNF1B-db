@@ -8,7 +8,7 @@ default:
     host: "127.0.0.1"
     port: "6612"
     port_self: "7779"
-    secret: mHzU/}bny4-==rm0]9~bsq.2Ob2`lHgu2#+K(/Dih#7bN@KmMLf\AK9y:Inf+FN
+    secret: <Dt'-XxOKzi6&]|BWyAx(g,DR:!M:etI`n(+^v]DKP!hm#IEI}`'#3NH7(:2
     refresh: 360
   hnf1b_db:
     dbtype: mysql
@@ -19,5 +19,5 @@ default:
     host: "hnf1b_mysql"
     port: "3306"
     port_self: "6668"
-    secret: mHzU/}bny4-==rm0]9~bsq.2Ob2`lHgu2#+K(/Dih#7bN@KmMLf\AK9y:Inf+FN
+    secret: <Dt'-XxOKzi6&]|BWyAx(g,DR:!M:etI`n(+^v]DKP!hm#IEI}`'#3NH7(:2
     refresh: 3600
