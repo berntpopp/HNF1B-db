@@ -82,13 +82,31 @@
             </v-data-table>
 
             <v-card-text class="d-flex justify-center">
+              <!-- Load Protein linear plot component -->
               <ProteinLinearPlot
                 :show_controls="false"
                 :variant_filter="
                   'equals(variant_id,' + this.$route.params.variant_id + ')'
                 "
-              ></ProteinLinearPlot>
+              >
+              </ProteinLinearPlot>
+              <!-- Load Protein linear plot component -->
             </v-card-text>
+
+            <v-card-text class="d-flex justify-center">
+              <!-- Load Individuals table component element -->
+              <template v-if="!loading">
+              <TableIndividuals
+                :show-filter-controls="false"
+                :show-pagination-controls="false"
+                :filter-input="individuals_with_variant_filter"
+                header-label="Individuals"
+                header-sub-label="carrying this variant"
+              />
+              </template>
+              <!-- Load Individuals table component element -->
+            </v-card-text>
+
           </v-card>
         </v-sheet>
       </v-col>
@@ -99,6 +117,7 @@
 
 <script>
 import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
+import TableIndividuals from "@/components/tables/TableIndividuals.vue";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
@@ -106,6 +125,7 @@ export default {
   mixins: [colorAndSymbolsMixin],
   components: {
     ProteinLinearPlot,
+    TableIndividuals
   },
   data() {
     return {
@@ -151,12 +171,16 @@ export default {
       opacity: 1,
       color: "#FFFFFF",
       loading: true,
+      individuals_with_variant: [],
+      individuals_with_variant_filter: "",
     };
   },
   computed: {},
-  created() {},
-  mounted() {
+  created() {
     this.loadVariantData();
+  },
+  mounted() {
+
   },
   methods: {
     async loadVariantData() {
@@ -171,6 +195,10 @@ export default {
       try {
         let response = await this.axios.get(apiUrl);
         this.variant = response.data.data;
+
+        this.individuals_with_variant = [...new Set(response.data.data[0].reports.map(item => item.individual_id))];
+        this.individuals_with_variant_filter = "contains(individual_id," + this.individuals_with_variant.join("|") + ")";
+
       } catch (e) {
         console.error(e);
       }
