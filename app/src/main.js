@@ -7,9 +7,21 @@ import vuetify from './plugins/vuetify'
 import VueAxios from 'vue-axios'
 import axios from 'axios'
 
+import VueMeta from "vue-meta";
+
 Vue.config.productionTip = false
 
-Vue.use(VueAxios, axios)
+// register vue-meta globally
+Vue.use(VueMeta, {
+  keyName: "metaInfo",
+  attribute: "data-vue-meta",
+  ssrAttribute: "data-vue-meta-server-rendered",
+  tagIDKeyName: "vmid",
+  refreshOnceOnNavigation: true,
+});
+
+// register vue-axios globally
+Vue.use(VueAxios, axios);
 
 new Vue({
   router,

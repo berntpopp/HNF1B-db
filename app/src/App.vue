@@ -136,6 +136,25 @@
 
 <script>
 export default {
+  name: "hnf1b-db",
+  metaInfo: {
+    // if no subcomponents specify a metaInfo.title, this title will be used
+    title: "HNF1B-DB",
+    // all titles will be injected into this template
+    titleTemplate:
+      "%s | HNF1B-DB - The curated database for the HNF1B gene and associated diseases",
+    htmlAttrs: {
+      lang: "en",
+    },
+    meta: [
+      {
+        vmid: "description",
+        name: "description",
+        content:
+          "HNF1B-DB is a web-based application for comprehensive data input and analysis from patient histories or published literature specifically designed to investigate the genotypes and phenotypes in HNF1B-associated disease.",
+      },
+    ],
+  },
   data: () => ({
     items: [
       { title: "About", to: "/about", id: "about" },
