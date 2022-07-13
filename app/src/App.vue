@@ -135,7 +135,6 @@
 export default {
   data: () => ({
     items: [
-      { title: "Search", to: "/search", id: "search" },
       { title: "About", to: "/about", id: "about" },
     ],
     items_small: [
@@ -149,7 +148,6 @@ export default {
         to: "/analysis_genotype_phenotype",
         id: "analysis 2",
       },
-      { title: "Search", to: "/search", id: "search" },
       { title: "About", to: "/about", id: "about" },
     ],
     tables: [
