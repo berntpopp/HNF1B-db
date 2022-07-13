@@ -1,6 +1,7 @@
 <template>
   <v-app id="hnf1b-db">
     <v-app-bar app>
+
       <v-toolbar-title>
         <v-btn x-large to="/">
           <v-img
@@ -21,7 +22,7 @@
         </v-btn>
       </v-toolbar-title>
 
-      <v-spacer></v-spacer>
+
 
       <v-toolbar-items class="hidden-sm-and-down">
         <v-menu offset-y>
@@ -76,6 +77,8 @@
           {{ item.title }}
         </v-btn>
       </v-toolbar-items>
+
+      <v-spacer class="hidden-md-and-up"></v-spacer>
 
       <!-- // collapsed toolbar for small screen devices //-->
       <v-toolbar-items class="hidden-md-and-up">
