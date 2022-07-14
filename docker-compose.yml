@@ -48,6 +48,8 @@ services:
   image: 'dockercloud/haproxy:1.6.7'
   links:
      - api
+  ports:
+    - '80:80'
   volumes:
      - /var/run/docker.sock:/var/run/docker.sock
   restart: always
