@@ -1,9 +1,0 @@
-user_id,user_name,password,email,user_role,first_name,family_name,orcid
-1,johannes,pass1salt1,Johannes.Muench@medizin.uni-leipzig.de,Administrator,Johannes,Münch,0000-0003-1779-1876
-2,jan,pass8salt8,Jan.Halbritter@medizin.uni-leipzig.de,Reviewer,Jan,Halbritter,0000-0002-1377-9880
-3,bernt,pass6salt6,bernt.popp@gmail.com,Administrator,Bernt,Popp,0000-0002-3679-1081
-4,georgia,pass2salt2,Georgia.Vasileiou@uk-erlangen.de,Reviewer,Georgia,Vasileiou,0000-0002-1993-1134
-5,jankowald,pass7salt7,Jan.Kowald@medizin.uni-leipzig.de,Reviewer,Jan,Kowald,0000-0001-6869-8271
-6,jonathan,pass5salt5,Jonathan.deFallois@medizin.uni-leipzig.de,Reviewer,Jonathan,de Fallois,0000-0002-6448-1881
-7,bastian,pass4salt4,Bastian.Krueger@medizin.uni-leipzig.de,Reviewer,Bastian,Krüger,0000-0001-7298-0421
-8,marie,pass3salt3,Marie.Engesser@medizin.uni-leipzig.de,Reviewer,Marie,Engesser,0000-0002-5714-4297
