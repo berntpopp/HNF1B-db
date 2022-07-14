@@ -5,7 +5,6 @@
 # load libraries
 library(plumber)
 library(tidyverse)
-library(cowplot)
 library(DBI)
 library(RMariaDB)
 library(jsonlite)
