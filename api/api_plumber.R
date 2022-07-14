@@ -242,8 +242,7 @@ function(res,
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
-        dw$host, ":",
-        dw$port_self,
+        dw$base_url,
         "/api/reports?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
@@ -342,9 +341,7 @@ function(res,
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
-        dw$host,
-        ":",
-        dw$port_self,
+        dw$base_url,
         "/api/individuals?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
@@ -448,9 +445,7 @@ function(res,
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
-        dw$host,
-        ":",
-        dw$port_self,
+        dw$base_url,
         "/api/variants?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
@@ -569,9 +564,7 @@ function(res,
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
       link != "null" ~ paste0("http://",
-        dw$host,
-        ":",
-        dw$port_self,
+        dw$base_url,
         "/api/publications?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
