@@ -81,6 +81,7 @@ source("functions/helper-functions.R", local = TRUE)
 #* @apiTag publication Publication related endpoints
 #* @apiTag variant Variant related endpoints
 #* @apiTag statistics Database statistics
+#* @apiTag user User account related endpoints
 #* @apiTag authentication Authentication related endpoints
 ##-------------------------------------------------------------------##
 ##-------------------------------------------------------------------##
@@ -865,6 +866,44 @@ function() {
 }
 
 ## Statistics endpoints
+##-------------------------------------------------------------------##
+
+
+
+##-------------------------------------------------------------------##
+## User endpoint section
+
+#* @tag user
+#* gets count statistics of all contributions of a user
+#' @get /api/user/<user_id>/contributions
+function(req, res, user_id) {
+
+  user_requested <- user_id
+  user <- req$user_id
+
+  # first check rights
+  if (length(user) == 0) {
+
+    res$status <- 401 # Unauthorized
+    return(list(error = "Please authenticate."))
+
+  } else if (req$user_role %in% c("Administrator", "Reviewer")) {
+
+  # get data from db view
+  user_statistics <- pool %>%
+    tbl("user_statistics") %>%
+    filter(user_id == user_requested) %>%
+    collect()
+
+  # generate object to return
+  user_statistics
+
+  } else {
+    res$status <- 403 # Forbidden
+    return(list(error = "Read access forbidden."))
+  }
+}
+
 ##-------------------------------------------------------------------##
 
 
