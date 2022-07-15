@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col cols="12" sm="12">
-        <v-sheet min-height="80vh" outlined class="px-2">
+        <v-sheet outlined class="px-2">
           <v-overlay
             :absolute="absolute"
             :opacity="opacity"
@@ -180,9 +180,7 @@ export default {
   created() {
     this.loadVariantData();
   },
-  mounted() {
-
-  },
+  mounted() {},
   methods: {
     async loadVariantData() {
       this.loading = true;

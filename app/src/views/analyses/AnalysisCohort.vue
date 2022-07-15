@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col cols="12">
-        <v-sheet min-height="80vh" outlined>
+        <v-sheet outlined>
           <!-- Tabs section -->
           <v-tabs v-model="tab" background-color="primary" dark>
             <v-tab v-for="item in items" :key="item.tab">

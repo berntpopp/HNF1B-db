@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col cols="12" sm="12">
-        <v-sheet min-height="80vh" outlined>
+        <v-sheet outlined>
           <v-overlay
             :absolute="absolute"
             :opacity="opacity"
@@ -93,6 +93,21 @@
               </v-list-item-content>
             </v-list-item>
           </v-card>
+
+          <v-card-text class="d-flex justify-center">
+            <!-- Load Variants table component element -->
+            <template v-if="!loading">
+            <TableVariants
+              :show-filter-controls="false"
+              :show-pagination-controls="false"
+              :filter-input="variant_of_individual_filter"
+              header-label="Variants"
+              header-sub-label="identified in this individual"
+            />
+            </template>
+            <!-- Load Variants table component element -->
+          </v-card-text>
+
         </v-sheet>
       </v-col>
     </v-row>
@@ -101,8 +116,16 @@
 
 
 <script>
+import TableVariants from "@/components/tables/TableVariants.vue";
+
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+
 export default {
   name: "PageIndividual",
+  mixins: [colorAndSymbolsMixin],
+  components: {
+    TableVariants
+  },
   data() {
     return {
       individual: {},
@@ -125,7 +148,7 @@ export default {
         male: "mdi-gender-male",
         unspecified: "mdi-help-circle-outline",
       },
-      cohort_style: { born: "success", fetus: "primary" },
+      variant_of_individual_filter: "",
     };
   },
   computed: {},
@@ -151,6 +174,8 @@ export default {
           this.$router.push("/PageNotFound");
         } else {
           this.individual = response.data.data[0];
+
+          this.variant_of_individual_filter = "equals(individual_id," + this.$route.params.individual_id + ")";
         }
 
       } catch (e) {
