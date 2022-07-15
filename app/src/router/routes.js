@@ -1,0 +1,200 @@
+// src/router/routes.js
+import Vue from "vue";
+
+import VueAxios from "vue-axios";
+import axios from "axios";
+
+Vue.use(VueAxios, axios);
+
+export const routes = [
+    {
+      path: '/',
+      name: 'Home',
+      component: () =>
+        import(
+            /* webpackChunkName: "Home" */ '@/views/Home.vue'
+          ),
+      meta: {
+        sitemap: {
+          priority: 1.0,
+          changefreq: "monthly",
+        },
+      },
+    },
+    {
+      path: '/table_reports',
+      name: 'TableReports',
+      component: () =>
+        import(
+          /* webpackChunkName: "Tables" */ '@/views/tables/TableReports.vue'
+        ),
+      props: (route) => ({
+        sort: route.query.sort,
+        filter: route.query.filter,
+        fields: route.query.fields,
+        page_after: route.query.page_after,
+        page_size: route.query.page_size,
+        fspec: route.query.fspec,
+      }),
+      meta: {
+        sitemap: {
+          priority: 0.6,
+          changefreq: "monthly",
+        },
+      },
+    },
+    {
+      path: '/table_individuals',
+      name: 'TableIndividuals',
+      component: () =>
+        import(
+          /* webpackChunkName: "Tables" */ '@/views/tables/TableIndividuals.vue'
+        ),
+      props: (route) => ({
+        sort: route.query.sort,
+        filter: route.query.filter,
+        fields: route.query.fields,
+        page_after: route.query.page_after,
+        page_size: route.query.page_size,
+        fspec: route.query.fspec,
+      }),
+      meta: {
+        sitemap: {
+          priority: 0.6,
+          changefreq: "monthly",
+        },
+      },
+    },
+    {
+      path: '/table_publications',
+      name: 'TablePublications',
+      component: () =>
+        import(
+          /* webpackChunkName: "Tables" */ '@/views/tables/TablePublications.vue'
+        ),
+      props: (route) => ({
+        sort: route.query.sort,
+        filter: route.query.filter,
+        fields: route.query.fields,
+        page_after: route.query.page_after,
+        page_size: route.query.page_size,
+        fspec: route.query.fspec,
+      }),
+      meta: {
+        sitemap: {
+          priority: 0.6,
+          changefreq: "monthly",
+        },
+      },
+    },
+    {
+      path: '/table_variants',
+      name: 'TableVariants',
+      component: () =>
+        import(
+          /* webpackChunkName: "Tables" */ '@/views/tables/TableVariants.vue'
+        ),
+      props: (route) => ({
+        sort: route.query.sort,
+        filter: route.query.filter,
+        fields: route.query.fields,
+        page_after: route.query.page_after,
+        page_size: route.query.page_size,
+        fspec: route.query.fspec,
+      }),
+      meta: {
+        sitemap: {
+          priority: 0.6,
+          changefreq: "monthly",
+        },
+      },
+    },
+    {
+      path: '/analysis_cohort',
+      name: 'AnalysisCohort',
+      component: () =>
+        import(
+          /* webpackChunkName: "Analyses" */ '@/views/analyses/AnalysisCohort.vue'
+        ),
+        meta: {
+          sitemap: {
+            priority: 0.7,
+            changefreq: "monthly",
+          },
+        },
+    },
+    {
+      path: '/analysis_genotype_phenotype',
+      name: 'AnalysisGenotypePhenotype',
+      component: () =>
+        import(
+          /* webpackChunkName: "Analyses" */ '@/views/analyses/AnalysisGenotypePhenotype.vue'
+        ),
+        meta: {
+          sitemap: {
+            priority: 0.7,
+            changefreq: "monthly",
+          },
+        },
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: () =>
+        import(
+          /* webpackChunkName: "Home" */ '@/views/About.vue'
+        ),
+        meta: {
+          sitemap: {
+            priority: 0.5,
+            changefreq: "yearly",
+          },
+        },
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () =>
+        import(
+          /* webpackChunkName: "User" */ '@/views/Login.vue'
+        ),
+        meta: {
+          sitemap: {
+            priority: 0.5,
+            changefreq: "yearly",
+          },
+        },
+    },
+    {
+      path: '/individual/:individual_id',
+      component: () =>
+        import(
+          /* webpackChunkName: "Pages" */ '@/views/pages/PageIndividual.vue'
+        ),
+        meta: { sitemap: { ignoreRoute: true } },
+    },
+    {
+      path: '/publication/:publication_id',
+      component: () =>
+        import(
+          /* webpackChunkName: "Pages" */ '@/views/pages/PagePublication.vue'
+        ),
+        meta: { sitemap: { ignoreRoute: true } },
+    },
+    {
+      path: '/variant/:variant_id',
+      component: () =>
+        import(
+          /* webpackChunkName: "Pages" */ '@/views/pages/PageVariant.vue'
+        ),
+        meta: { sitemap: { ignoreRoute: true } },
+    },
+    {
+      path: '/report/:report_id',
+      component: () =>
+        import(
+          /* webpackChunkName: "Pages" */ '@/views/pages/PageReport.vue'
+        ),
+        meta: { sitemap: { ignoreRoute: true } },
+    },
+  ];
