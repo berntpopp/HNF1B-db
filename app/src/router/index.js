@@ -12,22 +12,54 @@ const routes = [
   {
     path: '/table_reports',
     name: 'TableReports',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableReports.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableReports.vue'),
+    props: (route) => ({
+      sort: route.query.sort,
+      filter: route.query.filter,
+      fields: route.query.fields,
+      page_after: route.query.page_after,
+      page_size: route.query.page_size,
+      fspec: route.query.fspec,
+    }),
   },
   {
     path: '/table_individuals',
     name: 'TableIndividuals',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableIndividuals.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableIndividuals.vue'),
+    props: (route) => ({
+      sort: route.query.sort,
+      filter: route.query.filter,
+      fields: route.query.fields,
+      page_after: route.query.page_after,
+      page_size: route.query.page_size,
+      fspec: route.query.fspec,
+    }),
   },
   {
     path: '/table_publications',
     name: 'TablePublications',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TablePublications.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TablePublications.vue'),
+    props: (route) => ({
+      sort: route.query.sort,
+      filter: route.query.filter,
+      fields: route.query.fields,
+      page_after: route.query.page_after,
+      page_size: route.query.page_size,
+      fspec: route.query.fspec,
+    }),
   },
   {
     path: '/table_variants',
     name: 'TableVariants',
-    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableVariants.vue')
+    component: () => import(/* webpackChunkName: "Tables" */ '@/views/tables/TableVariants.vue'),
+    props: (route) => ({
+      sort: route.query.sort,
+      filter: route.query.filter,
+      fields: route.query.fields,
+      page_after: route.query.page_after,
+      page_size: route.query.page_size,
+      fspec: route.query.fspec,
+    }),
   },
   {
     path: '/analysis_cohort',
