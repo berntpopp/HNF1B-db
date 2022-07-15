@@ -80,7 +80,84 @@
         <v-spacer></v-spacer>
 
       <v-toolbar-items class="hidden-sm-and-down">
+        <v-menu
+          offset-y
+          v-if="user"
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn
+              :ripple="false"
+              text
+              v-on="on"
+              > 
+                {{ user }}
+              </v-btn>
+          </template>
+
+          <v-card>
+            <v-list dense>
+
+              <v-list-item
+                to="User"
+              >
+                <v-list-item-icon>
+                  <v-icon>
+                    mdi-account
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    View profile
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+
+              <v-list-item
+                @click="refreshWithJWT"
+              >
+                <v-list-item-icon>
+                  <v-icon>
+                    mdi-refresh
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    Refresh token
+                    <v-chip
+                      small
+                    >
+                      {{ Math.floor(time_to_logout) }}m
+                      {{
+                        ((time_to_logout - Math.floor(time_to_logout)) * 60).toFixed(
+                          0
+                        )
+                      }}s
+                    </v-chip>
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+
+              <v-list-item
+                @click="doUserLogOut"
+              >
+                <v-list-item-icon>
+                  <v-icon>
+                    mdi-logout
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    Sign out
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+
+            </v-list>
+          </v-card>
+        </v-menu>
+
         <v-btn
+          v-else
           :ripple="false"
           text
           key="Login"
@@ -152,10 +229,10 @@ export default {
   name: "hnf1b-db",
   metaInfo: {
     // if no subcomponents specify a metaInfo.title, this title will be used
-    title: "HNF1B-DB",
+    title: "HNF1B-db",
     // all titles will be injected into this template
     titleTemplate:
-      "%s | HNF1B-DB - The curated database for the HNF1B gene and associated diseases",
+      "%s | HNF1B-db - The curated database for the HNF1B gene and associated diseases",
     htmlAttrs: {
       lang: "en",
     },
@@ -164,11 +241,15 @@ export default {
         vmid: "description",
         name: "description",
         content:
-          "HNF1B-DB is a web-based application for comprehensive data input and analysis from patient histories or published literature specifically designed to investigate the genotypes and phenotypes in HNF1B-associated disease.",
+          "HNF1B-db is a web-based application for comprehensive data input and analysis from patient histories or published literature specifically designed to investigate the genotypes and phenotypes in HNF1B-associated disease.",
       },
     ],
   },
   data: () => ({
+    user: null,
+    review: false,
+    admin: false,
+    time_to_logout: 0,
     items: [
       { title: "About", to: "/about", id: "about" },
     ],
@@ -218,5 +299,134 @@ export default {
       },
     ],
   }),
+  watch: {
+    // used to refresh navbar on login push
+    $route(to, from) {
+      if (to !== from) {
+        this.isUserLoggedIn();
+      }
+    },
+  },
+  mounted() {
+    this.isUserLoggedIn();
+
+    this.interval = setInterval(() => {
+      this.updateDiffs();
+    }, 1000);
+
+    this.updateDiffs();
+  },
+  methods: {
+    isUserLoggedIn() {
+      if (localStorage.user && localStorage.token) {
+        this.checkSigninWithJWT();
+      } else {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+      }
+    },
+    async checkSigninWithJWT() {
+      let apiAuthenticateURL = process.env.VUE_APP_API_URL + "/api/auth/signin";
+
+      try {
+        let response_signin = await this.axios.get(apiAuthenticateURL, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+
+        this.user_from_jwt = response_signin.data;
+
+        if (
+          this.user_from_jwt.user_name[0] ==
+          JSON.parse(localStorage.user).user_name[0]
+        ) {
+          const allowed_roles = ["Administrator", "Reviewer"];
+          const allowence_navigation = [
+            ["Admin", "Curate", "Review"],
+            ["Review"],
+          ];
+
+          this.user = JSON.parse(localStorage.user).user_name[0];
+
+          let user_role = JSON.parse(localStorage.user).user_role[0];
+          let allowence =
+            allowence_navigation[allowed_roles.indexOf(user_role)];
+
+          this.review = allowence.includes("Review");
+          this.curate = allowence.includes("Curate");
+          this.admin = allowence.includes("Admin");
+        } else {
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+        }
+      } catch (e) {
+        console.log(e, "Error", "danger");
+      }
+    },
+    async refreshWithJWT() {
+      let apiAuthenticateURL =
+        process.env.VUE_APP_API_URL + "/api/auth/refresh";
+
+      try {
+        let response_refresh = await this.axios.get(apiAuthenticateURL, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+
+        localStorage.setItem("token", response_refresh.data[0]);
+        this.signinWithJWT();
+      } catch (e) {
+        console.log(e, "Error", "danger");
+      }
+    },
+    async signinWithJWT() {
+      let apiAuthenticateURL = process.env.VUE_APP_API_URL + "/api/auth/signin";
+
+      try {
+        let response_signin = await this.axios.get(apiAuthenticateURL, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+
+        localStorage.setItem("user", JSON.stringify(response_signin.data));
+      } catch (e) {
+        console.log(e, "Error", "danger");
+      }
+    },
+    doUserLogOut() {
+      if (localStorage.user || localStorage.token) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        this.user = null;
+
+        // based on https://stackoverflow.com/questions/57837758/navigationduplicated-navigating-to-current-location-search-is-not-allowed
+        // to avoid double nvigation
+        const path = `/`;
+        if (this.$route.path !== path) this.$router.push({ name: "Home" });
+      }
+    },
+    updateDiffs() {
+      if (localStorage.token) {
+        let expires = JSON.parse(localStorage.user).exp;
+        let timestamp = Math.floor(new Date().getTime() / 1000);
+
+        if (expires > timestamp) {
+          this.time_to_logout = ((expires - timestamp) / 60).toFixed(2);
+          if ([60, 180, 300].includes(expires - timestamp)) {
+            console.log(
+              "Refresh token.",
+              "Logout in " + (expires - timestamp) + " seconds",
+              "danger"
+            );
+          }
+        } else {
+          this.doUserLogOut();
+        }
+      }
+    },
+  },
 };
 </script>
