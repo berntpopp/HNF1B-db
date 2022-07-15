@@ -146,10 +146,15 @@ export default {
 
       try {
         let response = await this.axios.get(apiUrl);
-        this.publication = response.data.data;
 
-        this.individuals_in_publication = [...new Set(response.data.data[0].reports.map(item => item.individual_id))];
-        this.individuals_in_publication_filter = "contains(individual_id," + this.individuals_in_publication.join("|") + ")";
+        // redirect to 404 if response is empty data
+        if ( response.data.data.length === 0 ) {
+          this.$router.push("/PageNotFound");
+        } else {
+          this.publication = response.data.data;
+          this.individuals_in_publication = [...new Set(response.data.data[0].reports.map(item => item.individual_id))];
+          this.individuals_in_publication_filter = "contains(individual_id," + this.individuals_in_publication.join("|") + ")";
+        }
 
       } catch (e) {
         console.error(e);

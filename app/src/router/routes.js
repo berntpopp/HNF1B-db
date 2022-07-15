@@ -179,7 +179,7 @@ export const routes = [
         import(
           /* webpackChunkName: "Pages" */ '@/views/pages/PagePublication.vue'
         ),
-        meta: { sitemap: { ignoreRoute: true } },
+      meta: { sitemap: { ignoreRoute: true } },
     },
     {
       path: '/variant/:variant_id',
@@ -187,7 +187,7 @@ export const routes = [
         import(
           /* webpackChunkName: "Pages" */ '@/views/pages/PageVariant.vue'
         ),
-        meta: { sitemap: { ignoreRoute: true } },
+      meta: { sitemap: { ignoreRoute: true } },
     },
     {
       path: '/report/:report_id',
@@ -195,6 +195,14 @@ export const routes = [
         import(
           /* webpackChunkName: "Pages" */ '@/views/pages/PageReport.vue'
         ),
-        meta: { sitemap: { ignoreRoute: true } },
+      meta: { sitemap: { ignoreRoute: true } },
+    },
+    {
+      path: "*",
+      component: () =>
+        import(
+          /* webpackChunkName: "Pages" */ "@/views/PageNotFound.vue"
+        ),
+      meta: { sitemap: { ignoreRoute: true } },
     },
   ];

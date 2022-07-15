@@ -145,7 +145,14 @@ export default {
 
       try {
         let response = await this.axios.get(apiUrl);
-        this.individual = response.data.data[0];
+
+        // redirect to 404 if response is empty data
+        if ( response.data.data.length === 0 ) {
+          this.$router.push("/PageNotFound");
+        } else {
+          this.individual = response.data.data[0];
+        }
+
       } catch (e) {
         console.error(e);
       }
