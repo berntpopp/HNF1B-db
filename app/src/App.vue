@@ -210,7 +210,7 @@ export default {
         to: "https://github.com/berntpopp/HNF1B-db",
         target: "_blank",
       },
-      { icon: "mdi-api", to: "/api/__docs__/", target: "_self" },
+      { icon: "mdi-api", to: "/API", target: "_self" },
       {
         icon: "mdi-copyright",
         to: "https://creativecommons.org/licenses/by/4.0/",

@@ -205,4 +205,18 @@ export const routes = [
         ),
       meta: { sitemap: { ignoreRoute: true } },
     },
+    {
+      path: "/API",
+      name: "API",
+      component: () =>
+        import(
+          /* webpackChunkName: "API" */ "@/views/API.vue"
+        ),
+      meta: {
+        sitemap: {
+          priority: 0.6,
+          changefreq: "monthly",
+        },
+      },
+    },
   ];
