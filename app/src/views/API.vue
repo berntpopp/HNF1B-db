@@ -19,7 +19,6 @@ export default {
   methods: {
     async loadAPIInfo() {
       let apiURL = process.env.VUE_APP_API_URL + "/openapi.json";
-      console.log(apiURL);
       SwaggerUI({
         dom_id: "#swagger",
         url: apiURL,

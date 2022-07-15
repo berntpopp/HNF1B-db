@@ -11,20 +11,6 @@ export default {
           no: "light-blue",
           "not reported": "white",
         },
-        reported_phenotype_symbol: {
-          yes: "mdi-plus-circle-outline",
-          no: "mdi-minus-circle-outline",
-          "not reported": "mdi-help-circle-outline",
-        },
-        sex_symbol: {
-          female: "mdi-gender-female",
-          male: "mdi-gender-male",
-          unspecified: "mdi-help-circle-outline",
-        },
-        logical_symbol: {
-          1: "mdi-check-circle-outline",
-          0: "mdi-minus-circle-outline",
-        },
         variant_class_color: {
           copy_number_gain: "#3466C8",
           copy_number_loss: "#DB3B1F",
@@ -63,6 +49,24 @@ export default {
         cohort_style: {
           born: "success",
           fetus: "primary"
+        },
+        reported_phenotype_symbol: {
+          yes: "mdi-plus-circle-outline",
+          no: "mdi-minus-circle-outline",
+          "not reported": "mdi-help-circle-outline",
+        },
+        sex_symbol: {
+          female: "mdi-gender-female",
+          male: "mdi-gender-male",
+          unspecified: "mdi-help-circle-outline",
+        },
+        logical_symbol: {
+          1: "mdi-check-circle-outline",
+          0: "mdi-minus-circle-outline",
+        },
+        user_symbol: {
+          Administrator: "mdi-account-cowboy-hat",
+          Reviewer: "mdi-account-school",
         },
       };
     },
