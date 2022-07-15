@@ -22,6 +22,7 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@mdi/font": "^6.9.96",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-router": "^4.5.19",
     "@vue/cli-plugin-vuex": "^4.5.19",
