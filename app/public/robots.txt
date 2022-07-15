@@ -1,0 +1,3 @@
+Sitemap: https://hnf1b.uni-leipzig.de/sitemap.xml
+User-agent: *
+Disallow:
