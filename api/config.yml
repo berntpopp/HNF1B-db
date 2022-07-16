@@ -10,6 +10,13 @@ default:
     port_self: "7779"
     secret: <Dt'-XxOKzi6&]|BWyAx(g,DR:!M:etI`n(+^v]DKP!hm#IEI}`'#3NH7(:2
     refresh: 360
+    base_url: "http://127.0.0.1:7779"
+    mail_noreply_user: "noreply@hfn1b.org"
+    mail_noreply_host: "smtp.strato.de"
+    mail_noreply_port: 587
+    mail_noreply_use_ssl: TRUE
+    mail_noreply_overwrite: TRUE
+    mail_noreply_password: "62^cBO2u1IxK"
   hnf1b_db:
     dbtype: mysql
     dbname: hnf1b_db
@@ -21,3 +28,10 @@ default:
     port_self: "6668"
     secret: <Dt'-XxOKzi6&]|BWyAx(g,DR:!M:etI`n(+^v]DKP!hm#IEI}`'#3NH7(:2
     refresh: 3600
+    base_url: "https://hnf1b.uni-leipzig.de/"
+    mail_noreply_user: "noreply@hfn1b.org"
+    mail_noreply_host: "smtp.strato.de"
+    mail_noreply_port: 587
+    mail_noreply_use_ssl: TRUE
+    mail_noreply_overwrite: TRUE
+    mail_noreply_password: "62^cBO2u1IxK"

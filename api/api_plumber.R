@@ -53,7 +53,8 @@ pool <- dbPool(
 
 ##-------------------------------------------------------------------##
 ##-------------------------------------------------------------------##
-# Define global functions
+# Global API functions
+options("plumber.apiURL" = dw$base_url)
 
 # load source files
 source("functions/helper-functions.R", local = TRUE)
