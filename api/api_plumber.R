@@ -190,7 +190,7 @@ function(res,
   filter = "",
   fields = "",
   `page_after` = 0,
-  `page_size` = "all") {
+  `page_size` = "10") {
 
   start_time <- Sys.time()
 
@@ -274,7 +274,7 @@ function(res,
   filter = "",
   fields = "",
   `page_after` = 0,
-  `page_size` = "all") {
+  `page_size` = "10") {
 
   start_time <- Sys.time()
 
@@ -376,7 +376,7 @@ function(res,
   filter = "",
   fields = "",
   `page_after` = 0,
-  `page_size` = "all") {
+  `page_size` = "10") {
 
   start_time <- Sys.time()
 
@@ -499,7 +499,7 @@ function(res,
   filter = "",
   fields = "",
   `page_after` = 0,
-  `page_size` = "all") {
+  `page_size` = "10") {
 
   start_time <- Sys.time()
 
