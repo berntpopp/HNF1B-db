@@ -12,7 +12,25 @@ import SwaggerUI from "swagger-ui";
 import "swagger-ui/dist/swagger-ui.css";
 
 export default {
-  name: "Swagger",
+  name: "API",
+  metaInfo: {
+    // if no subcomponents specify a metaInfo.title, this title will be used
+    title: "API documentation",
+    // all titles will be injected into this template
+    titleTemplate:
+      "%s | HNF1B-db - The curated database for the HNF1B gene and associated diseases",
+    htmlAttrs: {
+      lang: "en",
+    },
+    meta: [
+      {
+        vmid: "description",
+        name: "description",
+        content:
+          "This is the Swagger / OpenAPI documentation HNF1B-db.",
+      },
+    ],
+  },
   mounted() {
     this.loadAPIInfo();
   },
@@ -23,6 +41,8 @@ export default {
         dom_id: "#swagger",
         url: apiURL,
         docExpansion: "none",
+        displayRequestDuration: true,
+        syntaxHighlight: {activate: true, theme: "obsidian"},
       });
     },
   },
@@ -30,4 +50,7 @@ export default {
 </script>
 
 <style scoped>
+::v-deep .info {
+    background-color: #FFFFFF !important;
+}
 </style> 

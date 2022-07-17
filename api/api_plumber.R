@@ -70,8 +70,7 @@ source("functions/helper-functions.R", local = TRUE)
 ##-------------------------------------------------------------------##
 #* @apiTitle HNF1B-db API
 
-#* @apiDescription This is the API powering the HNF1B-db website
-#* @apiDescription  and allowing programmatic access to the database contents.
+#* @apiDescription This is the API powering the HNF1B-db website and allowing programmatic access to the database contents.
 #* @apiVersion 0.1.0
 #* @apiTOS http://www.hnf1b.org/terms/
 #* @apiContact list(name = "API Support", url = "http://www.hnf1b.org/support", email = "support@hnf1b.org")

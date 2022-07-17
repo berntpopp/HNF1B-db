@@ -66,7 +66,7 @@ export default {
   mounted() {
     this.removeWrongAria();},
   methods: {
-    async removeWrongAria() {
+    removeWrongAria() {
       // select all elements with the class v-expansion-panel
       let expPanelsArr = document.querySelectorAll(".v-expansion-panel");
       // remove the wrongly set aria-expanded attribute
