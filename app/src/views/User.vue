@@ -22,11 +22,17 @@
           </v-toolbar>
 
             <v-card-text>
-              <v-list-item-group>
-                <v-list-item>
+              <v-list-item-group
+                  aria-label="User information"
+              >
+                <v-list-item
+                  aria-label="User name"
+                >
                   Username:
                   <v-spacer></v-spacer>
-                  <v-chip variant="info">
+                  <v-chip
+                    variant="info"
+                  >
                     {{ user.user_name[0] }}
                   </v-chip>
                 </v-list-item>
@@ -34,6 +40,7 @@
                 <v-list-item
                     v-for="(contribution, key) in user.contributions"
                     :key="`contribution-list-${contribution}`"
+                    :aria-label="`Curation contribution for ${contribution}`"
                   >
                   {{key}}:
                   <v-spacer></v-spacer>
@@ -45,30 +52,39 @@
                   </v-chip>
                 </v-list-item>
 
-                <v-list-item>
+                <v-list-item
+                  aria-label="Account creation date"
+                >
                   Account created:
                   <v-spacer></v-spacer>
                   {{ user.user_created[0] }}
                 </v-list-item>
 
                 <v-list-item>
+                  aria-label="Account E-mail"
+                >
                   E-Mail:
                   <v-spacer></v-spacer>
                   {{ user.email[0] }}
                 </v-list-item>
 
-                <v-list-item>
+                <v-list-item
+                  aria-label="Account ORCID"
+                >
                   ORCID:
                   <v-spacer></v-spacer>
                   <a
                     :href="'https://orcid.org/' + user.orcid[0]"
+                    aria-label="Link out to the ORCID of the user"
                     target="_blank"
                   >
                     {{ user.orcid[0] }}
                   </a>
                 </v-list-item>
 
-                <v-list-item>
+                <v-list-item
+                  aria-label="Token validity and refresh option"
+                >
                   Token expires:
                   <v-spacer></v-spacer>
                   <v-chip
@@ -90,6 +106,7 @@
                     href="#"
                     variant="success"
                     pill
+                    aria-label="refresh the current JWT"
                     @click="refreshWithJWT"
                   >
                     <v-icon>
