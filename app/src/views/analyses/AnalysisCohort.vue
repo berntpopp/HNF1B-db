@@ -4,7 +4,7 @@
       <v-col cols="12">
         <v-sheet outlined>
           <!-- Tabs section -->
-          <v-tabs v-model="tab" background-color="primary" dark>
+          <v-tabs v-model="tab">
             <v-tab v-for="item in items" :key="item.tab">
               {{ item.tab }}
             </v-tab>
