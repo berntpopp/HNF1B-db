@@ -31,9 +31,8 @@
                 <v-list-item>
                   PMID:
                   <a
-                    :href="
-                      'https://pubmed.ncbi.nlm.nih.gov/' + publication[0].PMID
-                    "
+                    :href="'https://pubmed.ncbi.nlm.nih.gov/' + publication[0].PMID"
+                    aria-label="Link out to PubMed"
                     target="_blank"
                   >
                     {{ publication[0].PMID }}
@@ -44,6 +43,7 @@
                   DOI:
                   <a
                     :href="'https://doi.org/' + publication[0].DOI"
+                    aria-label="Link out to Digital Object Identifier (DOI) System"
                     target="_blank"
                   >
                     {{ publication[0].DOI }}
