@@ -87,6 +87,20 @@
               class="elevation-1"
               item-key="individual_id"
             >
+
+            <!-- template to set aria-label for th expand buttons -->
+            <template v-slot:[`item.data-table-expand`]="{ expand, isExpanded }">
+                <v-btn 
+                  icon 
+                  @click="expand(!isExpanded)" 
+                  class="v-data-table__expand-icon"
+                  aria-label="Expand report table"
+                  :class="{'v-data-table__expand-icon--active' : isExpanded}"
+                  >
+                  <v-icon>mdi-chevron-down</v-icon>
+                </v-btn>
+            </template>
+
               <template v-slot:expanded-item="{ headers, item }">
                 <td :colspan="headers.length">
                   <v-data-table
