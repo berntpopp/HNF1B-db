@@ -30,7 +30,6 @@
               ></v-text-field>
 
               <v-btn
-                color="error"
                 class="mr-4"
                 @click="reset"
               >
