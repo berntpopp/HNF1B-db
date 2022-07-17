@@ -98,6 +98,7 @@
               <template v-slot:[`item.PMID`]="{ item }">
                 <a
                   :href="'https://pubmed.ncbi.nlm.nih.gov/' + item.PMID"
+                  aria-label="Link out to PubMed"
                   target="_blank"
                 >
                   {{ item.PMID }}
@@ -105,7 +106,11 @@
               </template>
 
               <template v-slot:[`item.DOI`]="{ item }">
-                <a :href="'https://doi.org/' + item.DOI" target="_blank">
+                <a 
+                  :href="'https://doi.org/' + item.DOI"
+                  aria-label="Link out to Digital Object Identifier (DOI) System"
+                  target="_blank"
+                >
                   {{ item.DOI }}
                 </a>
               </template>
