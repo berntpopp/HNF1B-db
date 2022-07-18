@@ -1,5 +1,5 @@
 #!/bin/bash
-# script to download configuration files for the SysNDD Docker containers and
+# script to download configuration files for the HNF1B-db Docker containers and
 # compose the installation using docker-compose
 # Written by: Bernt Popp
 # Last updated on: 2022-05-10
@@ -10,7 +10,7 @@
 config_archive_link=$1			# first command line argument: downloadable web adress with the config archive
 
 display_usage() { 
-    echo "A shell script to download configuration files for the SysNDD Docker containers and compose the installation using docker-compose."
+    echo "A shell script to download configuration files for the HNF1B-db Docker containers and compose the installation using docker-compose."
     echo -e "\nusage:\nsh bash deployment.sh config_archive_link"
 }
 

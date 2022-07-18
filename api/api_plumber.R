@@ -957,7 +957,7 @@ function(req, res, email_request = "") {
     key <- charToRaw(dw$secret)
 
     # connect to database, put timestamp of request password reset
-    sysndd_db <- dbConnect(RMariaDB::MariaDB(),
+    hnf1b_db <- dbConnect(RMariaDB::MariaDB(),
       dbname = dw$dbname,
       user = dw$user,
       password = dw$password,
@@ -965,14 +965,14 @@ function(req, res, email_request = "") {
       host = dw$host,
       port = dw$port)
 
-    dbExecute(sysndd_db,
+    dbExecute(hnf1b_db,
       paste0("UPDATE user SET password_reset_date = '",
         timestamp_request,
         "' WHERE user_id = ",
         user_id_from_email[1],
         ";"))
 
-    dbDisconnect(sysndd_db)
+    dbDisconnect(hnf1b_db)
 
     claim <- jwt_claim(user_id = user_table$user_id,
       user_name = user_table$user_name,
@@ -981,15 +981,15 @@ function(req, res, email_request = "") {
       iat = timestamp_iat,
       exp = timestamp_exp)
     jwt <- jwt_encode_hmac(claim, secret = key)
-    reset_url <- paste0(dw$base_url, "PasswordReset/", jwt)
+    reset_url <- paste0(dw$app_url, "/PasswordReset/", jwt)
 
     # send mail
     res$status <- 200 # OK
     res <- send_noreply_email(c(
        "We received a password reset for your account",
-       "at sysndd.org. Use this link to reset:",
+       "at hnf1b.org. Use this link to reset:",
        reset_url),
-       "Your password reset request for SysNDD.org",
+       "Your password reset request for hnf1b.org",
        user_table$email
       )
   } else {
@@ -1051,7 +1051,7 @@ function(req, res, new_pass_1 = "", new_pass_2 = "") {
     # if criteria fullfilled, remove time to invalidate JWT
     if (jwt_match && new_pass_match_and_valid) {
       # connect to database, put approval for user application then disconnect
-    sysndd_db <- dbConnect(RMariaDB::MariaDB(),
+    hnf1b_db <- dbConnect(RMariaDB::MariaDB(),
       dbname = dw$dbname,
       user = dw$user,
       password = dw$password,
@@ -1059,19 +1059,19 @@ function(req, res, new_pass_1 = "", new_pass_2 = "") {
       host = dw$host,
       port = dw$port)
 
-      dbExecute(sysndd_db,
+      dbExecute(hnf1b_db,
         paste0("UPDATE user SET password = '",
           new_pass_1,
           "' WHERE user_id = ",
           user_jwt$user_id,
           ";"))
 
-      dbExecute(sysndd_db,
+      dbExecute(hnf1b_db,
         paste0("UPDATE user SET password_reset_date = NULL WHERE user_id = ",
           user_jwt$user_id,
           ";"))
 
-      dbDisconnect(sysndd_db)
+      dbDisconnect(hnf1b_db)
 
       res$status <- 201 # Created
       return(list(message = "Password successfully changed."))

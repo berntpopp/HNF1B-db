@@ -1,38 +1,46 @@
 <template>
   <v-container fluid fill-height>
-    <v-layout align-center justify-center>
-      <v-flex xs12 sm8 md4>
-        <v-card class="elevation-12">
-          <v-toolbar dark color="primary">
-            <v-toolbar-title>Reset Password</v-toolbar-title>
-          </v-toolbar>
-          <v-card-text>
-            <v-form
-              ref="form"
-              v-model="valid"
-              lazy-validation
-              @submit.stop.prevent="requestPasswordReset()"
-            >
-              <v-text-field
-                prepend-icon="mdi-email"
-                name="mail"
-                label="Email address"
-                type="text"
-                placeholder="mail@your-institution.com"
-                v-model="email_entry"
-              ></v-text-field>
 
-              <v-btn
-                color="primary"
-                type="submit"
+    <!-- container with email input to request the password reset link -->
+    <v-container
+      v-if="show_request_container"
+    >
+      <v-layout align-center justify-center>
+        <v-flex xs12 sm8 md4>
+          <v-card class="elevation-12">
+            <v-toolbar dark color="primary">
+              <v-toolbar-title>Reset Password</v-toolbar-title>
+            </v-toolbar>
+            <v-card-text>
+              <v-form
+                ref="form"
+                v-model="valid"
+                lazy-validation
+                @submit.stop.prevent="requestPasswordReset()"
               >
-                Submit
-              </v-btn>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-flex>
-    </v-layout>
+                <v-text-field
+                  prepend-icon="mdi-email"
+                  name="mail"
+                  label="Email address"
+                  type="text"
+                  placeholder="mail@your-institution.com"
+                  v-model="email_entry"
+                ></v-text-field>
+
+                <v-btn
+                  color="primary"
+                  type="submit"
+                >
+                  Submit
+                </v-btn>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
+    <!-- container with email input to request the password reset link -->
+
   </v-container>
 </template>
 
