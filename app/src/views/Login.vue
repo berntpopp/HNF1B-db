@@ -29,6 +29,14 @@
                 v-model="password"
               ></v-text-field>
 
+              Don't have an account yet and want to help?
+              <a 
+                href="/Register"
+              >
+                Register now.
+              </a>
+              <br>
+
               Forgot your password?
               <a 
                 href="/PasswordReset"

@@ -1092,11 +1092,10 @@ function(req, res, new_pass_1 = "", new_pass_2 = "") {
 #* @tag authentication
 #* manages user signup
 #* @serializer json list(na="string")
-#' @post /api/auth/signup
-function() {
-  ## get json string from arguments body
-  signup_data <- req$argsBody$signup_json
-
+#' @get /api/auth/signup
+function(req, res, signup_data) {
+  ## TODO: should change this to a POST request, 
+  ## have to change filter function for that
   ## convert to tibble and check values for database
   user <- tibble::as_tibble(fromJSON(signup_data)) %>%
       mutate(terms_agreed = case_when(
@@ -1160,7 +1159,7 @@ function() {
       res$status <- 500
       res$body <- "User data could not be written to the database."
       res
-  }
+    }
 
   } else {
     res$status <- 404

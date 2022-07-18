@@ -252,4 +252,16 @@ export const routes = [
         import(/* webpackChunkName: "User" */ "@/views/PasswordReset.vue"),
       meta: { sitemap: { ignoreRoute: true } },
     },
+    {
+      path: "/Register",
+      name: "Register",
+      component: () =>
+        import(/* webpackChunkName: "User" */ "@/views/Register.vue"),
+      meta: {
+        sitemap: {
+          priority: 0.5,
+          changefreq: "yearly",
+        },
+      },
+    },
   ];

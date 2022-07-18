@@ -34,7 +34,6 @@
     </v-container>
     <!-- container with email input to request the password reset link -->
 
-
     <!-- container with password change inputs -->
     <v-container v-if="show_change_container">
       <v-layout align-center justify-center>
@@ -54,7 +53,14 @@
                   prepend-icon="mdi-lock"
                   :append-icon="show_pass_1 ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="show_pass_1 ? 'text' : 'password'"
-                  :rules="[passRules.required, passRules.min, passRules.upperChar, passRules.lowerChar, passRules.digit, passRules.special]"
+                  :rules="[
+                    passRules.required,
+                    passRules.min,
+                    passRules.upperChar,
+                    passRules.lowerChar,
+                    passRules.digit,
+                    passRules.special,
+                  ]"
                   name="password_1"
                   label="Enter your new password"
                   v-model="new_password_entry"
@@ -65,7 +71,14 @@
                   prepend-icon="mdi-lock"
                   :append-icon="show_pass_2 ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="show_pass_2 ? 'text' : 'password'"
-                  :rules="[passRules.required, passRules.min, passRules.upperChar, passRules.lowerChar, passRules.digit, passRules.special]"
+                  :rules="[
+                    passRules.required,
+                    passRules.min,
+                    passRules.upperChar,
+                    passRules.lowerChar,
+                    passRules.digit,
+                    passRules.special,
+                  ]"
                   name="password_2"
                   label="Repeat new password"
                   v-model="new_password_repeat"
@@ -80,13 +93,30 @@
       </v-layout>
     </v-container>
     <!-- container with password change inputs -->
-
   </v-container>
 </template>
+
 
 <script>
 export default {
   name: "PasswordReset",
+  metaInfo: {
+    // if no subcomponents specify a metaInfo.title, this title will be used
+    title: "HNF1B-db",
+    // all titles will be injected into this template
+    titleTemplate:
+      "%s | HNF1B-db - The curated database for the HNF1B gene and associated diseases",
+    htmlAttrs: {
+      lang: "en",
+    },
+    meta: [
+      {
+        vmid: "description",
+        name: "description",
+        content: "The PasswordReset view allows to initiate and perform lost password reset.",
+      },
+    ],
+  },
   data() {
     return {
       valid: true,
@@ -95,16 +125,17 @@ export default {
       show_pass_1: false,
       show_pass_2: false,
       passRules: {
-        required: value => !!value || 'Field is required.',
-        min: v => v.length >= 8 || 'Min 8 characters',
-        upperChar: v => /[A-Z]/.test(v) || 'Must contain upper characters',
-        lowerChar: v => /[a-z]/.test(v) || 'Must contain lower characters',
-        digit: v => /\d/.test(v) || 'Must contain digits',
-        special: v => /[!@#$%^&*]/.test(v) || 'Must contain special character (!@#$%^&*)',
+        required: (value) => !!value || "Field is required.",
+        min: (v) => v.length >= 8 || "Min 8 characters",
+        upperChar: (v) => /[A-Z]/.test(v) || "Must contain upper characters",
+        lowerChar: (v) => /[a-z]/.test(v) || "Must contain lower characters",
+        digit: (v) => /\d/.test(v) || "Must contain digits",
+        special: (v) =>
+          /[!@#$%^&*]/.test(v) || "Must contain special character (!@#$%^&*)",
       },
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        (v) => !!v || "E-mail is required",
+        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
       ],
       email_entry: "",
       new_password_entry: "",
