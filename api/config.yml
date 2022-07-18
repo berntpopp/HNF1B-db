@@ -4,6 +4,7 @@ default:
     dbname: hnf1b_db
     user: bernt
     password: "HNF1B-db"
+    salt: "satly"
     server: "0.0.0.0"
     host: "127.0.0.1"
     port: "6612"
@@ -16,12 +17,13 @@ default:
     mail_noreply_port: 587
     mail_noreply_use_ssl: TRUE
     mail_noreply_overwrite: TRUE
-    mail_noreply_password: "62^cBO2u1IxK"
+    mail_noreply_password: "great_pass"
   hnf1b_db:
     dbtype: mysql
     dbname: hnf1b_db
     user: bernt
     password: "HNF1B-db"
+    salt: "satly"
     server: "0.0.0.0"
     host: "hnf1b_mysql"
     port: "3306"
@@ -34,5 +36,5 @@ default:
     mail_noreply_port: 587
     mail_noreply_use_ssl: TRUE
     mail_noreply_overwrite: TRUE
-    mail_noreply_password: "62^cBO2u1IxK"
+    mail_noreply_password: "great_pass"
     

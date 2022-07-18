@@ -916,6 +916,88 @@ function(req, res, user_id) {
   }
 }
 
+
+#* @tag user
+#* request password reset
+#' @get /api/user/password/reset/request
+function(req, res, email_request = "") {
+
+  # get data from database
+  user_table <- pool %>%
+      tbl("user") %>%
+      collect()
+
+  # first validate email
+  if (!is_valid_email(email_request)) {
+    res$status <- 400 # Bad Request
+    return(list(error = "Invalid Parameter Value Error."))
+  } else if (!(email_request %in% user_table$email)) {
+    res$status <- 200 # OK
+    res <- "Request mail send!" # This is to not enable attacks on userbase
+  } else if ((email_request %in% user_table$email)) {
+    # transfor to lower case for comparisons
+    email_user <- str_to_lower(toString(email_request))
+
+    # get user data from database table
+    user_table <- user_table %>%
+      mutate(email_lower = str_to_lower(email)) %>%
+      filter(email_lower == email_user) %>%
+      mutate(hash = toString(md5(paste0(dw$salt, password)))) %>%
+      select(user_id, user_name, hash, email)
+
+    # extract user_id by mail
+    user_id_from_email <- user_table$user_id
+
+    # request time
+    timestamp_request <- Sys.time()
+    timestamp_iat <- as.integer(timestamp_request)
+    timestamp_exp <- as.integer(timestamp_request) + dw$refresh
+
+    # load secret and convert to raw
+    key <- charToRaw(dw$secret)
+
+    # connect to database, put timestamp of request password reset
+    sysndd_db <- dbConnect(RMariaDB::MariaDB(),
+      dbname = dw$dbname,
+      user = dw$user,
+      password = dw$password,
+      server = dw$server,
+      host = dw$host,
+      port = dw$port)
+
+    dbExecute(sysndd_db,
+      paste0("UPDATE user SET password_reset_date = '",
+        timestamp_request,
+        "' WHERE user_id = ",
+        user_id_from_email[1],
+        ";"))
+
+    dbDisconnect(sysndd_db)
+
+    claim <- jwt_claim(user_id = user_table$user_id,
+      user_name = user_table$user_name,
+      email = user_table$email,
+      hash = user_table$hash,
+      iat = timestamp_iat,
+      exp = timestamp_exp)
+    jwt <- jwt_encode_hmac(claim, secret = key)
+    reset_url <- paste0(dw$base_url, "PasswordReset/", jwt)
+
+    # send mail
+    res$status <- 200 # OK
+    res <- send_noreply_email(c(
+       "We received a password reset for your account",
+       "at sysndd.org. Use this link to reset:",
+       reset_url),
+       "Your password reset request for SysNDD.org",
+       user_table$email
+      )
+  } else {
+    res$status <- 401 # Unauthorized
+    return(list(error = "Error or unauthorized."))
+  }
+}
+
 ##-------------------------------------------------------------------##
 
 
