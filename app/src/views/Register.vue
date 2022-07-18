@@ -159,7 +159,8 @@ export default {
       ],
       orcidRules: [
         (v) => !!v || "ORCID is required",
-        (v) => /^(([0-9]{4})-){3}[0-9]{3}[0-9X]$/.test(v) || "ORCID must be valid",
+        (v) =>
+          /^(([0-9]{4})-){3}[0-9]{3}[0-9X]$/.test(v) || "ORCID must be valid",
       ],
       nameRules: [
         (v) => !!v || "Name is required",
@@ -191,7 +192,7 @@ export default {
   },
   watch: {
     valid() {
-      this.button_disabled = !(this.$refs.form.validate());
+      this.button_disabled = !this.$refs.form.validate();
     },
   },
   mounted() {
@@ -210,7 +211,8 @@ export default {
 
       try {
         let registration_form_copy = this.registration_form;
-        registration_form_copy.terms_agreed = (registration_form_copy.terms_agreed ? "accepted" : "not_accepted");
+        registration_form_copy.terms_agreed =
+          registration_form_copy.terms_agreed ? "accepted" : "not_accepted";
 
         let submission_json = JSON.stringify(registration_form_copy);
         let response = await this.axios.get(apiUrl + submission_json, {});

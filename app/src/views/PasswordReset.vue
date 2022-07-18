@@ -113,7 +113,8 @@ export default {
       {
         vmid: "description",
         name: "description",
-        content: "The PasswordReset view allows to initiate and perform lost password reset.",
+        content:
+          "The PasswordReset view allows to initiate and perform lost password reset.",
       },
     ],
   },
