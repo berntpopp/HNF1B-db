@@ -300,3 +300,68 @@ generate_cursor_pagination_info <- function(pagination_tibble,
 
   return(return_data)
 }
+
+
+# generate a random password
+# based on "https://stackoverflow.com/
+# questions/22219035/function-to-generate-a-random-password"
+random_password <- function() {
+  samp <- c(0:9, letters, LETTERS, "!", "$")
+  password <- paste(sample(samp, 12), collapse = "")
+  return(password)
+}
+
+
+# validate email
+# based on https://www.r-bloggers.com/2012/07/validating-email-adresses-in-r/
+is_valid_email <- function(x) {
+    grepl("\\<[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\>",
+      as.character(x),
+      ignore.case = TRUE
+      )
+}
+
+
+# generate initials for avatar from full name based on
+# https://stackoverflow.com/questions/24833566/get-initials-from-string-of-words
+generate_initials <- function(first_name, family_name) {
+    initials <- paste(substr(strsplit(paste0(first_name,
+          " ",
+          family_name),
+          " ")[[1]],
+        1, 1),
+      collapse = "")
+
+    return(initials)
+}
+
+
+# send noreply mail
+send_noreply_email <- function(email_body,
+  email_subject,
+  email_recipient,
+  email_blind_copy = "noreply@hnf1b.org") {
+    ## compsoe the email using function from blastula
+    email <- compose_email(
+      body = md(email_body),
+      footer = md(paste0("Visit [hnf1b.org](https://www.hnf1b.org) for ",
+        "the latest information on HNF1B-associated disease and variation."))
+      )
+
+    ## send the mail and supress messages
+    suppressMessages(email %>%
+        smtp_send(
+        from = "noreply@hnf1b.org",
+        subject = email_subject,
+        to = email_recipient,
+        bcc = email_blind_copy,
+        credentials = creds_envvar(
+          pass_envvar = "SMTP_PASSWORD",
+          user = dw$mail_noreply_user,
+          host = dw$mail_noreply_host,
+          port = dw$mail_noreply_port,
+          use_ssl = dw$mail_noreply_use_ssl
+        )
+      ))
+    return("Request mail send!")
+}

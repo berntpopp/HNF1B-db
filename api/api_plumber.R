@@ -20,14 +20,26 @@ library(pool)
 library(memoise)
 library(coop)
 library(timetk)
+library(blastula)
+library(keyring)
+library(rlang)
 ##-------------------------------------------------------------------##
 
 
 
 ##-------------------------------------------------------------------##
+## load config file
 dw <- config::get(Sys.getenv("API_CONFIG"))
 ##-------------------------------------------------------------------##
 
+
+
+##-------------------------------------------------------------------##
+## if not available set the enverinment variable for the noreply mail
+if (nchar(Sys.getenv("SMTP_PASSWORD")) == 0) {
+  Sys.setenv("SMTP_PASSWORD" = toString(dw$mail_noreply_password))
+}
+##-------------------------------------------------------------------##
 
 
 ##-------------------------------------------------------------------##
@@ -910,6 +922,87 @@ function(req, res, user_id) {
 
 ##-------------------------------------------------------------------##
 ## Authentication section
+
+#* @tag authentication
+#* manages user signup
+#* @serializer json list(na="string")
+#' @post /api/auth/signup
+function() {
+  ## get json string from arguments body
+  signup_data <- req$argsBody$signup_json
+
+  ## convert to tibble and check values for database
+  user <- tibble::as_tibble(fromJSON(signup_data)) %>%
+      mutate(terms_agreed = case_when(
+        terms_agreed == "accepted" ~ "1",
+        terms_agreed != "accepted" ~ "0"
+      )) %>%
+    select(user_name,
+      first_name,
+      family_name,
+      email,
+      orcid,
+      comment,
+      terms_agreed)
+
+  ## perform input validation
+  input_validation <- pivot_longer(user, cols = everything()) %>%
+      mutate(valid = case_when(
+        name == "user_name" ~ (nchar(value) >= 5 & nchar(value) <= 20),
+        name == "first_name" ~ (nchar(value) >= 2 & nchar(value) <= 50),
+        name == "family_name" ~ (nchar(value) >= 2 & nchar(value) <= 50),
+        name == "email" ~ str_detect(value, regex(".+@.+\\..+", dotall = TRUE)),
+        name == "orcid" ~ str_detect(value,
+          regex("^(([0-9]{4})-){3}[0-9]{3}[0-9X]$",
+          dotall = TRUE)),
+        name == "comment" ~ (nchar(value) >= 10 & nchar(value) <= 250),
+        name == "terms_agreed" ~ (value == "1")
+      )) %>%
+      mutate(all = "1") %>%
+      select(all, valid) %>%
+      group_by(all) %>%
+      summarise(valid = as.logical(prod(valid))) %>%
+      ungroup() %>%
+      select(valid)
+
+  ## if valid submit the data to the database
+  if (input_validation$valid) {
+
+    # connect to database
+    hnf1b_db <- dbConnect(RMariaDB::MariaDB(),
+      dbname = dw$dbname,
+      user = dw$user,
+      password = dw$password,
+      server = dw$server,
+      host = dw$host,
+      port = dw$port)
+
+    db_transaction_response <- dbAppendTable(hnf1b_db, "user", user)
+    dbDisconnect(hnf1b_db)
+
+    # send mail if data successfully written to database
+    if (db_transaction_response == 1) {
+
+      res <- send_noreply_email(c(
+        "Your registration request for hnf1b.org has been send to the curators",
+        "who will review it soon. Information provided:",
+        user),
+        "Your registration request to hnf1b.org",
+        user$email
+        )
+    } else {
+      res$status <- 500
+      res$body <- "User data could not be written to the database."
+      res
+  }
+
+  } else {
+    res$status <- 404
+    res$body <- "Please provide valid registration data."
+    res
+  }
+}
+
 
 #* @tag authentication
 #* does user login
