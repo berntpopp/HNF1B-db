@@ -27,9 +27,7 @@
           <div class="text-center pt-2">
             <v-row no-gutters>
               <v-col cols="8" class="px-1">
-                <v-container
-                  v-if="showFilterControls"
-                >
+                <v-container v-if="showFilterControls">
                   <v-text-field
                     v-model="filter['any'].content"
                     append-icon="mdi-magnify"
@@ -45,7 +43,9 @@
 
               <v-col cols="1" class="px-1">
                 <v-container
-                  v-if="meta.totalItems > meta.perPage || showPaginationControls"
+                  v-if="
+                    meta.totalItems > meta.perPage || showPaginationControls
+                  "
                 >
                   <v-select
                     v-model="meta.perPage"
@@ -59,7 +59,9 @@
 
               <v-col cols="3" class="px-1">
                 <v-container
-                  v-if="meta.totalItems > meta.perPage || showPaginationControls"
+                  v-if="
+                    meta.totalItems > meta.perPage || showPaginationControls
+                  "
                 >
                   <v-pagination
                     v-model="currentPage"
@@ -102,7 +104,7 @@
                   class="ma-1"
                   small
                   :color="variant_class_color[item.variant_class]"
-                  >
+                >
                   {{ item.variant_class }}
                 </v-chip>
               </template>
@@ -116,7 +118,6 @@
                   {{ item.verdict_classification }}
                 </v-chip>
               </template>
-
             </v-data-table>
           </div>
         </v-sheet>
@@ -137,7 +138,10 @@ export default {
     showFilterControls: { type: Boolean, default: true },
     showPaginationControls: { type: Boolean, default: true },
     headerLabel: { type: String, default: "Variants Table" },
-    headerSubLabel: { type: String, default: "Search and filter the reviewed variants in a tabular view." },
+    headerSubLabel: {
+      type: String,
+      default: "Search and filter the reviewed variants in a tabular view.",
+    },
     sortInput: { type: String, default: "+variant_id" },
     filterInput: { type: String, default: "filter=" },
     fieldsInput: { type: String, default: null },
@@ -203,8 +207,7 @@ export default {
     // transform input filter string from params to object and assign
     this.filter = this.filterStrToObj(this.filterInput, this.filter);
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     handlePerPageChange() {
       this.currentItemID = 0;

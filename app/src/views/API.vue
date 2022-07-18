@@ -1,9 +1,6 @@
 <template>
   <div class="container-fluid text-left py-2">
-    <div
-      id="swagger"
-      class="swagger"
-    />
+    <div id="swagger" class="swagger" />
   </div>
 </template>
 
@@ -26,8 +23,7 @@ export default {
       {
         vmid: "description",
         name: "description",
-        content:
-          "This is the Swagger / OpenAPI documentation HNF1B-db.",
+        content: "This is the Swagger / OpenAPI documentation HNF1B-db.",
       },
     ],
   },
@@ -42,7 +38,7 @@ export default {
         url: apiURL,
         docExpansion: "none",
         displayRequestDuration: true,
-        syntaxHighlight: {activate: true, theme: "obsidian"},
+        syntaxHighlight: { activate: true, theme: "obsidian" },
       });
     },
   },
@@ -51,6 +47,6 @@ export default {
 
 <style scoped>
 ::v-deep .info {
-    background-color: #FFFFFF !important;
+  background-color: #ffffff !important;
 }
 </style> 

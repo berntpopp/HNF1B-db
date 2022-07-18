@@ -97,17 +97,16 @@
           <v-card-text class="d-flex justify-center">
             <!-- Load Variants table component element -->
             <template v-if="!loading">
-            <TableVariants
-              :show-filter-controls="false"
-              :show-pagination-controls="false"
-              :filter-input="variant_of_individual_filter"
-              header-label="Variants"
-              header-sub-label="identified in this individual"
-            />
+              <TableVariants
+                :show-filter-controls="false"
+                :show-pagination-controls="false"
+                :filter-input="variant_of_individual_filter"
+                header-label="Variants"
+                header-sub-label="identified in this individual"
+              />
             </template>
             <!-- Load Variants table component element -->
           </v-card-text>
-
         </v-sheet>
       </v-col>
     </v-row>
@@ -124,7 +123,7 @@ export default {
   name: "PageIndividual",
   mixins: [colorAndSymbolsMixin],
   components: {
-    TableVariants
+    TableVariants,
   },
   data() {
     return {
@@ -170,14 +169,14 @@ export default {
         let response = await this.axios.get(apiUrl);
 
         // redirect to 404 if response is empty data
-        if ( response.data.data.length === 0 ) {
+        if (response.data.data.length === 0) {
           this.$router.push("/PageNotFound");
         } else {
           this.individual = response.data.data[0];
 
-          this.variant_of_individual_filter = "equals(individual_id," + this.$route.params.individual_id + ")";
+          this.variant_of_individual_filter =
+            "equals(individual_id," + this.$route.params.individual_id + ")";
         }
-
       } catch (e) {
         console.error(e);
       }

@@ -41,14 +41,10 @@
                   class="ma-1"
                   small
                   :color="variant_class_color[item.variant_class]"
-                  >
+                >
                   {{ item.variant_class }}
                 </v-chip>
-                <v-chip
-                  class="ma-1"
-                  small
-                  :color="impact_color[item.IMPACT]"
-                >
+                <v-chip class="ma-1" small :color="impact_color[item.IMPACT]">
                   {{ item.IMPACT }}
                 </v-chip>
               </template>
@@ -56,7 +52,6 @@
               <template v-slot:[`item.HGVS_C`]="{ item }">
                 {{ item.HGVS_C }}, {{ item.HGVS_P }}
               </template>
-
 
               <template v-slot:[`item.verdict_classification`]="{ item }">
                 <v-chip
@@ -74,7 +69,9 @@
                   class="ma-1"
                   v-for="criterion in item.criteria_classification"
                   :key="`criterion-list-${criterion}`"
-                  :color="criteria_color[criterion.charAt(0)][criterion.split('_')[1]]"
+                  :color="
+                    criteria_color[criterion.charAt(0)][criterion.split('_')[1]]
+                  "
                 >
                   {{ criterion }}
                 </v-chip>
@@ -96,17 +93,16 @@
             <v-card-text class="d-flex justify-center">
               <!-- Load Individuals table component element -->
               <template v-if="!loading">
-              <TableIndividuals
-                :show-filter-controls="false"
-                :show-pagination-controls="false"
-                :filter-input="individuals_with_variant_filter"
-                header-label="Individuals"
-                header-sub-label="carrying this variant"
-              />
+                <TableIndividuals
+                  :show-filter-controls="false"
+                  :show-pagination-controls="false"
+                  :filter-input="individuals_with_variant_filter"
+                  header-label="Individuals"
+                  header-sub-label="carrying this variant"
+                />
               </template>
               <!-- Load Individuals table component element -->
             </v-card-text>
-
           </v-card>
         </v-sheet>
       </v-col>
@@ -126,7 +122,7 @@ export default {
   mixins: [colorAndSymbolsMixin],
   components: {
     ProteinLinearPlot,
-    TableIndividuals
+    TableIndividuals,
   },
   data() {
     return {
@@ -195,15 +191,21 @@ export default {
         let response = await this.axios.get(apiUrl);
 
         // redirect to 404 if response is empty data
-        if ( response.data.data.length === 0 ) {
+        if (response.data.data.length === 0) {
           this.$router.push("/PageNotFound");
         } else {
           this.variant = response.data.data;
 
-          this.individuals_with_variant = [...new Set(response.data.data[0].reports.map(item => item.individual_id))];
-          this.individuals_with_variant_filter = "contains(individual_id," + this.individuals_with_variant.join("|") + ")";
+          this.individuals_with_variant = [
+            ...new Set(
+              response.data.data[0].reports.map((item) => item.individual_id)
+            ),
+          ];
+          this.individuals_with_variant_filter =
+            "contains(individual_id," +
+            this.individuals_with_variant.join("|") +
+            ")";
         }
-
       } catch (e) {
         console.error(e);
       }

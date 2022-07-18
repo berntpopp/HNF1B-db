@@ -29,22 +29,16 @@
                 v-model="password"
               ></v-text-field>
 
-              <v-btn
-                class="mr-4"
-                @click="reset"
-              >
-                Reset Form
-              </v-btn>
+              <v-btn class="mr-4" @click="reset"> Reset Form </v-btn>
 
               <v-btn
                 color="primary"
                 type="submit"
                 :class="{ shake: animated }"
                 @click="clickHandler()"
-                >
+              >
                 Login
               </v-btn>
-
             </v-form>
           </v-card-text>
         </v-card>
@@ -92,8 +86,8 @@ export default {
     this.loading = false;
   },
   methods: {
-    reset () {
-      this.$refs.form.reset()
+    reset() {
+      this.$refs.form.reset();
     },
     async loadJWT() {
       let apiAuthenticateURL =

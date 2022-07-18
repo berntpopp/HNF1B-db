@@ -5,119 +5,91 @@
         <v-card class="elevation-12">
           <v-toolbar dark color="primary">
             <v-spacer></v-spacer>
-      <v-badge
-        avatar
-        overlap
-        color="error"
-        :icon="user_symbol[user.user_role[0]]"
-      >
-              <v-avatar
-                color="indigo"
-                size="48"
-              >
+            <v-badge
+              avatar
+              overlap
+              color="error"
+              :icon="user_symbol[user.user_role[0]]"
+            >
+              <v-avatar color="indigo" size="48">
                 {{ user.abbreviation[0] }}
               </v-avatar>
-      </v-badge>
+            </v-badge>
             <v-spacer></v-spacer>
           </v-toolbar>
 
-            <v-card-text>
-              <v-list-item-group
-                  aria-label="User information"
+          <v-card-text>
+            <v-list-item-group aria-label="User information">
+              <v-list-item aria-label="User name">
+                Username:
+                <v-spacer></v-spacer>
+                <v-chip variant="info">
+                  {{ user.user_name[0] }}
+                </v-chip>
+              </v-list-item>
+
+              <v-list-item
+                v-for="(contribution, key) in user.contributions"
+                :key="`contribution-list-${contribution}`"
+                :aria-label="`Curation contribution for ${contribution}`"
               >
-                <v-list-item
-                  aria-label="User name"
+                {{ key }}:
+                <v-spacer></v-spacer>
+                <v-chip small class="ma-1">
+                  {{ contribution }}
+                </v-chip>
+              </v-list-item>
+
+              <v-list-item aria-label="Account creation date">
+                Account created:
+                <v-spacer></v-spacer>
+                {{ user.user_created[0] }}
+              </v-list-item>
+
+              <v-list-item>
+                aria-label="Account E-mail" > E-Mail:
+                <v-spacer></v-spacer>
+                {{ user.email[0] }}
+              </v-list-item>
+
+              <v-list-item aria-label="Account ORCID">
+                ORCID:
+                <v-spacer></v-spacer>
+                <a
+                  :href="'https://orcid.org/' + user.orcid[0]"
+                  aria-label="Link out to the ORCID of the user"
+                  target="_blank"
                 >
-                  Username:
-                  <v-spacer></v-spacer>
-                  <v-chip
-                    variant="info"
-                  >
-                    {{ user.user_name[0] }}
-                  </v-chip>
-                </v-list-item>
+                  {{ user.orcid[0] }}
+                </a>
+              </v-list-item>
 
-                <v-list-item
-                    v-for="(contribution, key) in user.contributions"
-                    :key="`contribution-list-${contribution}`"
-                    :aria-label="`Curation contribution for ${contribution}`"
-                  >
-                  {{key}}:
-                  <v-spacer></v-spacer>
-                  <v-chip
-                    small
-                    class="ma-1"
-                  >
-                    {{ contribution }}
-                  </v-chip>
-                </v-list-item>
-
-                <v-list-item
-                  aria-label="Account creation date"
+              <v-list-item aria-label="Token validity and refresh option">
+                Token expires:
+                <v-spacer></v-spacer>
+                <v-chip class="ml-1" variant="info">
+                  {{ Math.floor(time_to_logout) }} m
+                  {{
+                    (
+                      (time_to_logout - Math.floor(time_to_logout)) *
+                      60
+                    ).toFixed(0)
+                  }}
+                  s
+                </v-chip>
+                <v-chip
+                  class="ml-1"
+                  href="#"
+                  variant="success"
+                  pill
+                  aria-label="refresh the current JWT"
+                  @click="refreshWithJWT"
                 >
-                  Account created:
-                  <v-spacer></v-spacer>
-                  {{ user.user_created[0] }}
-                </v-list-item>
-
-                <v-list-item>
-                  aria-label="Account E-mail"
-                >
-                  E-Mail:
-                  <v-spacer></v-spacer>
-                  {{ user.email[0] }}
-                </v-list-item>
-
-                <v-list-item
-                  aria-label="Account ORCID"
-                >
-                  ORCID:
-                  <v-spacer></v-spacer>
-                  <a
-                    :href="'https://orcid.org/' + user.orcid[0]"
-                    aria-label="Link out to the ORCID of the user"
-                    target="_blank"
-                  >
-                    {{ user.orcid[0] }}
-                  </a>
-                </v-list-item>
-
-                <v-list-item
-                  aria-label="Token validity and refresh option"
-                >
-                  Token expires:
-                  <v-spacer></v-spacer>
-                  <v-chip
-                    class="ml-1"
-                    variant="info"
-                  >
-                    {{ Math.floor(time_to_logout) }} m
-                    {{
-                      (
-                        (time_to_logout -
-                          Math.floor(time_to_logout)) *
-                        60
-                      ).toFixed(0)
-                    }}
-                    s
-                  </v-chip>
-                  <v-chip
-                    class="ml-1"
-                    href="#"
-                    variant="success"
-                    pill
-                    aria-label="refresh the current JWT"
-                    @click="refreshWithJWT"
-                  >
-                    <v-icon>
-                      mdi-refresh
-                    </v-icon>
-                  </v-chip>
-                </v-list-item>
-
-              </v-list-item-group>
-            </v-card-text>
-
+                  <v-icon> mdi-refresh </v-icon>
+                </v-chip>
+              </v-list-item>
+            </v-list-item-group>
+          </v-card-text>
         </v-card>
       </v-flex>
     </v-layout>
@@ -141,7 +113,7 @@ export default {
         abbreviation: [],
         orcid: [],
         exp: [],
-        contributions: {}
+        contributions: {},
       },
       time_to_logout: 0,
       pass_change_visible: false,
@@ -207,13 +179,11 @@ export default {
           },
         });
 
-        this.user.contributions =
-          response_contributions.data[0];
-        
+        this.user.contributions = response_contributions.data[0];
+
         delete this.user.contributions.abbreviation;
         delete this.user.contributions.user_id;
         delete this.user.contributions.user_name;
-
       } catch (e) {
         console.log(e, "Error", "danger");
       }

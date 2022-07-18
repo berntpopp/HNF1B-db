@@ -31,7 +31,9 @@
                 <v-list-item>
                   PMID:
                   <a
-                    :href="'https://pubmed.ncbi.nlm.nih.gov/' + publication[0].PMID"
+                    :href="
+                      'https://pubmed.ncbi.nlm.nih.gov/' + publication[0].PMID
+                    "
                     aria-label="Link out to PubMed"
                     target="_blank"
                   >
@@ -70,16 +72,15 @@
 
           <!-- Load Individuals table component element -->
           <template v-if="!loading">
-          <TableIndividuals
-            :show-filter-controls="false"
-            :show-pagination-controls="false"
-            :filter-input="individuals_in_publication_filter"
-            header-label="Individuals"
-            header-sub-label="described in this publication"
-          />
+            <TableIndividuals
+              :show-filter-controls="false"
+              :show-pagination-controls="false"
+              :filter-input="individuals_in_publication_filter"
+              header-label="Individuals"
+              header-sub-label="described in this publication"
+            />
           </template>
           <!-- Load Individuals table component element -->
-
         </v-sheet>
       </v-col>
     </v-row>
@@ -96,7 +97,7 @@ export default {
   name: "PagePublication",
   mixins: [colorAndSymbolsMixin],
   components: {
-    TableIndividuals
+    TableIndividuals,
   },
   data() {
     return {
@@ -148,14 +149,20 @@ export default {
         let response = await this.axios.get(apiUrl);
 
         // redirect to 404 if response is empty data
-        if ( response.data.data.length === 0 ) {
+        if (response.data.data.length === 0) {
           this.$router.push("/PageNotFound");
         } else {
           this.publication = response.data.data;
-          this.individuals_in_publication = [...new Set(response.data.data[0].reports.map(item => item.individual_id))];
-          this.individuals_in_publication_filter = "contains(individual_id," + this.individuals_in_publication.join("|") + ")";
+          this.individuals_in_publication = [
+            ...new Set(
+              response.data.data[0].reports.map((item) => item.individual_id)
+            ),
+          ];
+          this.individuals_in_publication_filter =
+            "contains(individual_id," +
+            this.individuals_in_publication.join("|") +
+            ")";
         }
-
       } catch (e) {
         console.error(e);
       }

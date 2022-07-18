@@ -1,7 +1,6 @@
 <template>
   <v-app id="hnf1b-db">
     <v-app-bar app>
-
       <v-toolbar-title>
         <v-btn x-large to="/">
           <v-img
@@ -21,7 +20,6 @@
           </v-img>
         </v-btn>
       </v-toolbar-title>
-
 
       <v-toolbar-items class="hidden-sm-and-down">
         <v-menu offset-y>
@@ -77,96 +75,63 @@
         </v-btn>
       </v-toolbar-items>
 
-        <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
 
       <v-toolbar-items class="hidden-sm-and-down">
-        <v-menu
-          offset-y
-          v-if="user"
-        >
+        <v-menu offset-y v-if="user">
           <template v-slot:activator="{ on }">
-            <v-btn
-              :ripple="false"
-              text
-              v-on="on"
-              > 
-                {{ user }}
-              </v-btn>
+            <v-btn :ripple="false" text v-on="on">
+              {{ user }}
+            </v-btn>
           </template>
 
           <v-card>
             <v-list dense>
-
-              <v-list-item
-                to="User"
-              >
+              <v-list-item to="User">
                 <v-list-item-icon>
-                  <v-icon>
-                    mdi-account
-                  </v-icon>
+                  <v-icon> mdi-account </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>
-                    View profile
-                  </v-list-item-title>
+                  <v-list-item-title> View profile </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item
-                @click="refreshWithJWT"
-              >
+              <v-list-item @click="refreshWithJWT">
                 <v-list-item-icon>
-                  <v-icon>
-                    mdi-refresh
-                  </v-icon>
+                  <v-icon> mdi-refresh </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>
                     Refresh token
-                    <v-chip
-                      small
-                    >
+                    <v-chip small>
                       {{ Math.floor(time_to_logout) }}m
                       {{
-                        ((time_to_logout - Math.floor(time_to_logout)) * 60).toFixed(
-                          0
-                        )
+                        (
+                          (time_to_logout - Math.floor(time_to_logout)) *
+                          60
+                        ).toFixed(0)
                       }}s
                     </v-chip>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item
-                @click="doUserLogOut"
-              >
+              <v-list-item @click="doUserLogOut">
                 <v-list-item-icon>
-                  <v-icon>
-                    mdi-logout
-                  </v-icon>
+                  <v-icon> mdi-logout </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>
-                    Sign out
-                  </v-list-item-title>
+                  <v-list-item-title> Sign out </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-
             </v-list>
           </v-card>
         </v-menu>
 
-        <v-btn
-          v-else
-          :ripple="false"
-          text
-          key="Login"
-          to="/login"
-        >
+        <v-btn v-else :ripple="false" text key="Login" to="/login">
           Login
         </v-btn>
       </v-toolbar-items>
-
 
       <v-spacer class="hidden-md-and-up"></v-spacer>
 
@@ -250,9 +215,7 @@ export default {
     review: false,
     admin: false,
     time_to_logout: 0,
-    items: [
-      { title: "About", to: "/about", id: "about" },
-    ],
+    items: [{ title: "About", to: "/about", id: "about" }],
     items_small: [
       { title: "Individuals", to: "/table_individuals", id: "table 1" },
       { title: "Reports", to: "/table_reports", id: "table 2" },

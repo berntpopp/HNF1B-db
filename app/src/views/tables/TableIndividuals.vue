@@ -24,7 +24,7 @@ export default {
     filter: { type: String, default: "filter=" },
     fields: { type: String, default: null },
     pageAfter: { type: Number, default: 0 },
-    pageSize: { type: Number, default: 10 }
+    pageSize: { type: Number, default: 10 },
   },
 };
 </script>
