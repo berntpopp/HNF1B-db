@@ -998,6 +998,90 @@ function(req, res, email_request = "") {
   }
 }
 
+
+#* @tag user
+#* does password reset
+#' @get /api/user/password/reset/change
+function(req, res, new_pass_1 = "", new_pass_2 = "") {
+
+  # load jwt from header
+  jwt <- str_remove(req$HTTP_AUTHORIZATION, "Bearer ")
+
+  # load secret and convert to raw
+  key <- charToRaw(dw$secret)
+
+  user_jwt <- jwt_decode_hmac(jwt, secret = key)
+  user_jwt$token_expired <- (user_jwt$exp < as.numeric(Sys.time()))
+
+  if (is.null(jwt) || user_jwt$token_expired) {
+    res$status <- 401 # Unauthorized
+    return(list(error = "Reset token expired."))
+  } else {
+    #get user data from database table
+    user_table <- pool %>%
+      tbl("user") %>%
+      collect() %>%
+      filter(user_id == user_jwt$user_id) %>%
+      mutate(hash = toString(md5(paste0(dw$salt, password)))) %>%
+      mutate(timestamp_iat = as.integer(password_reset_date) - dw$refresh) %>%
+      mutate(timestamp_exp = as.integer(password_reset_date)) %>%
+      select(user_id, user_name, hash, email, timestamp_iat, timestamp_exp)
+
+    # compute JWT check
+    claim_check <- jwt_claim(user_id = user_table$user_id,
+      user_name = user_table$user_name,
+      email = user_table$email,
+      hash = user_table$hash,
+      iat = user_table$timestamp_iat,
+      exp = user_table$timestamp_exp)
+
+    jwt_check <- jwt_encode_hmac(claim_check, secret = key)
+    jwt_match <- (jwt == jwt_check)
+
+    # check if passwords match and the new password satisfies minimal criteria
+    # TODO: change this into a function
+    new_pass_match_and_valid <- (new_pass_1 == new_pass_2) &&
+      nchar(new_pass_1) > 7 &&
+      grepl("[a-z]", new_pass_1) &&
+      grepl("[A-Z]", new_pass_1) &&
+      grepl("\\d", new_pass_1) &&
+      grepl("[!@#$%^&*]", new_pass_1)
+
+    # connect to database and change password
+    # if criteria fullfilled, remove time to invalidate JWT
+    if (jwt_match && new_pass_match_and_valid) {
+      # connect to database, put approval for user application then disconnect
+    sysndd_db <- dbConnect(RMariaDB::MariaDB(),
+      dbname = dw$dbname,
+      user = dw$user,
+      password = dw$password,
+      server = dw$server,
+      host = dw$host,
+      port = dw$port)
+
+      dbExecute(sysndd_db,
+        paste0("UPDATE user SET password = '",
+          new_pass_1,
+          "' WHERE user_id = ",
+          user_jwt$user_id,
+          ";"))
+
+      dbExecute(sysndd_db,
+        paste0("UPDATE user SET password_reset_date = NULL WHERE user_id = ",
+          user_jwt$user_id,
+          ";"))
+
+      dbDisconnect(sysndd_db)
+
+      res$status <- 201 # Created
+      return(list(message = "Password successfully changed."))
+    } else {
+      res$status <- 409 # Conflict
+      return(list(error = "Password or JWT input problem."))
+    }
+  }
+}
+
 ##-------------------------------------------------------------------##
 
 
