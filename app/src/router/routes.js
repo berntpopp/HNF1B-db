@@ -245,4 +245,11 @@ export const routes = [
         else next();
       },
     },
+    {
+      path: "/PasswordReset/:request_jwt?",
+      name: "PasswordReset",
+      component: () =>
+        import(/* webpackChunkName: "User" */ "@/views/PasswordReset.vue"),
+      meta: { sitemap: { ignoreRoute: true } },
+    },
   ];

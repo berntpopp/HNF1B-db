@@ -29,6 +29,15 @@
                 v-model="password"
               ></v-text-field>
 
+              Forgot your password?
+              <a 
+                href="/PasswordReset"
+              >
+                Reset now.
+              </a>
+              <br>
+              <br>
+
               <v-btn class="mr-4" @click="reset"> Reset Form </v-btn>
 
               <v-btn
