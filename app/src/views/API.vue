@@ -46,7 +46,7 @@ export default {
 </script>
 
 <style scoped>
-::v-deep .info {
+:deep(.info) {
   background-color: #ffffff !important;
 }
 </style> 
