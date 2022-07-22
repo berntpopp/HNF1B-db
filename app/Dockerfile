@@ -7,9 +7,10 @@ COPY package*.json ./
 RUN npm install
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
+# update npm
+RUN npm install -g npm@8.15.0
 # build app for production with minification
-RUN npm run build
-RUN npm audit fix
+RUN npm run build --legacy-peer-deps
 
 # nginx state for serving content
 FROM nginx:1.23.0
