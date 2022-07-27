@@ -254,8 +254,7 @@ function(res,
   links <- hnf1b_db_report_table$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
-      link != "null" ~ paste0("http://",
-        dw$base_url,
+      link != "null" ~ paste0(dw$base_url,
         "/api/reports?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
@@ -353,8 +352,7 @@ function(res,
   links <- ind_plus_report_pag_info$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
-      link != "null" ~ paste0("http://",
-        dw$base_url,
+      link != "null" ~ paste0(dw$base_url,
         "/api/individuals?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
@@ -457,8 +455,7 @@ function(res,
   links <- variant_table_nested_pag_info$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
-      link != "null" ~ paste0("http://",
-        dw$base_url,
+      link != "null" ~ paste0(dw$base_url,
         "/api/variants?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),
@@ -576,8 +573,7 @@ function(res,
   links <- publication_tab_pag_info$links %>%
       pivot_longer(everything(), names_to = "type", values_to = "link") %>%
     mutate(link = case_when(
-      link != "null" ~ paste0("http://",
-        dw$base_url,
+      link != "null" ~ paste0(dw$base_url,
         "/api/publications?sort=",
         sort,
         ifelse(filter != "", paste0("&filter=", filter), ""),

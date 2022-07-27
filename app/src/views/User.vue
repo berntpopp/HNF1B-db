@@ -46,8 +46,9 @@
                 {{ user.user_created[0] }}
               </v-list-item>
 
-              <v-list-item>
-                aria-label="Account E-mail" > E-Mail:
+              <v-list-item
+                aria-label="Account E-mail"
+              > E-Mail:
                 <v-spacer></v-spacer>
                 {{ user.email[0] }}
               </v-list-item>
