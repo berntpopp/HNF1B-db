@@ -21,7 +21,7 @@ FROM nginx:${nginx_version} AS brotli_nonce_builder
 ARG nginx_version
 WORKDIR /root/
 RUN apt-get update \
-    && apt-get install -y build-essential git wget libpcre3 libpcre3-dev libssl-dev zlib1g-dev \
+    && apt-get install -y --no-install-recommends apt-utils build-essential git wget libpcre3 libpcre3-dev libssl-dev zlib1g-dev \
     && wget http://nginx.org/download/nginx-${nginx_version}.tar.gz \
     && tar zxf nginx-${nginx_version}.tar.gz \
     && wget https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v0.33.tar.gz \
@@ -93,7 +93,6 @@ COPY --from=brotli_nonce_builder /root/nginx-${nginx_version}/objs/ngx_http_brot
 COPY --from=brotli_nonce_builder /root/nginx-${nginx_version}/objs/ndk_http_module.so /usr/lib/nginx/modules/
 COPY --from=brotli_nonce_builder /root/nginx-${nginx_version}/objs/ngx_http_set_misc_module.so /usr/lib/nginx/modules/
 # remove and add new configs
-FROM nginx:${nginx_version}
 RUN rm /etc/nginx/conf.d/default.conf
 COPY ./docker/nginx/prod.conf /etc/nginx/conf.d/
 COPY ./docker/nginx/nginx.conf /etc/nginx/
