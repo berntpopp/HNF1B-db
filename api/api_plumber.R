@@ -1090,7 +1090,7 @@ function(req, res, new_pass_1 = "", new_pass_2 = "") {
 #* @serializer json list(na="string")
 #' @get /api/auth/signup
 function(req, res, signup_data) {
-  ## TODO: should change this to a POST request, 
+  ## TODO: should change this to a POST request,
   ## have to change filter function for that
   ## convert to tibble and check values for database
   user <- tibble::as_tibble(fromJSON(signup_data)) %>%
