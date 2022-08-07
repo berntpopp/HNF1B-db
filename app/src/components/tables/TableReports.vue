@@ -148,7 +148,7 @@ export default {
   props: {
     showFilterControls: { type: Boolean, default: true },
     showPaginationControls: { type: Boolean, default: true },
-    headerLabel: { type: String, default: "Reports Table<" },
+    headerLabel: { type: String, default: "Reports Table" },
     headerSubLabel: {
       type: String,
       default: "Search and filter the reviewed reports in a tabular view.",

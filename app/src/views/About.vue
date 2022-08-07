@@ -12,8 +12,9 @@
                 <v-expansion-panel-header>
                   {{ item.title }}
                 </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  {{ item.body }}
+                <v-expansion-panel-content
+                >
+                 <div v-html="item.body"></div>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -71,7 +72,7 @@ export default {
       {
         title: "Help and FAQ",
         index: 4,
-        body: "Here we will present Help and FAQ once the website and API functionallity is complete..",
+        body: "Here we will present Help and FAQ once the website and API functionallity is complete.",
       },
     ],
   }),

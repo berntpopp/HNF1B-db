@@ -49,4 +49,4 @@ export default {
 :deep(.info) {
   background-color: #ffffff !important;
 }
-</style> 
+</style>
