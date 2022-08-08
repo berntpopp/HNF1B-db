@@ -30,7 +30,7 @@
                 <v-container v-if="showFilterControls">
                   <v-text-field
                     v-model="filter['any'].content"
-                    append-icon="mdi-magnify"
+                    :append-icon="icons.mdiMagnify"
                     label="Search"
                     single-line
                     hide-details
@@ -95,7 +95,7 @@
                   :to="'/report/' + item.report_id"
                 >
                   rep{{ item.report_id }}
-                  <v-icon right> mdi-newspaper-variant </v-icon>
+                  <v-icon right> {{ icons.mdiNewspaperVariant }} </v-icon>
                 </v-chip>
               </template>
 
@@ -108,7 +108,7 @@
                   :to="'/individual/' + item.individual_id"
                 >
                   ind{{ item.individual_id }}
-                  <v-icon right> mdi-account </v-icon>
+                  <v-icon right> {{ icons.mdiAccount }} </v-icon>
                 </v-chip>
               </template>
 
@@ -141,6 +141,7 @@
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiNewspaperVariant, mdiAccount, mdiMagnify } from '@mdi/js';
 
 export default {
   name: "TableReports",
@@ -161,6 +162,11 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiNewspaperVariant,
+        mdiAccount,
+        mdiMagnify,
+      },
       reports: [],
       headers: [
         { text: "Report", value: "report_id" },

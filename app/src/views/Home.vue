@@ -32,7 +32,7 @@
               <span class="font-weight-bold"
                 >{{ statistics.individuals_count }} individuals</span
               >
-              <v-icon right> mdi-account </v-icon>
+              <v-icon right> {{ icons.mdiAccount }} </v-icon>
             </v-chip>
 
             with
@@ -47,7 +47,7 @@
               <span class="font-weight-bold">
                 {{ statistics.variants_count }} distinct variants</span
               >
-              <v-icon right> mdi-dna </v-icon>
+              <v-icon right> {{ icons.mdiDna }} </v-icon>
             </v-chip>
 
             from
@@ -62,7 +62,7 @@
               <span class="font-weight-bold">
                 {{ statistics.reports_count }} reports</span
               >
-              <v-icon right> mdi-newspaper-variant </v-icon>
+              <v-icon right> {{ icons.mdiNewspaperVariant }} </v-icon>
             </v-chip>
 
             in
@@ -77,7 +77,7 @@
               <span class="font-weight-bold">
                 {{ statistics.publications_count }} reviewed publications</span
               >
-              <v-icon right> mdi-book-open-blank-variant </v-icon>
+              <v-icon right> {{ icons.mdiBookOpenBlankVariant }} </v-icon>
             </v-chip>
             <!--// database statistics //-->
           </v-card-text>
@@ -91,7 +91,7 @@
               item-value="API"
               label="Individuals, reports, publications and variants"
               placeholder="Start typing to Search"
-              prepend-icon="mdi-database-search"
+              :prepend-icon="icons.mdiDatabaseSearch"
               return-object
             ></v-autocomplete>
           </v-card-text>
@@ -115,6 +115,7 @@
 
 <script>
 import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
+import { mdiAccount, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiDatabaseSearch } from '@mdi/js';
 
 export default {
   name: "Home",
@@ -123,6 +124,13 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiAccount,
+        mdiDna,
+        mdiNewspaperVariant,
+        mdiBookOpenBlankVariant,
+        mdiDatabaseSearch,
+      },
       statistics: {
         reports_count: 0,
         publications_count: 0,

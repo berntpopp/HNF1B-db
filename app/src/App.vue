@@ -89,7 +89,7 @@
             <v-list dense>
               <v-list-item to="User">
                 <v-list-item-icon>
-                  <v-icon> mdi-account </v-icon>
+                  <v-icon> {{ icons.mdiAccount }} </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title> View profile </v-list-item-title>
@@ -98,7 +98,7 @@
 
               <v-list-item @click="refreshWithJWT">
                 <v-list-item-icon>
-                  <v-icon> mdi-refresh </v-icon>
+                  <v-icon> {{ icons.mdiRefresh }} </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>
@@ -118,7 +118,7 @@
 
               <v-list-item @click="doUserLogOut">
                 <v-list-item-icon>
-                  <v-icon> mdi-logout </v-icon>
+                  <v-icon> {{ icons.mdiLogout }} </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title> Sign out </v-list-item-title>
@@ -140,7 +140,7 @@
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
             <v-btn :ripple="false" text v-on="on">
-              <v-icon dark right> mdi-dots-vertical </v-icon>
+              <v-icon dark right> {{ icons.mdiDotsVertical }} </v-icon>
             </v-btn>
           </template>
 
@@ -190,6 +190,8 @@
 
 
 <script>
+import { mdiAccount, mdiRefresh, mdiLogout, mdiDotsVertical, mdiGithub, mdiApi, mdiCopyright } from '@mdi/js';
+
 export default {
   name: "hnf1b-db",
   metaInfo: {
@@ -211,6 +213,15 @@ export default {
     ],
   },
   data: () => ({
+    icons: {
+      mdiAccount,
+      mdiRefresh,
+      mdiLogout,
+      mdiDotsVertical,
+      mdiGithub,
+      mdiApi,
+      mdiCopyright
+    },
     user: null,
     review: false,
     admin: false,
@@ -250,13 +261,13 @@ export default {
     ],
     footer_items: [
       {
-        icon: "mdi-github",
+        icon: mdiGithub,
         to: "https://github.com/berntpopp/HNF1B-db",
         target: "_blank",
       },
-      { icon: "mdi-api", to: "/API", target: "_self" },
+      { icon: mdiApi, to: "/API", target: "_self" },
       {
-        icon: "mdi-copyright",
+        icon: mdiCopyright,
         to: "https://creativecommons.org/licenses/by/4.0/",
         target: "_blank",
       },

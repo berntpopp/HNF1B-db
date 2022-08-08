@@ -14,7 +14,7 @@
               @submit.stop.prevent="onSubmit()"
             >
               <v-text-field
-                prepend-icon="mdi-account"
+                :prepend-icon="icons.mdiAccount"
                 name="login"
                 label="Login"
                 type="text"
@@ -22,7 +22,7 @@
               ></v-text-field>
               <v-text-field
                 id="password"
-                prepend-icon="mdi-lock"
+                :prepend-icon="icons.mdiLock"
                 name="password"
                 label="Password"
                 type="password"
@@ -65,6 +65,8 @@
 </template>
 
 <script>
+import { mdiAccount, mdiLock } from '@mdi/js';
+
 export default {
   name: "Login",
   metaInfo: {
@@ -87,6 +89,10 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiAccount,
+        mdiLock,
+      },
       valid: true,
       user_name: "",
       password: "",

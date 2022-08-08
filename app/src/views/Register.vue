@@ -18,7 +18,7 @@
                 <!-- text field for username -->
                 <v-text-field
                   :rules="userNameRules"
-                  prepend-icon="mdi-account"
+                  :prepend-icon="icons.mdiAccount"
                   id="username"
                   name="username"
                   label="Username"
@@ -30,7 +30,7 @@
                 <!-- text field for email -->
                 <v-text-field
                   :rules="emailRules"
-                  prepend-icon="mdi-email"
+                  :prepend-icon="icons.mdiEmail"
                   id="mail"
                   name="mail"
                   label="Email address"
@@ -43,7 +43,7 @@
                 <!-- text field for orcid -->
                 <v-text-field
                   :rules="orcidRules"
-                  prepend-icon="mdi-account-school"
+                  :prepend-icon="icons.mdiAccountSchool"
                   id="orcid"
                   name="orcid"
                   label="Enter your ORCID"
@@ -56,7 +56,7 @@
                 <!-- text field for first name -->
                 <v-text-field
                   :rules="nameRules"
-                  prepend-icon="mdi-form-textbox"
+                  :prepend-icon="icons.mdiFormTextbox"
                   id="firstname"
                   name="firstname"
                   label="Enter your first name"
@@ -69,7 +69,7 @@
                 <!-- text field for family name -->
                 <v-text-field
                   :rules="nameRules"
-                  prepend-icon="mdi-form-textbox"
+                  :prepend-icon="icons.mdiFormTextbox"
                   id="familyname"
                   name="familyname"
                   label="Enter your family name"
@@ -82,7 +82,7 @@
                 <!-- text field for registration comment -->
                 <v-text-field
                   :rules="commentRules"
-                  prepend-icon="mdi-form-textbox"
+                  :prepend-icon="icons.mdiFormTextbox"
                   id="comment"
                   name="comment"
                   label="Describe your interest in HNF1B-db"
@@ -124,6 +124,8 @@
 
 
 <script>
+import { mdiAccount, mdiEmail, mdiAccountSchool, mdiFormTextbox } from '@mdi/js';
+
 export default {
   name: "Register",
   metaInfo: {
@@ -145,6 +147,12 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiAccount,
+        mdiEmail,
+        mdiAccountSchool,
+        mdiFormTextbox,
+      },
       valid: false,
       button_disabled: true,
       userNameRules: [

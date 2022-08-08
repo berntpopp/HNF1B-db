@@ -13,5 +13,8 @@ module.exports = {
       pretty: true,
       routes,
     },
+    webpackBundleAnalyzer: {
+      openAnalyzer: false,
+    },
   },
 };

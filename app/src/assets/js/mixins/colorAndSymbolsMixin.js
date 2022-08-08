@@ -1,7 +1,19 @@
 // assets/js/mixins/colorAndSymbolsMixin.js
+import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccountCowboyHat, mdiAccountSchool } from '@mdi/js';
+
 export default {
     data() {
       return {
+        icons: {
+          mdiPlusCircleOutline,
+          mdiMinusCircleOutline,
+          mdiHelpCircleOutline,
+          mdiGenderFemale,
+          mdiGenderMale,
+          mdiCheckCircleOutline,
+          mdiAccountCowboyHat,
+          mdiAccountSchool 
+        },
         cohort_color: {
           born: "success",
           fetus: "primary"
@@ -51,22 +63,22 @@ export default {
           fetus: "primary"
         },
         reported_phenotype_symbol: {
-          yes: "mdi-plus-circle-outline",
-          no: "mdi-minus-circle-outline",
-          "not reported": "mdi-help-circle-outline",
+          yes: mdiPlusCircleOutline,
+          no: mdiMinusCircleOutline,
+          "not reported": mdiHelpCircleOutline,
         },
         sex_symbol: {
-          female: "mdi-gender-female",
-          male: "mdi-gender-male",
-          unspecified: "mdi-help-circle-outline",
+          female: mdiGenderFemale,
+          male: mdiGenderMale,
+          unspecified: mdiHelpCircleOutline,
         },
         logical_symbol: {
-          1: "mdi-check-circle-outline",
-          0: "mdi-minus-circle-outline",
+          1: mdiCheckCircleOutline,
+          0: mdiMinusCircleOutline,
         },
         user_symbol: {
-          Administrator: "mdi-account-cowboy-hat",
-          Reviewer: "mdi-account-school",
+          Administrator: mdiAccountCowboyHat,
+          Reviewer: mdiAccountSchool,
         },
       };
     },

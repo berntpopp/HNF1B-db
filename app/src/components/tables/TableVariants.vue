@@ -30,7 +30,7 @@
                 <v-container v-if="showFilterControls">
                   <v-text-field
                     v-model="filter['any'].content"
-                    append-icon="mdi-magnify"
+                    :append-icon="icons.mdiMagnify"
                     label="Search"
                     single-line
                     hide-details
@@ -95,7 +95,7 @@
                   :to="'/variant/' + item.variant_id"
                 >
                   var{{ item.variant_id }}
-                  <v-icon right> mdi-dna </v-icon>
+                  <v-icon right> {{ icons.mdiDna }} </v-icon>
                 </v-chip>
               </template>
 
@@ -130,6 +130,7 @@
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiMagnify, mdiDna } from '@mdi/js';
 
 export default {
   name: "TableVariants",
@@ -150,6 +151,10 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiMagnify,
+        mdiDna,
+      },
       variants: [],
       headers: [
         { text: "Variant", value: "variant_id" },

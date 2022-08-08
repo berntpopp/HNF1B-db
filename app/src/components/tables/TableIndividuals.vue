@@ -30,7 +30,7 @@
                 <v-container v-if="showFilterControls">
                   <v-text-field
                     v-model="filter['any'].content"
-                    append-icon="mdi-magnify"
+                    :append-icon="icons.mdiMagnify"
                     label="Search"
                     single-line
                     hide-details
@@ -100,7 +100,9 @@
                   aria-label="Expand report table"
                   :class="{ 'v-data-table__expand-icon--active': isExpanded }"
                 >
-                  <v-icon>mdi-chevron-down</v-icon>
+                  <v-icon>
+                    {{ icons.mdiChevronDown }}
+                  </v-icon>
                 </v-btn>
               </template>
 
@@ -119,7 +121,9 @@
                     <template v-slot:[`item.report_id`]="{ item }">
                       <v-chip color="deep-orange lighten-2" class="ma-2" small>
                         rep{{ item.report_id }}
-                        <v-icon right> mdi-newspaper-variant </v-icon>
+                        <v-icon right> 
+                          {{ icons.mdiNewspaperVariant }}
+                        </v-icon>
                       </v-chip>
                     </template>
 
@@ -162,7 +166,7 @@
                   :to="'/individual/' + item.individual_id"
                 >
                   ind{{ item.individual_id }}
-                  <v-icon right> mdi-account </v-icon>
+                  <v-icon right> {{ icons.mdiAccount }} </v-icon>
                 </v-chip>
               </template>
 
@@ -183,6 +187,7 @@
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiAccount, mdiMagnify, mdiChevronDown, mdiNewspaperVariant } from '@mdi/js';
 
 export default {
   name: "TableIndividuals",
@@ -204,6 +209,12 @@ export default {
   data() {
     return {
       individuals: [],
+      icons: {
+        mdiAccount,
+        mdiMagnify,
+        mdiChevronDown,
+        mdiNewspaperVariant,
+      },
       headers: [
         { text: "Individual", value: "individual_id" },
         { text: "Sex", value: "sex" },

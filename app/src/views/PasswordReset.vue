@@ -17,7 +17,7 @@
               >
                 <v-text-field
                   :rules="emailRules"
-                  prepend-icon="mdi-email"
+                  :prepend-icon="icons.mdiEmail"
                   name="mail"
                   label="Email address"
                   type="text"
@@ -50,8 +50,8 @@
                 @submit.stop.prevent="doPasswordChange()"
               >
                 <v-text-field
-                  prepend-icon="mdi-lock"
-                  :append-icon="show_pass_1 ? 'mdi-eye' : 'mdi-eye-off'"
+                  :prepend-icon="icons.mdiLock"
+                  :append-icon="show_pass_1 ? 'icons.mdiEye' : 'icons.mdiEyeOff'"
                   :type="show_pass_1 ? 'text' : 'password'"
                   :rules="[
                     passRules.required,
@@ -68,8 +68,8 @@
                 ></v-text-field>
 
                 <v-text-field
-                  prepend-icon="mdi-lock"
-                  :append-icon="show_pass_2 ? 'mdi-eye' : 'mdi-eye-off'"
+                  :prepend-icon="icons.mdiLock"
+                  :append-icon="show_pass_2 ? 'icons.mdiEye' : 'icons.mdiEyeOff'"
                   :type="show_pass_2 ? 'text' : 'password'"
                   :rules="[
                     passRules.required,
@@ -98,6 +98,8 @@
 
 
 <script>
+import { mdiEmail, mdiLock, mdiEye, mdiEyeOff } from '@mdi/js';
+
 export default {
   name: "PasswordReset",
   metaInfo: {
@@ -120,6 +122,12 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiEmail,
+        mdiLock,
+        mdiEye,
+        mdiEyeOff,
+      },
       valid: true,
       show_change_container: false,
       show_request_container: true,

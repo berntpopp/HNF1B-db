@@ -20,7 +20,7 @@
               Individual:
               <v-chip color="lime lighten-2" class="ma-2">
                 ind{{ $route.params.individual_id }}
-                <v-icon right> mdi-account </v-icon>
+                <v-icon right> {{ icons.mdiAccount }} </v-icon>
               </v-chip>
             </h3>
           </div>
@@ -37,7 +37,7 @@
                   Report:
                   <v-chip color="deep-orange lighten-2" class="ma-2" small>
                     rep{{ item.report_id }}
-                    <v-icon right> mdi-newspaper-variant </v-icon>
+                    <v-icon right> {{ icons.mdiNewspaperVariant }} </v-icon>
                   </v-chip>
                 </v-list-item-title>
 
@@ -118,6 +118,7 @@
 import TableVariants from "@/components/tables/TableVariants.vue";
 
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiAccount, mdiNewspaperVariant } from '@mdi/js';
 
 export default {
   name: "PageIndividual",
@@ -127,26 +128,15 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiAccount,
+        mdiNewspaperVariant,
+      },
       individual: {},
       absolute: true,
       opacity: 1,
       color: "#FFFFFF",
       loading: true,
-      reported_phenotype_color: {
-        yes: "teal lighten-1",
-        no: "light-blue",
-        "not reported": "white",
-      },
-      reported_phenotype_symbol: {
-        yes: "mdi-plus-circle-outline",
-        no: "mdi-minus-circle-outline",
-        "not reported": "mdi-help-circle-outline",
-      },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
       variant_of_individual_filter: "",
     };
   },

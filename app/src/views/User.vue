@@ -86,7 +86,7 @@
                   aria-label="refresh the current JWT"
                   @click="refreshWithJWT"
                 >
-                  <v-icon> mdi-refresh </v-icon>
+                  <v-icon> {{ icons.mdiRefresh }} </v-icon>
                 </v-chip>
               </v-list-item>
             </v-list-item-group>
@@ -99,12 +99,16 @@
 
 <script>
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiRefresh } from '@mdi/js';
 
 export default {
   name: "User",
   mixins: [colorAndSymbolsMixin],
   data() {
     return {
+      icons: {
+        mdiRefresh,
+      },
       user: {
         user_id: [],
         user_name: [],

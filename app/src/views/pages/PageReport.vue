@@ -20,7 +20,7 @@
               Report:
               <v-chip color="deep-orange lighten-2" class="ma-2">
                 rep{{ $route.params.report_id }}
-                <v-icon right> mdi-newspaper-variant </v-icon>
+                <v-icon right> {{ icons.mdiNewspaperVariant }} </v-icon>
               </v-chip>
             </h3>
           </div>
@@ -30,7 +30,7 @@
               <v-list-item-title class="text-h5">
                 <v-chip color="lime lighten-2" class="ma-2" small>
                   ind{{ report[0].individual_id }}
-                  <v-icon right> mdi-account </v-icon>
+                  <v-icon right> {{ icons.mdiAccount }} </v-icon>
                 </v-chip>
               </v-list-item-title>
 
@@ -93,10 +93,18 @@
 
 
 <script>
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiNewspaperVariant, mdiAccount } from '@mdi/js';
+
 export default {
   name: "PageReport",
+  mixins: [colorAndSymbolsMixin],
   data() {
     return {
+      icons: {
+        mdiNewspaperVariant,
+        mdiAccount,
+      },
       report: [
         {
           report_id: null,
@@ -117,22 +125,6 @@ export default {
       opacity: 1,
       color: "#FFFFFF",
       loading: true,
-      reported_phenotype_color: {
-        yes: "teal lighten-1",
-        no: "light-blue",
-        "not reported": "white",
-      },
-      reported_phenotype_symbol: {
-        yes: "mdi-plus-circle-outline",
-        no: "mdi-minus-circle-outline",
-        "not reported": "mdi-help-circle-outline",
-      },
-      sex_symbol: {
-        female: "mdi-gender-female",
-        male: "mdi-gender-male",
-        unspecified: "mdi-help-circle-outline",
-      },
-      cohort_style: { born: "success", fetus: "primary" },
     };
   },
   computed: {},

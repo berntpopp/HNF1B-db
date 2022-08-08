@@ -20,7 +20,7 @@
               Publication:
               <v-chip color="cyan accent-2" class="ma-2">
                 pub{{ $route.params.publication_id }}
-                <v-icon right> mdi-book-open-blank-variant </v-icon>
+                <v-icon right> {{ icons.mdiBookOpenBlankVariant }} </v-icon>
               </v-chip>
             </h3>
           </div>
@@ -92,6 +92,7 @@
 import TableIndividuals from "@/components/tables/TableIndividuals.vue";
 
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiBookOpenBlankVariant } from '@mdi/js';
 
 export default {
   name: "PagePublication",
@@ -101,6 +102,9 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiBookOpenBlankVariant,
+      },
       publication: [
         {
           publication_id: null,

@@ -20,7 +20,7 @@
               Variant:
               <v-chip color="pink lighten-4" class="ma-2">
                 var{{ $route.params.variant_id }}
-                <v-icon right> mdi-dna </v-icon>
+                <v-icon right> {{ icons.mdiDna }} </v-icon>
               </v-chip>
             </h3>
           </div>
@@ -117,6 +117,8 @@ import TableIndividuals from "@/components/tables/TableIndividuals.vue";
 
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
+import { mdiDna } from '@mdi/js';
+
 export default {
   name: "PageVariant",
   mixins: [colorAndSymbolsMixin],
@@ -126,6 +128,9 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiDna,
+      },
       variant: [
         {
           variant_id: null,

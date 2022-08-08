@@ -28,7 +28,7 @@
                 <v-container v-if="showFilterControls">
                   <v-text-field
                     v-model="filter['any'].content"
-                    append-icon="mdi-magnify"
+                    :append-icon="icons.mdiMagnify"
                     label="Search"
                     single-line
                     hide-details
@@ -93,7 +93,7 @@
                   :to="'/publication/' + item.publication_id"
                 >
                   pub{{ item.publication_id }}
-                  <v-icon right> mdi-book-open-blank-variant </v-icon>
+                  <v-icon right> {{ icons.mdiBookOpenBlankVariant }} </v-icon>
                 </v-chip>
               </template>
 
@@ -128,6 +128,7 @@
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import { mdiMagnify, mdiBookOpenBlankVariant } from '@mdi/js';
 
 export default {
   name: "TablePublications",
@@ -148,6 +149,10 @@ export default {
   },
   data() {
     return {
+      icons: {
+        mdiMagnify,
+        mdiBookOpenBlankVariant,
+      },
       publications: [],
       headers: [
         { text: "Publication", value: "publication_id" },
