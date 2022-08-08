@@ -4,7 +4,7 @@
       <v-toolbar-title>
         <v-btn x-large to="/">
           <v-img
-            src="../public/HNF1B-db_logo.png"
+            src="../public/HNF1B-db_logo.webp"
             max-width="184"
             max-height="40"
             alt="HNF1B database logo"
