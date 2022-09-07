@@ -7,4 +7,4 @@ libbz2-dev \
 libicu-dev \
 liblzma-dev \
 libsodium-dev
-RUN Rscript -e 'install.packages(c("Rcpp", "plumber", "DBI", "RMariaDB", "jsonlite", "config", "jose", "RCurl", "stringdist", "xlsx", "easyPubMed", "rvest", "lubridate", "pool", "memoise", "coop", "timetk", "blastula", "keyring", "rlang"), repos="https://cloud.r-project.org")'
+RUN Rscript -e 'install.packages(c("Rcpp", "plumber", "DBI", "RMariaDB", "jsonlite", "config", "jose", "RCurl", "stringdist", "xlsx", "easyPubMed", "rvest", "lubridate", "pool", "memoise", "coop", "timetk", "blastula", "keyring", "rlang", "logger", "tictoc", "fs"), repos="https://cloud.r-project.org")'
