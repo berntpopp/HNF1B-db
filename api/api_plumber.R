@@ -42,6 +42,7 @@ if (nchar(Sys.getenv("SMTP_PASSWORD")) == 0) {
 ##-------------------------------------------------------------------##
 
 
+
 ##-------------------------------------------------------------------##
 pool <- dbPool(
   drv = RMariaDB::MariaDB(),
@@ -92,6 +93,7 @@ source("functions/helper-functions.R", local = TRUE)
 #* @apiTag individual Individual related endpoints
 #* @apiTag publication Publication related endpoints
 #* @apiTag variant Variant related endpoints
+#* @apiTag search Search in database tables
 #* @apiTag statistics Database statistics
 #* @apiTag user User account related endpoints
 #* @apiTag authentication Authentication related endpoints
@@ -588,6 +590,74 @@ function(res,
 }
 
 ## Publication endpoints
+##-------------------------------------------------------------------##
+
+
+
+##-------------------------------------------------------------------##
+## Search endpoints
+
+#* @tag search
+#* searches the database tables individual, report, variant, publication
+#* @serializer json list(na="string")
+#' @get /api/search/<searchterm>
+function(searchterm, helper = TRUE) {
+  # make sure helper input is logical
+  helper <- as.logical(helper)
+
+  searchterm <- URLdecode(searchterm) %>%
+    str_squish()
+
+  search_view <- pool %>%
+    tbl("search_view") %>%
+    collect() %>%
+    mutate(searchdist = stringdist(str_to_lower(search),
+      str_to_lower(searchterm),
+      method = "jw",
+      p = 0.1)) %>%
+    arrange(searchdist, search) %>%
+    mutate(link = case_when(
+      type == "publication" ~ paste0("/publication/", result),
+      type == "inidividual" ~ paste0("/inidividual/", result),
+      type == "report" ~ paste0("/report/", result),
+      type == "variant" ~ paste0("/variant/", result),
+    ))
+
+  # compute filtered length with match < 0.1
+  search_length <- search_view %>%
+    filter(searchdist < 0.1) %>%
+    tally()
+
+  if (search_length$n > 10) {
+    return_count <- search_length$n
+  } else {
+    return_count <- 10
+  }
+
+  # check if perfect match exists
+  if (search_view$searchdist[1] == 0 &&
+    is.na(suppressWarnings(as.integer(search_view$search[1])))) {
+    search_view_return <- search_view %>%
+      slice_head(n = 1)
+  } else {
+    search_view_return <- search_view %>%
+      slice_head(n = return_count)
+  }
+
+  # change output by helper input to
+  # unique values (helper = TRUE) or entities (helper = FALSE)
+  if (helper) {
+    search_view_return <- search_view_return %>%
+      nest_by(search, .key = "values") %>%
+      ungroup() %>%
+      pivot_wider(everything(), names_from = "search", values_from = "values")
+  } else {
+    search_view_return
+  }
+
+  # return output
+  search_view_return
+}
 ##-------------------------------------------------------------------##
 
 
