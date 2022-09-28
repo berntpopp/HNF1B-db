@@ -1,5 +1,5 @@
 // assets/js/mixins/colorAndSymbolsMixin.js
-import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccountCowboyHat, mdiAccountSchool } from '@mdi/js';
+import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccount, mdiAccountCowboyHat, mdiAccountSchool, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant } from '@mdi/js';
 
 export default {
     data() {
@@ -13,6 +13,12 @@ export default {
           mdiCheckCircleOutline,
           mdiAccountCowboyHat,
           mdiAccountSchool 
+        },
+        type_color: {
+          individual: "lime lighten-2",
+          variant: "pink lighten-4",
+          report: "deep-orange lighten-2",
+          publication: "cyan accent-2"
         },
         cohort_color: {
           born: "success",
@@ -61,6 +67,12 @@ export default {
         cohort_style: {
           born: "success",
           fetus: "primary"
+        },
+        type_symbol: {
+          individual: mdiAccount,
+          variant: mdiDna,
+          report: mdiNewspaperVariant,
+          publication: mdiBookOpenBlankVariant
         },
         reported_phenotype_symbol: {
           yes: mdiPlusCircleOutline,

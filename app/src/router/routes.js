@@ -152,6 +152,18 @@ export const routes = [
         },
     },
     {
+      path: '/search',
+      name: 'Search',
+      component: () =>
+        import(
+          /* webpackChunkName: "Tables" */ '@/views/tables/TableSearch.vue'
+        ),
+        props: (route) => ({
+          term: route.query.term,
+        }),
+        meta: { sitemap: { ignoreRoute: true } },
+    },
+    {
       path: '/login',
       name: 'Login',
       component: () =>
