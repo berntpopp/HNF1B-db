@@ -16,7 +16,7 @@ export default {
   name: "Variants",
   components: { TableSearch },
   props: {
-    term: { type: String, default: null },
+    term: { type: String, default: "" },
   },
 };
 </script>

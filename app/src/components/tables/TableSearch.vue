@@ -79,7 +79,7 @@ export default {
       type: String,
       default: "Explore the results of your search.",
     },
-    termInput: { type: String, default: null },
+    termInput: { type: String, default: "" },
   },
   data() {
     return {
