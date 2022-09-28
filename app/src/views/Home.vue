@@ -91,8 +91,14 @@
               item-value="API"
               label="Individuals, reports, publications and variants"
               placeholder="Start typing to Search"
-              :prepend-icon="icons.mdiDatabaseSearch"
+              :prepend-icon="icons.mdiDatabase"
+              :append-icon="icons.mdiMagnify"
               return-object
+              :items="search_keys"
+              :loading="searchLoading"
+              :search-input.sync="search_input"
+              @click:append="keydown_handler"
+              @keydown.native="keydown_handler"
             ></v-autocomplete>
           </v-card-text>
           <v-divider></v-divider>
@@ -115,7 +121,7 @@
 
 <script>
 import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
-import { mdiAccount, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiDatabaseSearch } from '@mdi/js';
+import { mdiAccount, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiDatabase, mdiMagnify } from '@mdi/js';
 
 export default {
   name: "Home",
@@ -129,7 +135,8 @@ export default {
         mdiDna,
         mdiNewspaperVariant,
         mdiBookOpenBlankVariant,
-        mdiDatabaseSearch,
+        mdiDatabase,
+        mdiMagnify,
       },
       statistics: {
         reports_count: 0,
@@ -143,10 +150,21 @@ export default {
       image_publications: "",
       image_cohort: "",
       image_phenotype: "",
+      search_input: null,
+      search_keys: [],
+      search_object: {},
+      searchLoading: false,
       loading: true,
     };
   },
   computed: {},
+  watch: {
+  search_input () {
+    if (this.search_input) {
+      this.loadSearchInfo();
+    }
+  },
+},
   mounted() {
     this.loadStatisticsData();
   },
@@ -174,6 +192,44 @@ export default {
         console.error(e);
       }
       this.loading = false;
+    },
+    async loadSearchInfo() {
+      this.searchLoading = true;
+
+        const apiSearchURL = `${process.env.VUE_APP_API_URL
+        }/api/search/${
+          this.search_input
+        }?helper=true`;
+        try {
+          const response_search = await this.axios.get(apiSearchURL);
+          let rest;
+          [this.search_object, ...rest] = response_search.data;
+          this.search_keys = Object.keys(response_search.data[0]);
+        } catch (e) {
+          console.error(e);
+        }
+
+      this.searchLoading = false;
+
+    },
+    keydown_handler(event) {
+      if (
+        ((event.which === 13) || (event.which === 1))
+        && (this.search_input)
+        && !(this.search_object[this.search_input] === undefined)
+      ) {
+        this.$router.push(this.search_object[this.search_input][0].link);
+        this.search_input = '';
+        this.search_keys = [];
+      } else if (
+        ((event.which === 13) || (event.which === 1))
+        && (this.search_input)
+        && (this.search_object[this.search_input] === undefined)
+      ) {
+        this.$router.push(`/search?term=${this.search_input}`);
+        this.search_input = '';
+        this.search_keys = [];
+      }
     },
   },
 };
