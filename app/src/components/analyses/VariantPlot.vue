@@ -90,6 +90,9 @@ export default {
       const data = this.itemsVariant[this.variant_characteristics][0];
       const data_keys = Object.keys(data);
 
+      // calculate total count in object
+      const sumValues = Object.values(data).reduce((a, b) => a + b);
+
       // Compute the position of each group on the pie:
       const pie = d3
         .pie()
@@ -199,6 +202,15 @@ export default {
           const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
           return midangle < Math.PI ? "start" : "end";
         });
+
+      // Add total count as central label
+      svg.append("svg:text")
+          .attr("dy", ".35em")
+          .attr("text-anchor", "middle")
+          .attr("style","font-family:Ubuntu")
+          .attr("font-size","40")
+          .attr("fill","#5CB85C")
+          .text(sumValues);
     },
   },
 };
