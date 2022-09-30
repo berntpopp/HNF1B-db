@@ -141,7 +141,6 @@
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
-import { mdiNewspaperVariant, mdiAccount, mdiMagnify } from '@mdi/js';
 
 export default {
   name: "TableReports",
@@ -162,11 +161,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiNewspaperVariant,
-        mdiAccount,
-        mdiMagnify,
-      },
       reports: [],
       headers: [
         { text: "Report", value: "report_id" },

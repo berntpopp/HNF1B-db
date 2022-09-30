@@ -92,7 +92,6 @@
 import TableIndividuals from "@/components/tables/TableIndividuals.vue";
 
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
-import { mdiBookOpenBlankVariant } from '@mdi/js';
 
 export default {
   name: "PagePublication",
@@ -102,9 +101,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiBookOpenBlankVariant,
-      },
       publication: [
         {
           publication_id: null,

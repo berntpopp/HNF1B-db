@@ -98,10 +98,11 @@
 
 
 <script>
-import { mdiEmail, mdiLock, mdiEye, mdiEyeOff } from '@mdi/js';
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "PasswordReset",
+  mixins: [colorAndSymbolsMixin],
   metaInfo: {
     // if no subcomponents specify a metaInfo.title, this title will be used
     title: "HNF1B-db",
@@ -122,12 +123,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiEmail,
-        mdiLock,
-        mdiEye,
-        mdiEyeOff,
-      },
       valid: true,
       show_change_container: false,
       show_request_container: true,

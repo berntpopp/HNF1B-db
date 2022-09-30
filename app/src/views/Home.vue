@@ -121,23 +121,16 @@
 
 <script>
 import ProteinLinearPlot from "@/components/analyses/ProteinLinearPlot.vue";
-import { mdiAccount, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiDatabase, mdiMagnify } from '@mdi/js';
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "Home",
+  mixins: [colorAndSymbolsMixin],
   components: {
     ProteinLinearPlot,
   },
   data() {
     return {
-      icons: {
-        mdiAccount,
-        mdiDna,
-        mdiNewspaperVariant,
-        mdiBookOpenBlankVariant,
-        mdiDatabase,
-        mdiMagnify,
-      },
       statistics: {
         reports_count: 0,
         publications_count: 0,

@@ -65,10 +65,11 @@
 </template>
 
 <script>
-import { mdiAccount, mdiLock } from '@mdi/js';
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "Login",
+  mixins: [colorAndSymbolsMixin],
   metaInfo: {
     // if no subcomponents specify a metaInfo.title, this title will be used
     title: "Login",
@@ -89,10 +90,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiAccount,
-        mdiLock,
-      },
       valid: true,
       user_name: "",
       password: "",

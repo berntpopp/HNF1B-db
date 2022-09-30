@@ -124,10 +124,11 @@
 
 
 <script>
-import { mdiAccount, mdiEmail, mdiAccountSchool, mdiFormTextbox } from '@mdi/js';
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
 export default {
   name: "Register",
+  mixins: [colorAndSymbolsMixin],
   metaInfo: {
     // if no subcomponents specify a metaInfo.title, this title will be used
     title: "HNF1B-db",
@@ -147,12 +148,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiAccount,
-        mdiEmail,
-        mdiAccountSchool,
-        mdiFormTextbox,
-      },
       valid: false,
       button_disabled: true,
       userNameRules: [

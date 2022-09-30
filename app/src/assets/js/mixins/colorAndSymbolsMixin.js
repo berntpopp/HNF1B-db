@@ -1,5 +1,5 @@
 // assets/js/mixins/colorAndSymbolsMixin.js
-import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccount, mdiAccountCowboyHat, mdiAccountSchool, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiRefresh, mdiDownload } from '@mdi/js';
+import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccount, mdiAccountCowboyHat, mdiAccountSchool, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiRefresh, mdiLogout, mdiDownload, mdiDotsVertical, mdiGithub, mdiCopyright, mdiApi, mdiMagnify, mdiChevronDown, mdiDatabase, mdiEmail, mdiLock, mdiEye, mdiEyeOff, mdiFormTextbox } from '@mdi/js';
 
 export default {
     data() {
@@ -11,13 +11,27 @@ export default {
           mdiGenderFemale,
           mdiGenderMale,
           mdiCheckCircleOutline,
+          mdiAccount,
           mdiAccountCowboyHat,
           mdiAccountSchool,
           mdiDna,
           mdiNewspaperVariant,
           mdiBookOpenBlankVariant,
           mdiRefresh,
-          mdiDownload
+          mdiLogout,
+          mdiDotsVertical,
+          mdiGithub,
+          mdiApi,
+          mdiCopyright,
+          mdiDownload,
+          mdiMagnify,
+          mdiChevronDown,
+          mdiDatabase,
+          mdiEmail,
+          mdiLock,
+          mdiEye,
+          mdiEyeOff,
+          mdiFormTextbox
         },
         type_color: {
           individual: "lime lighten-2",

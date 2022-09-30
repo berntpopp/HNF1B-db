@@ -130,7 +130,6 @@
 <script>
 import urlParsingMixin from "@/assets/js/mixins/urlParsingMixin.js";
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
-import { mdiMagnify, mdiDna } from '@mdi/js';
 
 export default {
   name: "TableVariants",
@@ -151,10 +150,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiMagnify,
-        mdiDna,
-      },
       variants: [],
       headers: [
         { text: "Variant", value: "variant_id" },

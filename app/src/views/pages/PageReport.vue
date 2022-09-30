@@ -94,17 +94,12 @@
 
 <script>
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
-import { mdiNewspaperVariant, mdiAccount } from '@mdi/js';
 
 export default {
   name: "PageReport",
   mixins: [colorAndSymbolsMixin],
   data() {
     return {
-      icons: {
-        mdiNewspaperVariant,
-        mdiAccount,
-      },
       report: [
         {
           report_id: null,

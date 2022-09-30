@@ -117,8 +117,6 @@ import TableIndividuals from "@/components/tables/TableIndividuals.vue";
 
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 
-import { mdiDna } from '@mdi/js';
-
 export default {
   name: "PageVariant",
   mixins: [colorAndSymbolsMixin],
@@ -128,9 +126,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiDna,
-      },
       variant: [
         {
           variant_id: null,

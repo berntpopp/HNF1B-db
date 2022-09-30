@@ -118,7 +118,6 @@
 import TableVariants from "@/components/tables/TableVariants.vue";
 
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
-import { mdiAccount, mdiNewspaperVariant } from '@mdi/js';
 
 export default {
   name: "PageIndividual",
@@ -128,10 +127,6 @@ export default {
   },
   data() {
     return {
-      icons: {
-        mdiAccount,
-        mdiNewspaperVariant,
-      },
       individual: {},
       absolute: true,
       opacity: 1,
