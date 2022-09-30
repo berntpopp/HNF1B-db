@@ -1,5 +1,5 @@
 // assets/js/mixins/colorAndSymbolsMixin.js
-import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccount, mdiAccountCowboyHat, mdiAccountSchool, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant } from '@mdi/js';
+import { mdiPlusCircleOutline, mdiMinusCircleOutline, mdiHelpCircleOutline, mdiGenderFemale, mdiGenderMale, mdiCheckCircleOutline, mdiAccount, mdiAccountCowboyHat, mdiAccountSchool, mdiDna, mdiNewspaperVariant, mdiBookOpenBlankVariant, mdiRefresh, mdiDownload } from '@mdi/js';
 
 export default {
     data() {
@@ -12,7 +12,12 @@ export default {
           mdiGenderMale,
           mdiCheckCircleOutline,
           mdiAccountCowboyHat,
-          mdiAccountSchool 
+          mdiAccountSchool,
+          mdiDna,
+          mdiNewspaperVariant,
+          mdiBookOpenBlankVariant,
+          mdiRefresh,
+          mdiDownload
         },
         type_color: {
           individual: "lime lighten-2",

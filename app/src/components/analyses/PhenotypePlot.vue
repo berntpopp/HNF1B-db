@@ -1,15 +1,39 @@
 <template>
-  <!-- Content phenotype plot-->
-  <div id="phenotype_dataviz" class="svg-container"></div>
-  <!-- Content phenotype plot-->
+  <v-container fluid>
+    <!-- Controls-->
+    <v-container>
+      <v-row no-gutters>
+        <v-col cols="6" sm="6">
+        </v-col>
+        <v-col cols="6" md="6" class="d-flex flex-row-reverse">
+          <v-btn
+            id='saveButtonPhenotype'
+            small
+          >
+            <v-icon> {{ icons.mdiDownload }} </v-icon> PNG
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+    <!-- Controls-->
+
+    <!-- Content publications plot-->
+    <div id="phenotype_dataviz" class="svg-container"></div>
+    <!-- Content publications plot-->
+  </v-container>
 </template>
 
 
 <script>
-import * as d3 from "d3";
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
+import * as d3 from 'd3';
+import saveAs from 'file-saver';
+import svgString2Image from "@/assets/js/utilsSvgString2Image.js";
+import getSVGString from "@/assets/js/utilsGetSVGString.js";
 
 export default {
   name: "PhenotypePlot",
+  mixins: [colorAndSymbolsMixin],
   data() {
     return {
       itemsPhenotype: [],
@@ -45,12 +69,14 @@ export default {
       d3.select("#phenotype_dataviz").select("svg").remove();
 
       // append the svg object to the body of the page
-      const svg = d3
+      const svg_raw = d3
         .select("#phenotype_dataviz")
         .append("svg")
         .attr("viewBox", `0 0 750 300`)
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .classed("svg-content", true)
+        .classed("svg-content", true);
+
+      const svg = svg_raw
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -150,6 +176,18 @@ export default {
         .on("mouseover", mouseover)
         .on("mousemove", mousemove)
         .on("mouseleave", mouseleave);
+
+        // Set-up the export button
+        d3.select('#saveButtonPhenotype').on('click', function(){
+          var svgString = getSVGString(svg_raw.node());
+
+          function save( dataBlob, filesize ){
+            saveAs( dataBlob, 'plot.png' ); // FileSaver.js function
+          };
+
+          svgString2Image( svgString, 3*width, 3*height, 'png', save ); // passes Blob and filesize String to the callback
+
+        });
     },
   },
 };
