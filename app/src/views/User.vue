@@ -99,16 +99,12 @@
 
 <script>
 import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
-import { mdiRefresh } from '@mdi/js';
 
 export default {
   name: "User",
   mixins: [colorAndSymbolsMixin],
   data() {
     return {
-      icons: {
-        mdiRefresh,
-      },
       user: {
         user_id: [],
         user_name: [],
