@@ -19,6 +19,9 @@
 
 <script>
 import * as d3 from "d3";
+import getTransformation from "@/assets/js/utilsGetTransformation.js";
+import arrangeLabels from "@/assets/js/utilsArrangeLabels.js";
+import wrap from "@/assets/js/utilsWrap.js";
 
 export default {
   name: "CohortPlot",
@@ -56,6 +59,9 @@ export default {
       }
     },
     generateDonutGraph() {
+      // set the type of data plotted used for assigning IDs
+      const dataType = 'cohort'
+
       // set the dimensions and margins of the graph
       const width = 600,
         height = 500,
@@ -162,28 +168,20 @@ export default {
         .on("mousemove", mousemove)
         .on("mouseleave", mouseleave);
 
-      // Add the polylines between chart and labels:
-      svg
-        .selectAll("allPolylines")
-        .data(data_ready)
-        .join("polyline")
-        .attr("stroke", "black")
-        .style("fill", "none")
-        .attr("stroke-width", 1)
-        .attr("points", function (d) {
-          const posA = arc.centroid(d); // line insertion in the slice
-          const posB = outerArc.centroid(d); // line break: we use the other arc generator that has been built only for that
-          const posC = outerArc.centroid(d); // Label position = almost the same as posB
-          const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2; // we need the angle to see if the X position will be at the extreme right or extreme left
-          posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
-          return [posA, posB, posC];
-        });
+      // define function to compute mid angle
+      function midAngle(d) {
+          return d.startAngle + (d.endAngle - d.startAngle) / 2;
+      }
 
-      // Add the polylines between chart and labels:
+      // add the labels
       svg
         .selectAll("allLabels")
         .data(data_ready)
         .join("text")
+        .attr('class', 'label')
+        .attr('id', function(d, j) {
+            return dataType + '-' + j;
+        })
         .text((d) => d.data[0])
         .attr("transform", function (d) {
           const pos = outerArc.centroid(d);
@@ -191,12 +189,43 @@ export default {
           pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
           return `translate(${pos})`;
         })
-        .style("text-anchor", function (d) {
-          const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
-          return midangle < Math.PI ? "start" : "end";
+        .style("text-anchor", function(d) {
+            return midAngle(d) < Math.PI ? "start" : "end";
+        })
+        .attr("dy", ".35em")
+        .attr("dx", ".35em")
+        .attr("fill", "#111")
+        .call(wrap, 100);
+
+      // arrange labels
+      arrangeLabels(svg, ".label");
+
+      // define arc label radius
+      let labelArc = d3.arc()
+        .outerRadius(radius * 0.4)
+        .innerRadius(radius);
+
+      // add the polylines between chart and labels:
+      svg
+        .selectAll("allPolylines")
+        .data(data_ready)
+        .join("polyline")
+        .attr("stroke", "black")
+        .style("fill", "none")
+        .attr("stroke-width", 1)
+        .attr("points", function(d, j) {
+            const offset = midAngle(d) < Math.PI ? 0 : 10;
+            const label = d3.select('#' + dataType + '-' + j);
+            const transform = getTransformation(label.attr("transform"));
+            const pos = labelArc.centroid(d);
+            pos[0] = transform.translateX + offset;
+            pos[1] = transform.translateY;
+            const mid = labelArc.centroid(d);
+            mid[1] = transform.translateY;
+            return [arc.centroid(d), mid, pos];
         });
 
-      // Add total count as central label
+      // add total count as central label
       svg.append("svg:text")
           .attr("dy", ".35em")
           .attr("text-anchor", "middle")
