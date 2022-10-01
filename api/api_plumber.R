@@ -704,8 +704,7 @@ function(res) {
   execution_time <- as.character(paste0(round(end_time - start_time, 2),
   " secs"))
 
-  # add columns to the meta information from
-  # generate_cursor_pag_inf function return
+  # add columns to the meta information
   meta <- tibble::as_tibble(list(
     "max_count" = max(publications$count),
     "max_cumulative_count" = max(publications$cumulative_count),
@@ -750,8 +749,7 @@ function(res) {
   execution_time <- as.character(paste0(round(end_time - start_time, 2),
   " secs"))
 
-  # add columns to the meta information from
-  # generate_cursor_pag_inf function return
+  # add columns to the meta information
   meta <- tibble::as_tibble(list(
     "executionTime" = execution_time))
 
@@ -826,8 +824,7 @@ function(res) {
   execution_time <- as.character(paste0(round(end_time - start_time, 2),
   " secs"))
 
-  # add columns to the meta information from
-  # generate_cursor_pag_inf function return
+  # add columns to the meta information
   meta <- tibble::as_tibble(list(
     "executionTime" = execution_time))
 
@@ -918,8 +915,7 @@ function(res) {
   execution_time <- as.character(paste0(round(end_time - start_time, 2),
   " secs"))
 
-  # add columns to the meta information from
-  # generate_cursor_pag_inf function return
+  # add columns to the meta information
   meta <- tibble::as_tibble(list(
     "executionTime" = execution_time))
 
@@ -941,6 +937,161 @@ function() {
 
   # generate object to return
   statistics
+}
+
+#* @tag statistics
+#* gets a comparision table of phenotypes compared by variant attributes
+#* @serializer json list(na="string")
+#' @get /api/statistics/phenotypes_vs_variantattributes
+function(res, aggregate = "described", exclude_ckd = TRUE) {
+  # make sure exclude_ckd input is logical
+  exclude_ckd <- as.logical(exclude_ckd)
+
+  start_time <- Sys.time()
+
+  # get report_phenotype_view and
+  # aggregate according to argument provided
+  report_phenotype_view <- pool %>%
+    tbl("report_phenotype_view") %>%
+    collect() %>%
+    group_by(individual_id, phenotype_id) %>%
+      {if (aggregate == "described")
+          slice(., which.min(described_id))
+      else .
+      } %>%
+      {if (aggregate == "date")
+          slice(., which.max(report_review_date))
+      else .
+      } %>%
+    ungroup() %>%
+    {if (exclude_ckd)
+      filter(., !(phenotype_name %in% c("Chronic kidney disease",
+          "Stage 1 chronic kidney disease",
+          "Stage 2 chronic kidney disease",
+          "Stage 3 chronic kidney disease",
+          "Stage 4 chronic kidney disease",
+          "Stage 5 chronic kidney disease")
+          )
+      )
+    else .
+    }
+
+  # get variants and transform table
+  variant_ind <- pool %>%
+    tbl("report_variant_view") %>%
+    collect() %>%
+    select(individual_id,
+      variant_class,
+      EFFECT,
+      IMPACT,
+      verdict_classification) %>%
+    unique() %>%
+  mutate(ACMG_groups =
+    case_when(
+      verdict_classification == "Likely Benign" ~ "LB/B",
+      verdict_classification == "Uncertain Significance" ~ "VUS",
+      TRUE ~ "LP/P",
+    )
+  ) %>%
+  mutate(ACMG_groups =
+    case_when(
+      verdict_classification == "Likely Benign" ~ "LB/B",
+      verdict_classification == "Uncertain Significance" ~ "VUS",
+      TRUE ~ "LP/P",
+    )
+  ) %>%
+  separate(EFFECT, c("EFFECT"), sep = ",", extra = "drop") %>%
+  mutate(impact_groups =
+    case_when(
+      IMPACT == "MODERATE" ~ "nT",
+      IMPACT == "HIGH" ~ "T",
+      IMPACT == "LOW" & ACMG_groups == "LP/P" ~ "T",
+      IMPACT == "MODIFIER" & ACMG_groups == "LP/P" ~ "T",
+      is.na(IMPACT) & ACMG_groups == "LP/P" ~ "T",
+      TRUE ~ "other",
+    )
+  ) %>%
+  mutate(effect_groups =
+    case_when(
+      EFFECT == "transcript_ablation" ~ "17qDel/Dup",
+      EFFECT == "transcript_amplification" ~ "17qDup/Dup",
+      IMPACT == "MODERATE" ~ "nT",
+      is.na(IMPACT) & ACMG_groups == "LP/P" ~ "T",
+      IMPACT == "LOW" & ACMG_groups == "LP/P" ~ "T",
+      EFFECT %in% c("stop_gained",
+        "start_lost",
+        "stop_lost",
+        "frameshift_variant",
+        "splice_donor_variant",
+        "splice_acceptor_variant",
+        "splice_donor_5th_base_variant",
+        "coding_sequence_variant") ~ "T",
+        TRUE ~ "other",
+    )
+  )
+
+  # compute counts
+  # TODO: allow changing the variant attribute
+  phenotype_counts <- report_phenotype_view %>%
+    left_join(variant_ind, by = c("individual_id")) %>%
+    filter(ACMG_groups %in% c("LP/P")) %>%
+    arrange(individual_id, phenotype_name) %>%
+    select(individual_id,
+      phenotype_name,
+      phenotype_group,
+      described,
+      described_id,
+      impact_groups) %>%
+    select(-described_id) %>%
+    group_by(phenotype_name, described, phenotype_group, impact_groups) %>%
+    summarise(count = n(), .groups = "drop") %>%
+    ungroup() %>%
+    filter(described != "not reported")
+
+# compute p-values
+phenotype_counts_p <- phenotype_counts %>%
+  pivot_wider(names_from = c(described, impact_groups),
+    values_from = count, names_sep = ".") %>%
+  mutate_at(vars(no.T, no.nT, yes.T, yes.nT), ~replace_na(., 0)) %>%
+  rowwise() %>%
+  mutate(pfisher = fisher.test(rbind(c(yes.T, no.T), c(yes.nT, no.nT)))$p.value,
+    OR = fisher.test(rbind(c(yes.T, no.T), c(yes.nT, no.nT)))$estimate) %>%
+  ungroup() %>%
+  mutate(qfdr = p.adjust(pfisher, method = "fdr"))
+
+# tarnsform table to wide format
+# add significance level labels
+phenotype_counts_wider <- phenotype_counts_p %>%
+  pivot_longer(cols = matches("\\."),
+    names_to = c("described", "impact_groups"),
+    values_to = "count",
+    names_pattern = "(.+)\\.(.+)") %>%
+  mutate(p_label =
+    case_when(
+      qfdr < 0.001 ~ "***\n(p<0.001)",
+      qfdr < 0.01 ~ "**\n(p<0.01)",
+      qfdr < 0.05 ~ "*\n(p<0.05)",
+      qfdr >= 0.05 ~ "ns"
+    )
+  ) %>%
+  mutate(p_label =
+    case_when(
+      described == "yes" & impact_groups == "nT" ~ p_label,
+      TRUE ~ "",
+    )
+  )
+
+  # compute execution time
+  end_time <- Sys.time()
+  execution_time <- as.character(paste0(round(end_time - start_time, 2),
+  " secs"))
+
+  # add columns to the meta information
+  meta <- tibble::as_tibble(list(
+    "executionTime" = execution_time))
+
+  # generate object to return
+  list(meta = meta, data = phenotype_counts_wider)
 }
 
 ## Statistics endpoints
