@@ -1094,6 +1094,173 @@ phenotype_counts_wider <- phenotype_counts_p %>%
   list(meta = meta, data = phenotype_counts_wider)
 }
 
+
+#* @tag statistics
+#* gets a table of phenotype summary scores compared by variant attributes
+#* @serializer json list(na="string")
+#' @get /api/statistics/phenotypescore_vs_variantattributes
+function(res, aggregate = "described", exclude_ckd = TRUE) {
+  # make sure exclude_ckd input is logical
+  exclude_ckd <- as.logical(exclude_ckd)
+
+  start_time <- Sys.time()
+
+  # get variants and transform table
+  variant_ind <- pool %>%
+    tbl("report_variant_view") %>%
+    collect() %>%
+    select(individual_id,
+      variant_class,
+      EFFECT,
+      IMPACT,
+      verdict_classification) %>%
+    unique() %>%
+  mutate(ACMG_groups =
+    case_when(
+      verdict_classification == "Likely Benign" ~ "LB/B",
+      verdict_classification == "Uncertain Significance" ~ "VUS",
+      TRUE ~ "LP/P",
+    )
+  ) %>%
+  mutate(ACMG_groups =
+    case_when(
+      verdict_classification == "Likely Benign" ~ "LB/B",
+      verdict_classification == "Uncertain Significance" ~ "VUS",
+      TRUE ~ "LP/P",
+    )
+  ) %>%
+  separate(EFFECT, c("EFFECT"), sep = ",", extra = "drop") %>%
+  mutate(impact_groups =
+    case_when(
+      IMPACT == "MODERATE" ~ "nT",
+      IMPACT == "HIGH" ~ "T",
+      IMPACT == "LOW" & ACMG_groups == "LP/P" ~ "T",
+      IMPACT == "MODIFIER" & ACMG_groups == "LP/P" ~ "T",
+      is.na(IMPACT) & ACMG_groups == "LP/P" ~ "T",
+      TRUE ~ "other",
+    )
+  ) %>%
+  mutate(effect_groups =
+    case_when(
+      EFFECT == "transcript_ablation" ~ "17qDel/Dup",
+      EFFECT == "transcript_amplification" ~ "17qDup/Dup",
+      IMPACT == "MODERATE" ~ "nT",
+      is.na(IMPACT) & ACMG_groups == "LP/P" ~ "T",
+      IMPACT == "LOW" & ACMG_groups == "LP/P" ~ "T",
+      EFFECT %in% c("stop_gained",
+        "start_lost",
+        "stop_lost",
+        "frameshift_variant",
+        "splice_donor_variant",
+        "splice_acceptor_variant",
+        "splice_donor_5th_base_variant",
+        "coding_sequence_variant") ~ "T",
+        TRUE ~ "other",
+    )
+  )
+
+  # get phenotypes and compute scores
+  report_phenotype_view <- pool %>%
+    tbl("report_phenotype_view") %>%
+    collect()
+
+  phenotype_score_ind <- report_phenotype_view %>%
+    arrange(individual_id, phenotype_name) %>%
+    {if (exclude_ckd)
+      filter(., !(phenotype_name %in% c("Chronic kidney disease",
+          "Stage 1 chronic kidney disease",
+          "Stage 2 chronic kidney disease",
+          "Stage 3 chronic kidney disease",
+          "Stage 4 chronic kidney disease",
+          "Stage 5 chronic kidney disease")
+          )
+      )
+    else .
+    } %>%
+    select(individual_id,
+      phenotype_name, described,
+      described_id, phenotype_group,
+      report_review_date) %>%
+    group_by(individual_id, phenotype_name) %>%
+      {if (aggregate == "described")
+          filter(., described_id == min(described_id))
+      else .
+      } %>%
+      {if (aggregate == "date")
+          filter(., report_review_date == max(report_review_date))
+      else .
+      } %>%
+    unique() %>%
+    ungroup() %>%
+    mutate(phenotype_score =
+        case_when(
+        described_id == 1 ~ 1,
+        described_id == 2 ~ -1,
+        described_id == 3 ~ 0
+        )
+    ) %>%
+    group_by(individual_id) %>%
+    mutate(phenotype_score_pm = sum(phenotype_score)) %>%
+    mutate(phenotype_score_p = sum(phenotype_score[phenotype_score > 0])) %>%
+    mutate(phenotype_score_pm_noKidneyGenitalHormones =
+      sum(phenotype_score[!(phenotype_group %in% c("Kidney",
+        "Genital",
+        "Hormones"))])) %>%
+    mutate(phenotype_score_p_noKidneyGenitalHormones =
+      sum(phenotype_score[phenotype_score > 0 &
+        !(phenotype_group %in% c("Kidney",
+          "Genital",
+          "Hormones"))])) %>%
+    ungroup() %>%
+        group_by(individual_id, phenotype_group) %>%
+    mutate(organ_phenotype_score_p =
+      sum(phenotype_score[phenotype_score > 0])) %>%
+    mutate(organ_phenotype_score_p_normalized =
+      sum(phenotype_score[phenotype_score > 0]) / n()) %>%
+    ungroup() %>%
+    select(-phenotype_name,
+      -described,
+      -described_id,
+      -phenotype_score,
+      -report_review_date) %>%
+    unique() %>%
+        group_by(individual_id) %>%
+    mutate(phenotype_score_p_normalized =
+      sum(organ_phenotype_score_p_normalized)) %>%
+    mutate(phenotype_score_p_noKidneyGenitalHormones_normalized =
+      sum(organ_phenotype_score_p_normalized[!(phenotype_group %in% c("Kidney",
+        "Genital",
+        "Hormones"))])) %>%
+    ungroup() %>%
+        select(-organ_phenotype_score_p,
+          -organ_phenotype_score_p_normalized,
+          -phenotype_group) %>%
+    unique()
+
+# join the phenotype score and variant tables
+variant_phenotype_score_ind <- variant_ind %>%
+  left_join(phenotype_score_ind, by = c("individual_id")) %>%
+  mutate(effect_groups =
+    case_when(
+      effect_groups == "17qDup" ~ "17qDel/Dup",
+      effect_groups == "17qDel" ~ "17qDel/Dup",
+      TRUE ~ effect_groups,
+    )
+  )
+
+  # compute execution time
+  end_time <- Sys.time()
+  execution_time <- as.character(paste0(round(end_time - start_time, 2),
+  " secs"))
+
+  # add columns to the meta information
+  meta <- tibble::as_tibble(list(
+    "executionTime" = execution_time))
+
+  # generate object to return
+  list(meta = meta, data = variant_phenotype_score_ind)
+}
+
 ## Statistics endpoints
 ##-------------------------------------------------------------------##
 
