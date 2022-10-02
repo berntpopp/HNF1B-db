@@ -853,6 +853,12 @@ function(res,
   # check input
   group_options <- c("individual_id", "variant_id", "report_id")
   aggregate_options <- c("default", "last", "first", "min", "max")
+  variant_characteristics_options <- c("detection_method",
+    "segregation",
+    "class",
+    "impact",
+    "effect",
+    "classification")
 
   if (!(group %in% group_options) ||
     !(aggregate %in% aggregate_options)) {
@@ -961,9 +967,10 @@ function(res,
   meta <- tibble::as_tibble(list(
     "executionTime" = execution_time,
     "group" = group,
-    "group_options" = list(group_options),
+    "groupOptions" = list(group_options),
     "aggregate" = list(aggregate),
-    "aggregate_options" = list(aggregate_options)))
+    "aggregateOptions" = list(aggregate_options),
+    "variantCharacteristicsOptions" = list(variant_characteristics_options)))
 
   # generate object to return
   list(meta = meta, data = variant_characteristics)

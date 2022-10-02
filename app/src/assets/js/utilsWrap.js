@@ -7,7 +7,7 @@ export default function wrap(text, width) {
     text.each(function() {
         var text = d3.select(this);
         var words = text.text()
-            .split(/ |\,|_/)
+            .split(/ |\, |_/)
             .reverse();
         var word;
         var line = [];

@@ -1,13 +1,50 @@
 <template>
   <v-container fluid>
     <!-- Controls-->
-    <v-select
-      :items="items"
-      v-model="variant_characteristics"
-      label="Characteristic"
-      dense
-      outlined
-    ></v-select>
+    <v-container>
+      <v-row no-gutters>
+        <v-col cols="6" sm="6">
+          <v-select
+            :items="itemsCharacteristic"
+            v-model="variantCharacteristics"
+            label="Characteristic"
+            dense
+            outlined
+            class="px-2"
+          ></v-select>
+        </v-col>
+        <v-col cols="2" sm="2">
+          <v-select
+            :items="itemsGrouping"
+            v-model="variantGrouping"
+            label="Grouping"
+            dense
+            outlined
+            class="px-2"
+          ></v-select>
+        </v-col>
+        <v-col cols="2" sm="2">
+          <v-select
+            :items="itemsAggregation"
+            v-model="variantAggregation"
+            label="Aggregation"
+            dense
+            outlined
+            class="px-2"
+          ></v-select>
+        </v-col>
+        <v-col cols="2" md="2" class="d-flex flex-row-reverse">
+          <v-btn
+            id='saveButtonPhenotype'
+            small
+            class="px-2"
+          >
+            <v-icon> {{ icons.mdiDownload }} </v-icon> PNG
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+
     <!-- Controls-->
 
     <!-- Content variant plot-->
@@ -18,6 +55,7 @@
 
 
 <script>
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 import * as d3 from "d3";
 import getTransformation from "@/assets/js/utilsGetTransformation.js";
 import arrangeLabels from "@/assets/js/utilsArrangeLabels.js";
@@ -25,18 +63,22 @@ import wrap from "@/assets/js/utilsWrap.js";
 
 export default {
   name: "VariantPlot",
+  mixins: [colorAndSymbolsMixin],
   data() {
     return {
       itemsVariant: [],
       itemsVarianteMeta: [],
-      variant_characteristics: "classification",
-      items: [
-        "detection_method",
-        "segregation",
-        "class",
-        "impact",
-        "effect",
+      variantCharacteristics: "classification",
+      itemsCharacteristic: [
         "classification",
+      ],
+      variantGrouping: "variant_id",
+      itemsGrouping: [
+        "variant_id",
+      ],
+      variantAggregation: "default",
+      itemsAggregation: [
+        "default",
       ],
     };
   },
@@ -45,20 +87,29 @@ export default {
     this.loadVariantData();
   },
   watch: {
-    variant_characteristics(value) {
+    variantCharacteristics(value) {
       this.generateDonutGraph();
+    },
+    variantGrouping(value) {
+      this.loadVariantData();
+    },
+    variantAggregation(value) {
+      this.loadVariantData();
     },
   },
   methods: {
     async loadVariantData() {
       let apiUrl =
-        process.env.VUE_APP_API_URL + "/api/statistics/variant_characteristics";
+        process.env.VUE_APP_API_URL + "/api/statistics/variant_characteristics?group=" + this.variantGrouping + "&aggregate=" + this.variantAggregation;
 
       try {
         let response = await this.axios.get(apiUrl);
 
         this.itemsVariant = response.data.data;
         this.itemsVarianteMeta = response.data.meta;
+        this.itemsCharacteristic = response.data.meta[0].variantCharacteristicsOptions;
+        this.itemsGrouping = response.data.meta[0].groupOptions;
+        this.itemsAggregation = response.data.meta[0].aggregateOptions;
 
         this.generateDonutGraph();
       } catch (e) {
@@ -94,7 +145,7 @@ export default {
         .attr("transform", `translate(${width / 2},${height / 2})`);
 
       // load data
-      const data = this.itemsVariant[this.variant_characteristics][0];
+      const data = this.itemsVariant[this.variantCharacteristics][0];
       const data_keys = Object.keys(data);
 
       // calculate total count in object
