@@ -9,6 +9,7 @@
           <v-btn
             id='saveButton'
             small
+            class="px-2"
           >
             <v-icon> {{ icons.mdiDownload }} </v-icon> PNG
           </v-btn>

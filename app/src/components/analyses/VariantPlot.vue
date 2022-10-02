@@ -35,7 +35,7 @@
         </v-col>
         <v-col cols="2" md="2" class="d-flex flex-row-reverse">
           <v-btn
-            id='saveButtonPhenotype'
+            id='saveButtonVariant'
             small
             class="px-2"
           >
@@ -60,6 +60,9 @@ import * as d3 from "d3";
 import getTransformation from "@/assets/js/utilsGetTransformation.js";
 import arrangeLabels from "@/assets/js/utilsArrangeLabels.js";
 import wrap from "@/assets/js/utilsWrap.js";
+import saveAs from 'file-saver';
+import svgString2Image from "@/assets/js/utilsSvgString2Image.js";
+import getSVGString from "@/assets/js/utilsGetSVGString.js";
 
 export default {
   name: "VariantPlot",
@@ -135,12 +138,14 @@ export default {
       d3.select("#variant_dataviz").select("div").remove();
 
       // append the svg object to the div called 'variant_dataviz'
-      const svg = d3
+      const svg_raw = d3
         .select("#variant_dataviz")
         .append("svg")
         .attr("viewBox", `0 0 800 500`)
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .classed("svg-content", true)
+        .classed("svg-content", true);
+
+      const svg = svg_raw
         .append("g")
         .attr("transform", `translate(${width / 2},${height / 2})`);
 
@@ -292,6 +297,18 @@ export default {
           .attr("font-size","40")
           .attr("fill","#5CB85C")
           .text(sumValues);
+
+      // Set-up the export button
+      d3.select('#saveButtonVariant').on('click', function(){
+        var svgString = getSVGString(svg_raw.node());
+
+        function save( dataBlob, filesize ){
+          saveAs( dataBlob, 'plot.png' ); // FileSaver.js function
+        };
+
+        svgString2Image( svgString, 3*width, 3*height, 'png', save ); // passes Blob and filesize String to the callback
+
+      });
     },
   },
 };
