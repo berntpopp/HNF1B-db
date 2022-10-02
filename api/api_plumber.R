@@ -844,23 +844,66 @@ function(res) {
 #* gets variant characteristics
 #* @serializer json list(na="string")
 #' @get /api/statistics/variant_characteristics
-function(res) {
+function(res,
+  group = "individual_id",
+  aggregate = "default") {
 
   start_time <- Sys.time()
 
+  # check input
+  group_options <- c("individual_id", "variant_id", "report_id")
+  aggregate_options <- c("default", "last", "first", "min", "max")
+
+  if (!(group %in% group_options) ||
+    !(aggregate %in% aggregate_options)) {
+    res$status <- 400
+    res$body <- jsonlite::toJSON(auto_unbox = TRUE, list(
+    status = 400,
+    message = paste0("Required 'group'",
+      "parameter not in supported list.")
+    ))
+    return(res)
+  }
+
   # get variants
   # get data from report_variant_view
+  # TODO: change default to have sensible per column sorting (factors)
   variant_table <- pool %>%
     tbl("report_variant_view") %>%
     collect() %>%
-    select(variant_id,
+    arrange(variant_id) %>%
+    select(report_id,
+        individual_id,
+        variant_id,
+        report_review_date,
         detection_method,
         segregation,
         variant_class,
         IMPACT,
         EFFECT,
         verdict_classification) %>%
-    arrange(variant_id)
+    group_by(!!rlang::sym(group)) %>%
+    {if (aggregate == "default")
+        slice(., which.max(report_review_date))
+    else .
+    } %>%
+    {if (aggregate == "last")
+        slice(., which.max(report_review_date))
+    else .
+    } %>%
+    {if (aggregate == "first")
+        slice(., which.min(report_review_date))
+    else .
+    } %>%
+    {if (aggregate == "max")
+        summarise_all(., max)
+    else .
+    } %>%
+    {if (aggregate == "min")
+        summarise_all(., min)
+    else .
+    } %>%
+    ungroup()
 
     # generate sublists
     variant_detection_method <- variant_table %>%
@@ -876,32 +919,24 @@ function(res) {
         pivot_wider(names_from = segregation, values_from = count)
 
     variant_class <- variant_table %>%
-        select(-detection_method, -segregation) %>%
-        unique() %>%
         group_by(variant_class) %>%
         summarise(count = n()) %>%
         ungroup() %>%
         pivot_wider(names_from = variant_class, values_from = count)
 
     variant_impact <- variant_table %>%
-        select(-detection_method, -segregation) %>%
-        unique() %>%
         group_by(IMPACT) %>%
         summarise(count = n()) %>%
         ungroup() %>%
         pivot_wider(names_from = IMPACT, values_from = count)
 
     variant_effect <- variant_table %>%
-        select(-detection_method, -segregation) %>%
-        unique() %>%
         group_by(EFFECT) %>%
         summarise(count = n()) %>%
         ungroup() %>%
         pivot_wider(names_from = EFFECT, values_from = count)
 
     variant_classification <- variant_table %>%
-        select(-detection_method, -segregation) %>%
-        unique() %>%
         group_by(verdict_classification) %>%
         summarise(count = n()) %>%
         ungroup() %>%
@@ -924,7 +959,11 @@ function(res) {
 
   # add columns to the meta information
   meta <- tibble::as_tibble(list(
-    "executionTime" = execution_time))
+    "executionTime" = execution_time,
+    "group" = group,
+    "group_options" = list(group_options),
+    "aggregate" = list(aggregate),
+    "aggregate_options" = list(aggregate_options)))
 
   # generate object to return
   list(meta = meta, data = variant_characteristics)
@@ -951,7 +990,10 @@ function() {
 #* gets a comparision table of phenotypes compared by variant attributes
 #* @serializer json list(na="string")
 #' @get /api/statistics/phenotypes_vs_variantattributes
-function(res, aggregate = "described", exclude_ckd = TRUE, fspec = "phenotype_name,phenotype_group") {
+function(res,
+  aggregate = "described",
+  exclude_ckd = TRUE,
+  fspec = "phenotype_name,phenotype_group") {
   # make sure exclude_ckd input is logical
   exclude_ckd <- as.logical(exclude_ckd)
 
@@ -1114,7 +1156,10 @@ phenotype_counts_wider <- phenotype_counts_p %>%
 #* gets a table of phenotype summary scores compared by variant attributes
 #* @serializer json list(na="string")
 #' @get /api/statistics/phenotypescore_vs_variantattributes
-function(res, aggregate = "described", exclude_ckd = TRUE, fspec = "variant_class,EFFECT,IMPACT,verdict_classification,ACMG_groups,impact_groups,effect_groups") {
+function(res,
+  aggregate = "described",
+  exclude_ckd = TRUE,
+  fspec = "variant_class,EFFECT,IMPACT,verdict_classification,ACMG_groups,impact_groups,effect_groups") {
   # make sure exclude_ckd input is logical
   exclude_ckd <- as.logical(exclude_ckd)
 
