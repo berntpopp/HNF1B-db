@@ -302,6 +302,76 @@ generate_cursor_pagination_info <- function(pagination_tibble,
 }
 
 
+# generate field specs from a tibble
+generate_tibble_fspec <- function(field_tibble, fspecInput) {
+
+    # get column names from field_tibble
+    tibble_colnames <- colnames(field_tibble)
+
+    # check if fspecInput is empty string,
+    # if so assign tibble_colnames to it, else
+    # split the fields_requested input by comma
+    if (fspecInput != "") {
+      fspecInput <- str_split(str_replace_all(
+        fspecInput, fixed(" "), ""), ",")[[1]]
+    } else {
+      fspecInput <- tibble_colnames
+    }
+
+    # generate fields object
+    fields_values <- field_tibble %>%
+      mutate(across(everything(), as.character)) %>%
+      pivot_longer(everything(),
+        names_to = "key",
+        values_to = "values",
+        values_ptypes = list(values = character())) %>%
+      arrange(key, values) %>%
+      unique() %>%
+      group_by(key) %>%
+      summarise(selectOptions = list(values)) %>%
+      mutate(count = lengths(selectOptions)) %>%
+      mutate(filterable = case_when(
+        count > 10 ~ TRUE,
+        count <= 10 ~ FALSE,
+      )) %>%
+      mutate(multi_selectable = case_when(
+        count <= 10 & count > 2 ~ TRUE,
+        TRUE ~ FALSE,
+      )) %>%
+      mutate(selectable = case_when(
+        count <= 2 ~ TRUE,
+        TRUE ~ FALSE,
+      )) %>%
+      mutate(selectOptions = case_when(
+        count > 10 ~ list("null"),
+        count <= 10 ~ selectOptions,
+      )) %>%
+      mutate(sortDirection = "asc") %>%
+      mutate(sortable = TRUE) %>%
+      mutate(class = "text-left") %>%
+      mutate(label = str_to_sentence(str_replace_all(key, "_", " "))) %>%
+      filter(key %in% fspecInput) %>%
+      arrange(factor(key, levels = fspecInput)) %>%
+      {if ("details" %in% fspecInput)
+        add_row(., key = "details",
+          selectOptions = NULL,
+          filterable = FALSE,
+          selectable = FALSE,
+          multi_selectable = FALSE,
+          sortable = FALSE,
+          sortDirection = "asc",
+          class = "text-center",
+          label = "Details")
+      else .
+      }
+
+  # generate return list
+  return_data <- list(fspec = fields_values)
+
+  return(return_data)
+}
+
+
 # generate a random password
 # based on "https://stackoverflow.com/
 # questions/22219035/function-to-generate-a-random-password"

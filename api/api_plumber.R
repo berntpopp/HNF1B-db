@@ -72,7 +72,14 @@ options("plumber.apiURL" = dw$base_url)
 # load source files
 source("functions/helper-functions.R", local = TRUE)
 
-# Memoise functions
+# convert to memoise functions
+# Expire items in cache after 60 minutes
+# and set cache 100 MB limit
+cm <- cachem::cache_mem(max_age = 60 * 60,
+  max_size = 100 * 1024 ^ 2)
+
+generate_tibble_fspec_mem <- memoise(generate_tibble_fspec,
+  cache = cm)
 
 ##-------------------------------------------------------------------##
 ##-------------------------------------------------------------------##
@@ -939,11 +946,12 @@ function() {
   statistics
 }
 
+
 #* @tag statistics
 #* gets a comparision table of phenotypes compared by variant attributes
 #* @serializer json list(na="string")
 #' @get /api/statistics/phenotypes_vs_variantattributes
-function(res, aggregate = "described", exclude_ckd = TRUE) {
+function(res, aggregate = "described", exclude_ckd = TRUE, fspec = "phenotype_name,phenotype_group") {
   # make sure exclude_ckd input is logical
   exclude_ckd <- as.logical(exclude_ckd)
 
@@ -1081,6 +1089,12 @@ phenotype_counts_wider <- phenotype_counts_p %>%
     )
   )
 
+  # use the helper generate_tibble_fspec to
+  # generate fields specs from a tibble
+  phenotype_counts_wider_fspec <- generate_tibble_fspec_mem(
+    phenotype_counts_wider,
+    fspec)
+
   # compute execution time
   end_time <- Sys.time()
   execution_time <- as.character(paste0(round(end_time - start_time, 2),
@@ -1088,7 +1102,8 @@ phenotype_counts_wider <- phenotype_counts_p %>%
 
   # add columns to the meta information
   meta <- tibble::as_tibble(list(
-    "executionTime" = execution_time))
+    "executionTime" = execution_time,
+    "fspec" = phenotype_counts_wider_fspec))
 
   # generate object to return
   list(meta = meta, data = phenotype_counts_wider)
@@ -1099,7 +1114,7 @@ phenotype_counts_wider <- phenotype_counts_p %>%
 #* gets a table of phenotype summary scores compared by variant attributes
 #* @serializer json list(na="string")
 #' @get /api/statistics/phenotypescore_vs_variantattributes
-function(res, aggregate = "described", exclude_ckd = TRUE) {
+function(res, aggregate = "described", exclude_ckd = TRUE, fspec = "variant_class,EFFECT,IMPACT,verdict_classification,ACMG_groups,impact_groups,effect_groups") {
   # make sure exclude_ckd input is logical
   exclude_ckd <- as.logical(exclude_ckd)
 
@@ -1248,6 +1263,12 @@ variant_phenotype_score_ind <- variant_ind %>%
     )
   )
 
+  # use the helper generate_tibble_fspec to
+  # generate fields specs from a tibble
+  variant_phenotype_score_ind_fspec <- generate_tibble_fspec_mem(
+    variant_phenotype_score_ind,
+    fspec)
+
   # compute execution time
   end_time <- Sys.time()
   execution_time <- as.character(paste0(round(end_time - start_time, 2),
@@ -1255,7 +1276,8 @@ variant_phenotype_score_ind <- variant_ind %>%
 
   # add columns to the meta information
   meta <- tibble::as_tibble(list(
-    "executionTime" = execution_time))
+    "executionTime" = execution_time,
+    "fspec" = variant_phenotype_score_ind_fspec))
 
   # generate object to return
   list(meta = meta, data = variant_phenotype_score_ind)
