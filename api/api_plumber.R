@@ -1319,20 +1319,20 @@ variant_phenotype_score_ind <- variant_ind %>%
 
   # group and compute summary status
   variant_phenotype_score_ind_grouped <- variant_phenotype_score_ind %>%
-    select(individual_id, !!rlang::sym(group), !!rlang::sym(score)) %>%
+    select(individual_id, !!rlang::sym(group), score = !!rlang::sym(score)) %>%
     nest_by(!!rlang::sym(group), .key = "individuals") %>%
     ungroup() %>%
     mutate(median = purrr::map_dbl(individuals,
-      function(group_values) median(group_values[[score]]))) %>%
+      function(group_values) median(group_values[["score"]]))) %>%
     mutate(q1 = purrr::map_dbl(individuals,
-      function(group_values) quantile(group_values[[score]], probs = 0.25))) %>%
+      function(group_values) quantile(group_values[["score"]], probs = 0.25))) %>%
     mutate(q3 = purrr::map_dbl(individuals,
-      function(group_values) quantile(group_values[[score]], probs = 0.75))) %>%
+      function(group_values) quantile(group_values[["score"]], probs = 0.75))) %>%
     mutate(interQuantileRange = q3 - q1) %>%
     mutate(max = purrr::map_dbl(individuals,
-      function(group_values) max(group_values[[score]]))) %>%
+      function(group_values) max(group_values[["score"]]))) %>%
     mutate(min = purrr::map_dbl(individuals,
-      function(group_values) min(group_values[[score]]))) %>%
+      function(group_values) min(group_values[["score"]]))) %>%
     rowwise() %>%
     mutate(lower = max(min, q1 - 1.5 * interQuantileRange)) %>%
     mutate(upper = min(max, q3 + 1.5 * interQuantileRange)) %>%

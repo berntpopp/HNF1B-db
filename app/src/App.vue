@@ -232,9 +232,9 @@ export default {
       { title: "Reports", to: "/table_reports", id: "table 2" },
       { title: "Publications", to: "/table_publications", id: "table 3" },
       { title: "Variants", to: "/table_variants", id: "table 4" },
-      { title: "Cohort", to: "/analysis_cohort", id: "analysis 1" },
+      { title: "Cohort characteristics", to: "/analysis_cohort", id: "analysis 1" },
       {
-        title: "Individuals",
+        title: "Genotype phenotype",
         to: "/analysis_genotype_phenotype",
         id: "analysis 2",
       },
