@@ -996,7 +996,7 @@ function() {
 #* @tag statistics
 #* gets a comparision table of phenotypes compared by variant attributes
 #* @serializer json list(na="string")
-#' @get /api/statistics/phenotypes_vs_variantattributes
+#' @get /api/statistics/variantattributes_vs_phenotypes
 function(res,
   aggregate = "described",
   exclude_ckd = TRUE,
@@ -1162,8 +1162,10 @@ phenotype_counts_wider <- phenotype_counts_p %>%
 #* @tag statistics
 #* gets a table of phenotype summary scores compared by variant attributes
 #* @serializer json list(na="string")
-#' @get /api/statistics/phenotypescore_vs_variantattributes
+#' @get /api/statistics/variantattributes_vs_phenotypescore
 function(res,
+  group = "ACMG_groups",
+  score = "phenotype_score_p_normalized",
   aggregate = "described",
   exclude_ckd = TRUE,
   fspec = "variant_class,EFFECT,IMPACT,verdict_classification,ACMG_groups,impact_groups,effect_groups") {
@@ -1315,6 +1317,29 @@ variant_phenotype_score_ind <- variant_ind %>%
     )
   )
 
+  # group and compute summary status
+  variant_phenotype_score_ind_grouped <- variant_phenotype_score_ind %>%
+    select(individual_id, !!rlang::sym(group), !!rlang::sym(score)) %>%
+    nest_by(!!rlang::sym(group), .key = "individuals") %>%
+    ungroup() %>%
+    mutate(median = purrr::map_dbl(individuals,
+      function(group_values) median(group_values[[score]]))) %>%
+    mutate(q1 = purrr::map_dbl(individuals,
+      function(group_values) quantile(group_values[[score]], probs = 0.25))) %>%
+    mutate(q3 = purrr::map_dbl(individuals,
+      function(group_values) quantile(group_values[[score]], probs = 0.75))) %>%
+    mutate(interQuantileRange = q3 - q1) %>%
+    mutate(max = purrr::map_dbl(individuals,
+      function(group_values) max(group_values[[score]]))) %>%
+    mutate(min = purrr::map_dbl(individuals,
+      function(group_values) min(group_values[[score]]))) %>%
+    rowwise() %>%
+    mutate(lower = max(min, q1 - 1.5 * interQuantileRange)) %>%
+    mutate(upper = min(max, q3 + 1.5 * interQuantileRange)) %>%
+    ungroup() %>%
+    nest_by(!!rlang::sym(group), .key = "value") %>%
+    select(key = !!rlang::sym(group), value)
+
   # use the helper generate_tibble_fspec to
   # generate fields specs from a tibble
   variant_phenotype_score_ind_fspec <- generate_tibble_fspec_mem(
@@ -1332,7 +1357,7 @@ variant_phenotype_score_ind <- variant_ind %>%
     "fspec" = variant_phenotype_score_ind_fspec))
 
   # generate object to return
-  list(meta = meta, data = variant_phenotype_score_ind)
+  list(meta = meta, data = variant_phenotype_score_ind_grouped)
 }
 
 ## Statistics endpoints
