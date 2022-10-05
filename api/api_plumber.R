@@ -434,7 +434,8 @@ function(res,
   # using the helper function "select_tibble_fields"
   variant_table_nested <- select_tibble_fields(variant_table_nested,
     fields,
-    "variant_id")
+    "variant_id") %>%
+    unique()
 
   # use the helper generate_cursor_pagination_info
   # to generate cursor pagination information from a tibble

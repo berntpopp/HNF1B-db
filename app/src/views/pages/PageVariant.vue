@@ -129,7 +129,6 @@ export default {
       variant: [
         {
           variant_id: null,
-          variant_report_status: null,
           variant_annotation_source: null,
           variant_annotation_date: null,
           variant_class: null,
@@ -183,7 +182,7 @@ export default {
 
       let apiUrl =
         process.env.VUE_APP_API_URL +
-        "/api/variants?filter=equals(variant_id," +
+        "/api/variants?sort=variant_id&fields=variant_id,variant_annotation_source,variant_annotation_date,variant_class,vcf_hg19,ID,INFO_hg19,FEATUREID,HGVS_C,HGVS_P,IMPACT,EFFECT,Protein_position,CADD_PHRED,verdict_classification,criteria_classification,reports&page_after=0&page_size=all&filter=equals(variant_id," +
         this.$route.params.variant_id +
         ")";
 

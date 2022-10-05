@@ -61,6 +61,10 @@ export default {
       }
     },
     generateVPSGraph() {
+      // based on https://d3-graph-gallery.com/graph/boxplot_horizontal.html
+      // TODO: clean up code below
+      // TODO: adapt y-axis hight based on selected score
+
       // set the dimensions and margins of the graph
       const margin = {top: 10, right: 30, bottom: 50, left: 30},
         width = 400 - margin.left - margin.right,
