@@ -731,11 +731,23 @@ function(res) {
 
   start_time <- Sys.time()
 
+  # define phenotypes to exclude
+  # TODO: find other solution for CKD
+  # TODO: option to choose between CKD stages and other phenotypes
+  ckd_list <- c("Chronic kidney disease",
+    "Stage 1 chronic kidney disease",
+    "Stage 2 chronic kidney disease",
+    "Stage 3 chronic kidney disease",
+    "Stage 4 chronic kidney disease",
+    "Stage 5 chronic kidney disease")
+
   # get phenotypes
   phenotype_view <- pool %>%
     tbl("report_phenotype_view") %>%
     collect() %>%
     arrange(individual_id, phenotype_name) %>%
+    filter(!(phenotype_name %in% ckd_list)) %>%
+    # <- this excludes all CKD categories here
     select(individual_id, group = phenotype_name, described, described_id) %>%
     group_by(individual_id, group) %>%
     filter(described_id == min(described_id)) %>%
