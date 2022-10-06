@@ -782,9 +782,26 @@ function(res) {
 #* gets cohort characteristics
 #* @serializer json list(na="string")
 #' @get /api/statistics/cohort_characteristics
-function(res) {
+function(res,
+  group = "individual_id",
+  aggregate = "default") {
 
   start_time <- Sys.time()
+
+  # check input
+  group_options <- c("individual_id", "report_id")
+  aggregate_options <- c("default", "last", "first", "min", "max")
+
+  if (!(group %in% group_options) ||
+    !(aggregate %in% aggregate_options)) {
+    res$status <- 400
+    res$body <- jsonlite::toJSON(auto_unbox = TRUE, list(
+    status = 400,
+    message = paste0("Required 'group'",
+      "parameter not in supported list.")
+    ))
+    return(res)
+  }
 
   # get phenotypes
   # get data from individual table and report view and combine
@@ -800,15 +817,34 @@ function(res) {
     arrange(desc(report_date)) %>%
     mutate(report_date =
       case_when(
-        is.na(report_date) ~ Sys.Date(),
+        is.na(report_date) ~ as.Date(report_review_date),
         !is.na(report_date) ~ as.Date(report_date)
       )
     ) %>%
-    group_by(individual_id) %>%
-    filter(report_date == max(report_date)) %>%
+    group_by(!!rlang::sym(group)) %>%
+    {if (aggregate == "default")
+        slice(., which.max(report_review_date))
+    else .
+    } %>%
+    {if (aggregate == "last")
+        slice(., which.max(report_review_date))
+    else .
+    } %>%
+    {if (aggregate == "first")
+        slice(., which.min(report_review_date))
+    else .
+    } %>%
+    {if (aggregate == "max")
+        summarise_all(., max)
+    else .
+    } %>%
+    {if (aggregate == "min")
+        summarise_all(., min)
+    else .
+    } %>%
+    ungroup() %>%
     select(individual_id, sex, report_date, cohort, reported_multiple) %>%
-    arrange(individual_id) %>%
-    ungroup()
+    arrange(individual_id)
 
     # generate indivdual sublists
     individual_sex <- individual_plus_report_table %>%
@@ -846,7 +882,11 @@ function(res) {
 
   # add columns to the meta information
   meta <- tibble::as_tibble(list(
-    "executionTime" = execution_time))
+    "executionTime" = execution_time,
+    "group" = group,
+    "groupOptions" = list(group_options),
+    "aggregate" = list(aggregate),
+    "aggregateOptions" = list(aggregate_options)))
 
   # generate object to return
   list(meta = meta, data = cohort_characteristics)
