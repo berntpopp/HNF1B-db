@@ -44,7 +44,6 @@
         </v-col>
       </v-row>
     </v-container>
-
     <!-- Controls-->
 
     <!-- Content variant plot-->
@@ -70,7 +69,7 @@ export default {
   data() {
     return {
       itemsVariant: [],
-      itemsVarianteMeta: [],
+      itemsVariantMeta: [],
       variantCharacteristics: "classification",
       itemsCharacteristic: [
         "classification",
@@ -109,7 +108,7 @@ export default {
         let response = await this.axios.get(apiUrl);
 
         this.itemsVariant = response.data.data;
-        this.itemsVarianteMeta = response.data.meta;
+        this.itemsVariantMeta = response.data.meta;
         this.itemsCharacteristic = response.data.meta[0].variantCharacteristicsOptions;
         this.itemsGrouping = response.data.meta[0].groupOptions;
         this.itemsAggregation = response.data.meta[0].aggregateOptions;

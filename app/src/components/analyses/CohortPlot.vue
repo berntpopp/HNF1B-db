@@ -1,13 +1,49 @@
 <template>
   <v-container fluid>
     <!-- Controls-->
-    <v-select
-      :items="items"
-      v-model="cohort_characteristics"
-      label="Characteristic"
-      dense
-      outlined
-    ></v-select>
+    <v-container>
+      <v-row no-gutters>
+        <v-col cols="6" sm="6">
+          <v-select
+            :items="itemsCharacteristic"
+            v-model="cohortCharacteristics"
+            label="Characteristic"
+            dense
+            outlined
+            class="px-2"
+          ></v-select>
+        </v-col>
+        <v-col cols="2" sm="2">
+          <v-select
+            :items="itemsGrouping"
+            v-model="cohortGrouping"
+            label="Grouping"
+            dense
+            outlined
+            class="px-2"
+          ></v-select>
+        </v-col>
+        <v-col cols="2" sm="2">
+          <v-select
+            :items="itemsAggregation"
+            v-model="cohortAggregation"
+            label="Aggregation"
+            dense
+            outlined
+            class="px-2"
+          ></v-select>
+        </v-col>
+        <v-col cols="2" md="2" class="d-flex flex-row-reverse">
+          <v-btn
+            id='saveButtonCohort'
+            small
+            class="px-2"
+          >
+            <v-icon> {{ icons.mdiDownload }} </v-icon> PNG
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
     <!-- Controls-->
 
     <!-- Content cohort plot-->
@@ -18,19 +54,34 @@
 
 
 <script>
+import colorAndSymbolsMixin from "@/assets/js/mixins/colorAndSymbolsMixin.js";
 import * as d3 from "d3";
 import getTransformation from "@/assets/js/utilsGetTransformation.js";
 import arrangeLabels from "@/assets/js/utilsArrangeLabels.js";
 import wrap from "@/assets/js/utilsWrap.js";
+import saveAs from 'file-saver';
+import svgString2Image from "@/assets/js/utilsSvgString2Image.js";
+import getSVGString from "@/assets/js/utilsGetSVGString.js";
 
 export default {
   name: "CohortPlot",
+  mixins: [colorAndSymbolsMixin],
   data() {
     return {
       itemsCohort: [],
-      itemsCohorteMeta: [],
-      cohort_characteristics: "cohort",
-      items: ["cohort", "sex", "reported"],
+      itemsCohortMeta: [],
+      cohortCharacteristics: "cohort",
+      itemsCharacteristic: [
+        "cohort"
+      ],
+      cohortGrouping: "individual_id",
+      itemsGrouping: [
+        "individual_id",
+      ],
+      cohortAggregation: "default",
+      itemsAggregation: [
+        "default",
+      ],
     };
   },
   computed: {},
@@ -38,20 +89,30 @@ export default {
     this.loadCohortData();
   },
   watch: {
-    cohort_characteristics(value) {
+    cohortCharacteristics(value) {
       this.generateDonutGraph();
+    },
+    cohortGrouping(value) {
+      this.loadCohortData();
+    },
+    cohortAggregation(value) {
+      this.loadCohortData();
     },
   },
   methods: {
     async loadCohortData() {
       let apiUrl =
-        process.env.VUE_APP_API_URL + "/api/statistics/cohort_characteristics";
+        process.env.VUE_APP_API_URL + "/api/statistics/cohort_characteristics?group=" + this.cohortGrouping + "&aggregate=" + this.cohortAggregation;
 
       try {
         let response = await this.axios.get(apiUrl);
 
         this.itemsCohort = response.data.data;
-        this.itemsCohorteMeta = response.data.meta;
+        this.itemsCohortMeta = response.data.meta;
+
+        this.itemsCharacteristic = response.data.meta[0].cohortCharacteristicsOptions;
+        this.itemsGrouping = response.data.meta[0].groupOptions;
+        this.itemsAggregation = response.data.meta[0].aggregateOptions;
 
         this.generateDonutGraph();
       } catch (e) {
@@ -76,17 +137,19 @@ export default {
       d3.select("#cohort_dataviz").select("div").remove();
 
       // append the svg object to the div called 'cohort_dataviz'
-      const svg = d3
+      const svg_raw = d3
         .select("#cohort_dataviz")
         .append("svg")
         .attr("viewBox", `0 0 600 500`)
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .classed("svg-content", true)
+        .classed("svg-content", true);
+
+      const svg = svg_raw
         .append("g")
         .attr("transform", `translate(${width / 2},${height / 2})`);
 
       // load data
-      const data = this.itemsCohort[this.cohort_characteristics][0];
+      const data = this.itemsCohort[this.cohortCharacteristics][0];
       const data_keys = Object.keys(data);
 
       // calculate total count in object
@@ -233,6 +296,18 @@ export default {
           .attr("font-size","40")
           .attr("fill","#5CB85C")
           .text(sumValues);
+
+      // Set-up the export button
+      d3.select('#saveButtonCohort').on('click', function(){
+        var svgString = getSVGString(svg_raw.node());
+
+        function save( dataBlob, filesize ){
+          saveAs( dataBlob, 'plot.png' ); // FileSaver.js function
+        };
+
+        svgString2Image( svgString, 3*width, 3*height, 'png', save ); // passes Blob and filesize String to the callback
+
+      });
     },
   },
 };
