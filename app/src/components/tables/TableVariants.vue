@@ -113,10 +113,10 @@
                 <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-chip
-                    small
-                    class="ma-1"
                     v-bind="attrs"
                     v-on="on"
+                    small
+                    class="ma-1"
                     :color="classification_color[item.verdict_classification]"
                   >
                     {{ item.verdict_classification }}

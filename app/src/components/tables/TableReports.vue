@@ -113,15 +113,33 @@
               </template>
 
               <template v-slot:[`item.reported_multiple`]="{ item }">
-                <v-icon small>
-                  {{ logical_symbol[item.reported_multiple] }}
-                </v-icon>
+                <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                    small
+                  >
+                    {{ logical_symbol[item.reported_multiple] }}
+                  </v-icon>
+                </template>
+                <span>{{ item.reported_multiple ? "yes" : "no" }}</span>
+                </v-tooltip>
               </template>
 
               <template v-slot:[`item.sex_reported`]="{ item }">
-                <v-icon small>
+                <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                    small
+                  >
                   {{ sex_symbol[item.sex_reported] }}
-                </v-icon>
+                  </v-icon>
+                </template>
+                <span>{{ item.sex_reported }}</span>
+                </v-tooltip>
               </template>
 
               <template v-slot:[`item.cohort`]="{ item }">

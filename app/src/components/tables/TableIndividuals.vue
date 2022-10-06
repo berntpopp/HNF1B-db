@@ -119,7 +119,13 @@
                     disable-filtering
                   >
                     <template v-slot:[`item.report_id`]="{ item }">
-                      <v-chip color="deep-orange lighten-2" class="ma-2" small>
+                      <v-chip
+                        color="deep-orange lighten-2"
+                        class="ma-2"
+                        small
+                        link
+                        :to="'/report/' + item.report_id"
+                      >
                         rep{{ item.report_id }}
                         <v-icon right> 
                           {{ icons.mdiNewspaperVariant }}
@@ -139,18 +145,28 @@
 
                     <template v-slot:[`item.phenotypes`]="{ item }">
                       <template v-for="phenotype in item.phenotypes">
-                        <v-chip
-                          class="ma-0"
-                          small
-                          v-if="phenotype.described === 'yes'"
+                        <v-tooltip
+                          top
                           :key="phenotype.phenotype_id"
-                          :color="reported_phenotype_color[phenotype.described]"
                         >
-                          <v-icon>
-                            {{ reported_phenotype_symbol[phenotype.described] }}
-                          </v-icon>
-                          {{ phenotype.phenotype_name }}
-                        </v-chip>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-chip
+                            v-bind="attrs"
+                            v-on="on"
+                            class="ma-0"
+                            small
+                            v-if="phenotype.described === 'yes'"
+                            :key="phenotype.phenotype_id"
+                            :color="reported_phenotype_color[phenotype.described]"
+                          >
+                            <v-icon>
+                              {{ reported_phenotype_symbol[phenotype.described] }}
+                            </v-icon>
+                            {{ phenotype.phenotype_name }}
+                          </v-chip>
+                        </template>
+                        <span>{{ phenotype.phenotype_id }}</span>
+                        </v-tooltip>
                       </template>
                     </template>
                   </v-data-table>
@@ -171,9 +187,18 @@
               </template>
 
               <template v-slot:[`item.sex`]="{ item }">
-                <v-icon small>
+                <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                    small
+                  >
                   {{ sex_symbol[item.sex] }}
-                </v-icon>
+                  </v-icon>
+                </template>
+                <span>{{ item.sex }}</span>
+                </v-tooltip>
               </template>
             </v-data-table>
           </div>

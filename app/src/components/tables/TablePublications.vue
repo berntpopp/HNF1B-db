@@ -85,16 +85,37 @@
               item-key="name"
             >
               <template v-slot:[`item.publication_id`]="{ item }">
-                <v-chip
-                  color="cyan accent-2"
-                  class="ma-2"
-                  small
-                  link
-                  :to="'/publication/' + item.publication_id"
-                >
-                  pub{{ item.publication_id }}
-                  <v-icon right> {{ icons.mdiBookOpenBlankVariant }} </v-icon>
-                </v-chip>
+                <v-tooltip right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-chip
+                    v-bind="attrs"
+                    v-on="on"
+                    color="cyan accent-2"
+                    class="ma-2"
+                    small
+                    link
+                    :to="'/publication/' + item.publication_id"
+                  >
+                    pub{{ item.publication_id }}
+                    <v-icon right> {{ icons.mdiBookOpenBlankVariant }} </v-icon>
+                  </v-chip>
+                </template>
+                <span>title: {{ item.title }}</span>
+                </v-tooltip>
+              </template>
+              
+              <template v-slot:[`item.publication_type`]="{ item }">
+                <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <div
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    {{ item.publication_type }}
+                  </div>
+                </template>
+                <span>reports curated from: {{ item.reports.length }}</span>
+                </v-tooltip>
               </template>
 
               <template v-slot:[`item.PMID`]="{ item }">
@@ -115,6 +136,24 @@
                 >
                   {{ item.DOI }}
                 </a>
+              </template>
+              
+              <template v-slot:[`item.firstauthor_lastname`]="{ item }">
+                {{ item.firstauthor_firstname }} {{ item.firstauthor_lastname }}
+              </template>
+              
+              <template v-slot:[`item.journal_abbreviation`]="{ item }">
+                <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <div
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    {{ item.journal_abbreviation }}
+                  </div>
+                </template>
+                <span>{{ item.journal }}</span>
+                </v-tooltip>
               </template>
             </v-data-table>
           </div>
@@ -155,7 +194,7 @@ export default {
         { text: "PMID", value: "PMID" },
         { text: "DOI", value: "DOI" },
         { text: "First Author", value: "firstauthor_lastname" },
-        { text: "Journal", value: "journal" },
+        { text: "Journal", value: "journal_abbreviation" },
         { text: "Date", value: "publication_date" },
       ],
       absolute: true,
