@@ -110,13 +110,20 @@
               </template>
 
               <template v-slot:[`item.verdict_classification`]="{ item }">
-                <v-chip
-                  small
-                  class="ma-1"
-                  :color="classification_color[item.verdict_classification]"
-                >
-                  {{ item.verdict_classification }}
-                </v-chip>
+                <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-chip
+                    small
+                    class="ma-1"
+                    v-bind="attrs"
+                    v-on="on"
+                    :color="classification_color[item.verdict_classification]"
+                  >
+                    {{ item.verdict_classification }}
+                  </v-chip>
+                </template>
+                <span>{{ item.criteria_classification.join(", ") }}</span>
+                </v-tooltip>
               </template>
             </v-data-table>
           </div>
