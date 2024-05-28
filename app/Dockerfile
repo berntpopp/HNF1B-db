@@ -1,13 +1,13 @@
 # define nginx version
 ARG nginx_version=1.23.1
 
-FROM node:16.16.0-bullseye as builder
+FROM node:16.16.0-bullseye as app_builder
 # make the 'app' folder the current working directory
 WORKDIR /app
 # copy both 'package.json' and 'package-lock.json' (if available)
 COPY package*.json ./
 # update npm
-RUN npm install -g npm@8.16.0
+RUN npm install -g npm@8.17.0
 # install project dependencies
 RUN npm install --legacy-peer-deps
 # copy project files and folders to the current working directory (i.e. 'app' folder)
@@ -95,12 +95,13 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY ./docker/nginx/prod.conf /etc/nginx/conf.d/
 COPY ./docker/nginx/nginx.conf /etc/nginx/
 COPY ./docker/nginx/*.pem /etc/nginx/certificates/
+COPY ./docker/nginx/*.key /etc/nginx/certificates/
 # Set working directory to nginx asset directory
 WORKDIR /usr/share/nginx/html
 # Remove default nginx static assets
 RUN rm -rf ./*
-# Copy static assets from builder stage
-COPY --from=builder /app/dist .
+# Copy static assets from app_builder stage
+COPY --from=app_builder /app/dist .
 # Containers run nginx with global directives and daemon off
 EXPOSE 443
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
